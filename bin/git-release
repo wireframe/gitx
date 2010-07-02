@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'grit'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
+require 'readline'
+include Socialcast
+
+repo = Grit::Repo.new(Dir.pwd)
+branch = Grit::Head.current(repo).name
+
+raise "Cannot release reserved branch" if %w{master staging}.include?(branch)
+
+exit unless Readline.readline("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
+run_cmd 'git checkout master'
+run_cmd 'git pull origin master'
+run_cmd "git pull . #{branch}"
+run_cmd 'git push origin HEAD'
+run_cmd "grb rm #{branch}"
+
+run_cmd "git integrate"
