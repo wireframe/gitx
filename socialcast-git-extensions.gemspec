@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{socialcast-git-extensions}
-  s.version = "0.2.0"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Sonnek"]
   s.date = %q{2010-07-02}
   s.description = %q{git extension scripts for socialcast workflow}
   s.email = %q{ryan@socialcast.com}
-  s.executables = ["git-integrate", "git-promote", "git-wtf"]
+  s.executables = ["git-integrate", "git-promote", "git-release", "git-wtf"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README.rdoc"
@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
      "VERSION",
      "bin/git-integrate",
      "bin/git-promote",
+     "bin/git-release",
      "bin/git-wtf",
      "lib/socialcast-git-extensions.rb",
      "socialcast-git-extensions.gemspec",
@@ -49,13 +50,19 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_runtime_dependency(%q<grit>, [">= 0"])
+      s.add_runtime_dependency(%q<jira4r>, [">= 0"])
+      s.add_runtime_dependency(%q<soap4r>, [">= 0"])
     else
       s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_dependency(%q<grit>, [">= 0"])
+      s.add_dependency(%q<jira4r>, [">= 0"])
+      s.add_dependency(%q<soap4r>, [">= 0"])
     end
   else
     s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
     s.add_dependency(%q<grit>, [">= 0"])
+    s.add_dependency(%q<jira4r>, [">= 0"])
+    s.add_dependency(%q<soap4r>, [">= 0"])
   end
 end
 

@@ -12,6 +12,8 @@ begin
     gem.authors = ["Ryan Sonnek"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
     gem.add_runtime_dependency "grit", ">= 0"
+    gem.add_runtime_dependency "jira4r", ">= 0"
+    gem.add_runtime_dependency "soap4r", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
