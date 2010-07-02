@@ -14,8 +14,8 @@ run_cmd "git pull"
 def each_branch(options = {}, &block)
   reserved_branches = %w{ HEAD master last_known_good_master staging last_known_good_staging next_release last_known_good_next_release }
   args = []
-  args << '--merged'
   args << '-r' if options[:remote]
+  args << '--merged'
   branches = `git branch #{args.join(' ')}`.split("\n")
   branches.each do |branch|
     branch = branch.gsub(/\*/, '').strip.split(' ').first
