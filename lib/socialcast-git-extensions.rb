@@ -4,13 +4,13 @@ module Socialcast
     raise "#{cmd} failed" unless system cmd
   end
 
-  def integrate(branch, destination_branch = 'staging')
-
+  def update(branch)
     puts "updating #{branch} to have most recent changes from master"
     run_cmd "git pull origin #{branch}"
     run_cmd 'git pull origin master'
     run_cmd 'git push origin HEAD'
-
+  end
+  def integrate(branch, destination_branch = 'staging')
     puts "integrating #{branch} into #{destination_branch}"
     run_cmd "git remote prune origin"
     run_cmd "git branch -D #{destination_branch}"
