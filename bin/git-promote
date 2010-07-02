@@ -7,11 +7,12 @@ include Socialcast
 repo = Grit::Repo.new(Dir.pwd)
 branch = Grit::Head.current(repo).name
 
+ticket = ARGV.shift
+raise 'JIRA ticket is required in order to move into next_release'
+
 update(branch)
 integrate(branch, 'next_release')
 
-ticket = ARGV.shift
-raise 'JIRA ticket is required in order to move into next_release'
 update_ticket ticket, {:branch => branch, :in_staging => true}
 resolve_ticket ticket
 
