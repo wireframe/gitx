@@ -51,13 +51,13 @@ module Socialcast
     jira_server.updateIssue ticket, fields
   end
   def start_ticket(ticket)
-    transition_ticket_if_has_status '1', '11'
+    transition_ticket_if_has_status ticket, '1', '11'
   end
   def resolve_ticket(ticket)
-    transition_ticket_if_has_status '3', '21'
+    transition_ticket_if_has_status ticket, '3', '21'
   end
   def release_ticket(ticket)
-    transition_ticket_if_has_status '4', '101'
+    transition_ticket_if_has_status ticket, '4', '101'
   end
   def transition_ticket_if_has_status(ticket, status, action)
     issue = jira_server.getIssue ticket
