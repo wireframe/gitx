@@ -39,23 +39,22 @@ module Socialcast
     end
   end
 
-  def jira_in_staging(ticket, branch)
-    puts "updating #{ticket} to be marked in_staging with #{branch} git branch"
-    jira_server.updateIssue ticket, [Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [branch]), Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true'])]
+  def update_ticket(ticket, options => {})
+    fields = []
+    fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
+    fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
+    jira_server.updateIssue ticket, fields
+  end
+  def start_ticket(ticket)
     issue = jira_server.getIssue ticket
-
     if issue.status == '1'
       puts "Transitioning ticket from 'Open' to 'In Progress'"
       start_work_action = '11'
       jira_server.progressWorkflowAction ticket, start_work_action, []
     end
   end
-
-  def jira_in_next_release(ticket, branch)
-    puts "updating #{ticket} to with #{branch} git branch"
-    jira_server.updateIssue ticket, [Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [branch])]
+  def resolve_ticket(ticket)
     issue = jira_server.getIssue ticket
-
     if issue.status == '3'
       puts 'Transitioning ticket from "In Progress" to "Resolved"'
       finish_work_action = '21'

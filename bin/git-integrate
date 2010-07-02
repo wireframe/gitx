@@ -11,4 +11,7 @@ update(branch)
 integrate(branch, 'staging')
 
 ticket = ARGV.shift
-jira_in_staging(ticket, branch) if ticket
+if ticket
+  update_ticket ticket, {:branch => branch, :in_staging => true}
+  start_ticket ticket
+end
