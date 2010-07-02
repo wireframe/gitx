@@ -1,17 +1,14 @@
 #!/usr/bin/env ruby
 
-require 'grit'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
-repo = Grit::Repo.new(Dir.pwd)
-branch = Grit::Head.current(repo).name
+ticket = ARGV.shift
+raise 'JIRA ticket is required in order to move into staging'
 
+branch = current_branch
 update(branch)
 integrate(branch, 'staging')
 
-ticket = ARGV.shift
-if ticket
-  update_ticket ticket, {:branch => branch, :in_staging => true}
-  start_ticket ticket
-end
+update_ticket ticket, {:branch => branch, :in_staging => true}
+start_ticket ticket
