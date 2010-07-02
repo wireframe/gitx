@@ -9,4 +9,9 @@ branch = Grit::Head.current(repo).name
 
 update(branch)
 integrate(branch, 'next_release')
+
+ticket = ARGV.shift
+raise 'JIRA ticket is required in order to move into next_release'
+jira_in_next_release(ticket, branch)
+
 integrate(branch, 'staging')

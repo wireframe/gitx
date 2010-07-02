@@ -51,6 +51,18 @@ module Socialcast
     end
   end
 
+  def jira_in_next_release(ticket, branch)
+    puts "updating #{ticket} to with #{branch} git branch"
+    jira_server.updateIssue ticket, [Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [branch])]
+    issue = jira_server.getIssue ticket
+
+    if issue.status == '3'
+      puts 'Transitioning ticket from "In Progress" to "Resolved"'
+      finish_work_action = '21'
+      jira_server.progressWorkflowAction ticket, finish_work_action, []
+    end
+  end
+
   def run_cmd(cmd)
     puts "\nRunning: #{cmd}"
     raise "#{cmd} failed" unless system cmd
