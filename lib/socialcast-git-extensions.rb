@@ -39,7 +39,7 @@ module Socialcast
     end
   end
 
-  def update_ticket(ticket, options => {})
+  def update_ticket(ticket, options = {})
     fields = []
     fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
     fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
