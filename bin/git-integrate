@@ -2,21 +2,29 @@
 
 require 'grit'
 
-repo = Grit::Repo.new(Dir.pwd)
-branch = Grit::Head.current(repo).name
-
 def run_cmd(cmd)
   puts "\nRunning: #{cmd}"
   raise "#{cmd} failed" unless system cmd
 end
 
-run_cmd "git pull origin #{branch}"
-run_cmd 'git pull origin master'
-run_cmd 'git push origin HEAD'
-run_cmd "git remote prune origin"
-run_cmd "git branch -D staging"
-run_cmd "grb track staging"
-run_cmd "git checkout staging"
-run_cmd "git pull . #{branch}"
-run_cmd "git push origin HEAD"
-run_cmd "git checkout #{branch}"
+def integrate(destination_branch = 'staging')
+  repo = Grit::Repo.new(Dir.pwd)
+  branch = Grit::Head.current(repo).name
+
+  puts "updating #{branch} to have most recent changes from master"
+  run_cmd "git pull origin #{branch}"
+  run_cmd 'git pull origin master'
+  run_cmd 'git push origin HEAD'
+
+  puts "integrating #{branch} into #{destination_branch}"
+  run_cmd "git remote prune origin"
+  run_cmd "git branch -D #{destination_branch}"
+  run_cmd "grb track #{destination_branch}"
+  run_cmd "git checkout #{destination_branch}"
+  run_cmd "git pull . #{branch}"
+  run_cmd "git push origin HEAD"
+
+  run_cmd "git checkout #{branch}"
+end
+
+integrate
