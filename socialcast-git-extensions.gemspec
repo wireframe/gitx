@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "bin/git-integrate",
+     "bin/git-promote",
      "bin/git-wtf",
      "lib/socialcast-git-extensions.rb",
      "socialcast-git-extensions.gemspec",

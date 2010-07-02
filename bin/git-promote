@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'grit'
-require 'socialcast-git-extension'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
 repo = Grit::Repo.new(Dir.pwd)
