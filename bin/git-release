@@ -8,7 +8,7 @@ branch = current_branch
 raise "Cannot release reserved branch" if %w{master staging}.include?(branch)
 
 ticket = ARGV.shift
-raise 'JIRA ticket is required in order to release this branch'
+raise 'JIRA ticket is required in order to release this branch' unless ticket
 
 exit unless Readline.readline("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
 

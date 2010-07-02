@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extension
 include Socialcast
 
 ticket = ARGV.shift
-raise 'JIRA ticket is required in order to move into staging'
+raise 'JIRA ticket is required in order to move into staging' unless ticket
 
 branch = current_branch
 update(branch)
