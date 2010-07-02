@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'grit'
-require 'jira4r'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 

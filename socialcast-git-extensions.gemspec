@@ -52,17 +52,20 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<grit>, [">= 0"])
       s.add_runtime_dependency(%q<jira4r>, [">= 0"])
       s.add_runtime_dependency(%q<soap4r>, [">= 0"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 2.3.5"])
     else
       s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_dependency(%q<grit>, [">= 0"])
       s.add_dependency(%q<jira4r>, [">= 0"])
       s.add_dependency(%q<soap4r>, [">= 0"])
+      s.add_dependency(%q<activesupport>, [">= 2.3.5"])
     end
   else
     s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
     s.add_dependency(%q<grit>, [">= 0"])
     s.add_dependency(%q<jira4r>, [">= 0"])
     s.add_dependency(%q<soap4r>, [">= 0"])
+    s.add_dependency(%q<activesupport>, [">= 2.3.5"])
   end
 end
 

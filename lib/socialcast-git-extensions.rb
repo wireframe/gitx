@@ -1,10 +1,13 @@
+require 'jira4r'
+require 'activesupport'
+
 module Socialcast
   GIT_BRANCH_FIELD = 'customfield_10010'
   IN_STAGING_FIELD = 'customfield_10020'
   JIRA_CREDENTIALS_FILE = File.expand_path('~/.jira_key')
   
   def jira_credentials
-    @credentials = YAML.load_file(JIRA_CREDENTIALS_FILE).symbolize_keys!
+    @credentials ||= YAML.load_file(JIRA_CREDENTIALS_FILE).symbolize_keys!
     @credentials
   end
   def jira_server
@@ -37,6 +40,7 @@ module Socialcast
   end
 
   def jira_in_staging(ticket, branch)
+    puts "updating #{ticket} to be marked in_staging with #{branch} git branch"
     jira_server.updateIssue ticket, [Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [branch]), Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true'])]
     issue = jira_server.getIssue ticket
 
