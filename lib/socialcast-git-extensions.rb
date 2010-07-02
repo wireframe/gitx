@@ -69,7 +69,7 @@ module Socialcast
 
   def update(branch)
     puts "updating #{branch} to have most recent changes from master"
-    run_cmd "git pull origin #{branch}"
+    run_cmd "git pull origin #{branch}" rescue nil
     run_cmd 'git pull origin master'
     run_cmd 'git push origin HEAD'
   end
