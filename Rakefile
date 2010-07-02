@@ -5,12 +5,13 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "socialcast-git-extensions"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{git extension scripts for socialcast workflow}
+    gem.description = %Q{git extension scripts for socialcast workflow}
     gem.email = "ryan@socialcast.com"
     gem.homepage = "http://github.com/wireframe/socialcast-git-extensions"
     gem.authors = ["Ryan Sonnek"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
+    gem.add_runtime_dependency "grit", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new

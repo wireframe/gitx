@@ -5,10 +5,18 @@ require 'grit'
 repo = Grit::Repo.new(Dir.pwd)
 branch = Grit::Head.current(repo).name
 
-`git remote prune origin`
-`git branch -D staging`
-`grb track staging`
-`git checkout staging`
-`git pull . #{branch}`
-`git push origin HEAD`
-`git checkout #{branch}`
+def run_cmd(cmd)
+  puts "\nRunning: #{cmd}"
+  raise "#{cmd} failed" unless system cmd
+end
+
+run_cmd "git pull origin #{branch}"
+run_cmd 'git pull origin master'
+run_cmd 'git push origin HEAD'
+run_cmd "git remote prune origin"
+run_cmd "git branch -D staging"
+run_cmd "grb track staging"
+run_cmd "git checkout staging"
+run_cmd "git pull . #{branch}"
+run_cmd "git push origin HEAD"
+run_cmd "git checkout #{branch}"
