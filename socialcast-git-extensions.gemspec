@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
      "bin/git-integrate",
      "bin/git-wtf",
      "lib/socialcast-git-extensions.rb",
+     "socialcast-git-extensions.gemspec",
      "test/helper.rb",
      "test/test_socialcast-git-extensions.rb"
   ]
