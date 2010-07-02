@@ -2,21 +2,13 @@
 
 require 'grit'
 
-root_dir = File.expand_path(File.dirname(__FILE__) + '/../..')
-repo = Grit::Repo.new(root_dir)
+repo = Grit::Repo.new(Dir.pwd)
 branch = Grit::Head.current(repo).name
 
-desc 'integrate the current feature branch into staging'
-task :integrate => 'git:update' do
-  feature_branch = current_branch
-  run_cmd "git remote prune origin"
-  target_branch = 'staging'
-
-  run_cmd "git branch -D #{target_branch}"
-  run_cmd "grb track #{target_branch}"
-  run_cmd "git checkout #{target_branch}"
-  run_cmd "git pull . #{feature_branch}"
-  run_cmd 'git push origin HEAD'
-
-  run_cmd "git checkout #{feature_branch}"
-end
+`git remote prune origin`
+`git branch -D staging`
+`grb track staging`
+`git checkout staging`
+`git pull . #{branch}`
+`git push origin HEAD`
+`git checkout #{branch}`
