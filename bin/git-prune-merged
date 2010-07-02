@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+#prune branches that have been merged into master from the repo
+#usage -r --remote to prune remote branches
+
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
