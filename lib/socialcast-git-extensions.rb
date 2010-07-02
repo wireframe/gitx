@@ -13,7 +13,7 @@ module Socialcast
   def integrate(branch, destination_branch = 'staging')
     puts "integrating #{branch} into #{destination_branch}"
     run_cmd "git remote prune origin"
-    run_cmd "git branch -D #{destination_branch}"
+    run_cmd "git branch -D #{destination_branch}" rescue nil
     run_cmd "grb track #{destination_branch}"
     run_cmd "git checkout #{destination_branch}"
     run_cmd "git pull . #{branch}"
