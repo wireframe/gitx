@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.date = %q{2010-07-02}
   s.description = %q{git extension scripts for socialcast workflow}
   s.email = %q{ryan@socialcast.com}
-  s.executables = ["git-integrate", "git-wtf"]
+  s.executables = ["git-integrate", "git-promote", "git-wtf"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README.rdoc"

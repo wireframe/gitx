@@ -6,4 +6,4 @@ include Socialcast
 
 repo = Grit::Repo.new(Dir.pwd)
 branch = Grit::Head.current(repo).name
-integrate(branch, 'staging')
+integrate(branch, 'next_release')
