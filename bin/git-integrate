@@ -6,8 +6,9 @@ include Socialcast
 ticket = ARGV.shift
 raise 'JIRA ticket is required in order to move into staging' unless ticket
 
+run_cmd 'git update'
+
 branch = current_branch
-update(branch)
 integrate(branch, 'staging')
 
 update_ticket ticket, {:branch => branch, :in_staging => true}

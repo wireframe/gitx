@@ -12,11 +12,13 @@ raise 'JIRA ticket is required in order to release this branch' unless ticket
 
 exit unless Readline.readline("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
 
-update branch
+run_cmd 'git update'
+
 integrate branch, 'master'
 
 update_ticket ticket, {:branch => branch}
 release_ticket ticket
 
+run_cmd "git promote #{ticket}"
 run_cmd "git integrate #{ticket}"
 run_cmd "grb rm #{branch}"
