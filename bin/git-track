@@ -5,4 +5,4 @@ include Socialcast
 
 branch = current_branch
 
-run_cmd "git branch --track #{branch} origin/#{branch}"
+run_cmd "git branch --set-upstream #{branch} origin/#{branch}"
