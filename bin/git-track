@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
+include Socialcast
+
+branch = current_branch
+
+run_cmd "git branch --track #{branch} origin/#{branch}"
