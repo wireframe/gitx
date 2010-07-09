@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
+require 'readline'
+include Socialcast
+
+run_cmd 'git checkout master'
+run_cmd 'git pull'
+run_cmd 'git pull origin next_release'
+run_cmd 'put push origin HEAD'
+
+filter_id = '10102'
+issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
+issues.each do |issue|
+  #TODO: only resolve if the git branch has been merged into master?
+  puts 'Transitioning ticket from "Resolved" to "Closed"'
+  release_action = '101'
+  # jira_server.progressWorkflowAction issue.key, release_action, []
+end
+
+run_cmd 'git prune-merged -r'
