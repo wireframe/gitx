@@ -17,7 +17,7 @@ issues.each do |issue|
   field = issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
   if field
     branch = field.values.first
-    puts "Also found: #{associated_tickets(branch)}"
+    puts "Related tickets: #{associated_tickets(branch).collect(&:key).join(' ')}"
     puts "All changes in #{branch} have been merged into master" if branches(:merged => true, :remote => true).include?(branch)
   end
   # puts 'Transitioning ticket from "Resolved" to "Closed"'
@@ -26,4 +26,3 @@ issues.each do |issue|
 end
 
 run_cmd 'git prune-merged -r'
-run_cmd 'git integrate'

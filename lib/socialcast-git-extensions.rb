@@ -66,7 +66,7 @@ module Socialcast
     end
   end
   def associated_tickets(branch)
-    jira_server.getIssuesFromJqlSearch("project = 'SCWEBAPP' and 'Git Branch' ~ '#{branch}'")
+    jira_server.getIssuesFromJqlSearch "project = 'SCWEBAPP' and 'Git Branch' ~ '#{branch}'", 1000
   end
 
   def run_cmd(cmd)
