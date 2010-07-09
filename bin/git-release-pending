@@ -18,6 +18,7 @@ issues.each do |issue|
   if field
     branch = field.values.first
     puts "Also found: #{associated_tickets(branch)}"
+    puts "All changes in #{branch} have been merged into master" if branches(:merged => true, :remote => true).include?(branch)
   end
   # puts 'Transitioning ticket from "Resolved" to "Closed"'
   # release_action = '101'

@@ -74,6 +74,20 @@ module Socialcast
     raise "#{cmd} failed" unless system cmd
   end
 
+  def branches(options = {})
+    branches = []
+    reserved_branches = %w{ HEAD master last_known_good_master staging last_known_good_staging next_release last_known_good_next_release }
+    args = []
+    args << '-r' if options[:remote]
+    args << '--merged' if options[:merged]
+    branches = `git branch #{args.join(' ')}`.split("\n")
+    branches.each do |branch|
+      branch = branch.gsub(/\*/, '').strip.split(' ').first
+      branch = branch.split('/').last if options[:remote]
+      branches << branch unless reserved_branches.include?(branch)
+    end
+    branches
+  end
   def reset_branch(branch)
     run_cmd "git checkout master"
     run_cmd "git pull"
