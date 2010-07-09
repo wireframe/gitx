@@ -71,6 +71,14 @@ module Socialcast
     raise "#{cmd} failed" unless system cmd
   end
 
+  def reset_branch(branch)
+    run_cmd "git branch -D #{branch}"
+    run_cmd "git push origin :#{branch}"
+    run_cmd "git checkout master"
+    run_cmd "git checkout -b #{branch}"
+    run_cmd "grb publish #{branch}"
+  end
+
   def integrate(branch, destination_branch = 'staging')
     puts "integrating #{branch} into #{destination_branch}"
     run_cmd "git remote prune origin"

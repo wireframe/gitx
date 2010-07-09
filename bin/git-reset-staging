@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
+require 'readline'
+include Socialcast
+
+reset_branch('staging')
+reset_branch('last_known_good_staging')
+
+filter_id = '10103'
+issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
+issues.each do |issue|
+  puts "Removing #{issue.key} from staging"
+  jira_server.updateIssue issue.key, [Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, [''])]
+end
