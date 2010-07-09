@@ -20,3 +20,4 @@ issues.each do |issue|
 end
 
 run_cmd 'git prune-merged -r'
+run_cmd 'git integrate'
