@@ -72,7 +72,7 @@ module Socialcast
   end
 
   def reset_branch(branch)
-    run_cmd "git branch -D #{branch}"
+    run_cmd "git branch -D #{branch}" rescue nil
     run_cmd "git push origin :#{branch}"
     run_cmd "git checkout master"
     run_cmd "git checkout -b #{branch}"
