@@ -7,7 +7,7 @@ include Socialcast
 run_cmd 'git checkout master'
 run_cmd 'git pull'
 run_cmd 'git pull origin last_known_good_next_release'
-run_cmd 'put push origin HEAD'
+run_cmd 'git push origin HEAD'
 
 filter_id = '10102'
 issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
