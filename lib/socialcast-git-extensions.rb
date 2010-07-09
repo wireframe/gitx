@@ -80,8 +80,8 @@ module Socialcast
     args = []
     args << '-r' if options[:remote]
     args << '--merged' if options[:merged]
-    branches = `git branch #{args.join(' ')}`.split("\n")
-    branches.each do |branch|
+    output = `git branch #{args.join(' ')}`.split("\n")
+    output.each do |branch|
       branch = branch.gsub(/\*/, '').strip.split(' ').first
       branch = branch.split('/').last if options[:remote]
       branches << branch unless reserved_branches.include?(branch)
