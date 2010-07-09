@@ -65,6 +65,9 @@ module Socialcast
       jira_server.progressWorkflowAction ticket, action.to_s, []
     end
   end
+  def associated_tickets(branch)
+    jira_server.getIssuesFromJqlSearch("project = 'SCWEBAPP' and 'Git Branch' ~ '#{branch}'")
+  end
 
   def run_cmd(cmd)
     puts "\nRunning: #{cmd}"

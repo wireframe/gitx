@@ -14,6 +14,11 @@ issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
 issues.each do |issue|
   #TODO: only resolve if the git branch has been merged into master?
   puts "Should this ticket be closed? #{issue.key}"
+  field = issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
+  if field
+    branch = field.values.first
+    puts "Also found: #{associated_tickets(branch)}"
+  end
   # puts 'Transitioning ticket from "Resolved" to "Closed"'
   # release_action = '101'
   # jira_server.progressWorkflowAction issue.key, release_action, []
