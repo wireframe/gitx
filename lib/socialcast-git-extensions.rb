@@ -1,5 +1,5 @@
 require 'jira4r'
-require 'activesupport'
+require 'active_support'
 require 'grit'
 
 module Socialcast
