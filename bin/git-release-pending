@@ -20,14 +20,14 @@ issues_with_no_branch = issues.reject do |issue|
   issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
 end
 if issues_with_no_branch.any?
-  puts "\nThe following tickets do not have a git branch configured:"
+  puts "\n\nThe following tickets do not have a git branch configured:"
   issues_with_no_branch.each do |issue|
     puts "#{issue.key} - #{issue.summary}"
   end
 end
 
 branches.each do |branch|
-  puts "\nChecking state of branch #{branch}:"
+  puts "\n\nChecking state of branch #{branch}:"
   if branches(:merged => true, :remote => true).include?(branch)
     puts "All changes in #{branch} have been merged into master"
     issues_in_branch = associated_tickets(branch)
