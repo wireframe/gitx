@@ -11,18 +11,35 @@ run_cmd 'git push origin HEAD'
 
 filter_id = '10102'
 issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
-issues.each do |issue|
-  #TODO: only resolve if the git branch has been merged into master?
-  puts "Should this ticket be closed? #{issue.key}"
+branches = issues.collect do |issue|
   field = issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
-  if field
-    branch = field.values.first
-    puts "Related tickets on branch #{branch}: #{associated_tickets(branch).collect(&:key).join(' ')}"
-    puts "All changes in #{branch} have been merged into master" if branches(:merged => true, :remote => true).include?(branch)
+  field ? field.values.first : nil
+end.uniq.compact
+
+issues_with_no_branch = issues.reject do |issue| 
+  issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
+end
+if issues_with_no_branch.any?
+  puts "The following tickets do not have a git branch configured"
+  puts issues_with_no_branch.collect(&:key).join(' ')
+end
+
+branches.each do |branch|
+  if branches(:merged => true, :remote => true).include?(branch)
+    puts "All changes in #{branch} have been merged into master"
+    issues_in_branch = associated_tickets(branch)
+    puts "Related tickets on branch #{branch}: #{issues_in_branch.collect(&:key).join(' ')}"
+
+    issues_in_branch.each do |issue|
+      puts "#{issue.key} - #{issue.summary}"
+      next unless Readline.readline("Mark this issue as released? (y/n)? ") == 'y'
+
+      release_action = '101'
+      jira_server.progressWorkflowAction issue.key, release_action, []
+    end
+  else
+    puts "#{branch} has NOT yet been merged into master"
   end
-  # puts 'Transitioning ticket from "Resolved" to "Closed"'
-  # release_action = '101'
-  # jira_server.progressWorkflowAction issue.key, release_action, []
 end
 
 run_cmd 'git prune-merged -r'
