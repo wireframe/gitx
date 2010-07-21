@@ -15,7 +15,7 @@ run_cmd 'git update'
 
 integrate branch, 'master'
 
-update_tickets {:branch => branch}
+update_tickets :branch => branch
 release_tickets
 
 run_cmd "git promote #{ticket}"

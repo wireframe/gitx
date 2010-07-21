@@ -10,7 +10,7 @@ run_cmd 'git update'
 branch = current_branch
 integrate(branch, 'next_release')
 
-update_tickets {:branch => branch, :in_staging => true}
+update_tickets :branch => branch, :in_staging => true
 resolve_tickets
 
 integrate(branch, 'staging')
