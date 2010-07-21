@@ -44,7 +44,7 @@ module Socialcast
     end
   end
 
-  def assert_tickets
+  def assert_tickets_provided
     raise "JIRA ticket is required to run this process" unless tickets.any?
   end
   def tickets
