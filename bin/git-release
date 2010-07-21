@@ -7,8 +7,7 @@ include Socialcast
 branch = current_branch
 raise "Cannot release reserved branch" if %w{master staging}.include?(branch)
 
-ticket = ARGV.shift
-raise 'JIRA ticket is required in order to release this branch' unless ticket
+assert_tickets_provided
 
 exit unless Readline.readline("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
 
@@ -16,8 +15,8 @@ run_cmd 'git update'
 
 integrate branch, 'master'
 
-update_ticket ticket, {:branch => branch}
-release_ticket ticket
+update_tickets {:branch => branch}
+release_tickets
 
 run_cmd "git promote #{ticket}"
 run_cmd "git integrate #{ticket}"

@@ -44,25 +44,47 @@ module Socialcast
     end
   end
 
-  def update_ticket(ticket, options = {})
-    fields = []
-    fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
-    fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
-    jira_server.updateIssue ticket, fields
+  def assert_tickets
+    raise "JIRA ticket is required to run this process" unless tickets.any?
   end
-  def start_ticket(ticket)
-    transition_ticket_if_has_status ticket, 1, 11
+  def tickets
+    ARGV
   end
-  def resolve_ticket(ticket)
-    transition_ticket_if_has_status ticket, 3, 21
+  def update_tickets(options = {})
+    tickets.each do |ticket|
+      fields = []
+      fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
+      fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
+      begin
+        jira_server.updateIssue ticket, fields
+      rescue => e
+        puts "Error updating ticket: #{e.message}"
+      end
+    end
   end
-  def release_ticket(ticket)
-    transition_ticket_if_has_status ticket, 5, 101
+  def start_tickets
+    tickets.each do |ticket|
+      transition_ticket_if_has_status ticket, 1, 11
+    end
+  end
+  def resolve_tickets
+    tickets.each do |ticket|
+      transition_ticket_if_has_status ticket, 3, 21
+    end
+  end
+  def release_tickets
+    tickets.each do |ticket|
+      transition_ticket_if_has_status ticket, 5, 101
+    end
   end
   def transition_ticket_if_has_status(ticket, status, action)
     issue = jira_server.getIssue ticket
     if issue.status == status.to_s
-      jira_server.progressWorkflowAction ticket, action.to_s, []
+      begin
+        jira_server.progressWorkflowAction ticket, action.to_s, []
+      rescue => e
+        puts "Error updating ticket: #{e.message}"
+      end
     end
   end
   def associated_tickets(branch)

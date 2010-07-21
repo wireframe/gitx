@@ -3,15 +3,14 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
-ticket = ARGV.shift
-raise 'JIRA ticket is required in order to move into next_release' unless ticket
+assert_tickets_provided
 
 run_cmd 'git update'
 
 branch = current_branch
 integrate(branch, 'next_release')
 
-update_ticket ticket, {:branch => branch, :in_staging => true}
-resolve_ticket ticket
+update_tickets {:branch => branch, :in_staging => true}
+resolve_tickets
 
 integrate(branch, 'staging')
