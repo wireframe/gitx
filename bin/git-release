@@ -18,6 +18,6 @@ integrate branch, 'master'
 update_tickets :branch => branch
 release_tickets
 
-run_cmd "git promote #{ticket}"
-run_cmd "git integrate #{ticket}"
+run_cmd "git promote #{ARGV.join(' ')}"
+run_cmd "git integrate #{ARGV.join(' ')}"
 run_cmd "grb rm #{branch}"
