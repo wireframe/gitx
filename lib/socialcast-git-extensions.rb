@@ -1,5 +1,6 @@
 require 'jira4r'
 require 'active_support'
+require 'active_support/core_ext/hash/keys'
 require 'grit'
 
 module Socialcast
