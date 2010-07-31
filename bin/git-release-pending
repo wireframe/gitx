@@ -30,10 +30,7 @@ branches.each do |branch|
   puts "\n\nChecking state of branch #{branch}:"
   if branches(:merged => true, :remote => true).include?(branch)
     puts "All changes in #{branch} have been merged into master"
-    issues_in_branch = associated_tickets(branch)
-    puts "Related tickets on branch #{branch}: #{issues_in_branch.collect(&:key).join(' ')}"
-
-    releasable_tickets = issues_in_branch.select do |issue|
+    releasable_tickets = tickets_from_branch(branch).select do |issue|
       puts "#{issue.key} - #{issue.summary}"
       Readline.readline("Mark this issue as released? (y/n)? ") == 'y'
     end

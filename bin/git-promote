@@ -3,14 +3,13 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
-assert_tickets_provided
+branch = current_branch
+tickets = assert_tickets_provided(ARGV, branch)
 
 run_cmd 'git update'
-
-branch = current_branch
 integrate(branch, 'next_release')
 
-update_tickets :branch => branch, :in_staging => true
-resolve_tickets
+update_tickets tickets, :branch => branch, :in_staging => true
+resolve_tickets tickets
 
 integrate(branch, 'staging')

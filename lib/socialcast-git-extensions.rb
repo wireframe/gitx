@@ -45,51 +45,57 @@ module Socialcast
     end
   end
 
-  def assert_tickets_provided
-    raise "JIRA ticket is required to run this process" unless tickets.any?
+  def assert_tickets_provided(ticket_ids, branch)
+    tickets = tickets_from_branch_and_arguments(ticket_ids, branch)
+    raise "JIRA ticket id or existing JIRA Git Branch is required to run this process" unless tickets.any?
+    tickets
   end
-  def tickets
-    ARGV
+  def tickets_from_branch_and_arguments(ticket_ids, branch)
+    tickets_from_arguments(ticket_ids) + tickets_from_branch(branch)
   end
-  def update_tickets(options = {})
+  def tickets_from_arguments(ticket_ids)
+    ticket_ids.collect do |key|
+      jira_server.getIssue key
+    end
+  end
+  def tickets_from_branch(branch)
+    jira_server.getIssuesFromJqlSearch "project = 'SCWEBAPP' and 'Git Branch' ~ '#{branch}'", 1000
+  end
+  def update_tickets(tickets, options = {})
     tickets.each do |ticket|
       fields = []
       fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
       fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
       begin
-        jira_server.updateIssue ticket, fields
+        jira_server.updateIssue ticket.key, fields
       rescue => e
         puts "Error updating ticket: #{e.message}"
       end
     end
   end
-  def start_tickets
+  def start_tickets(tickets)
     tickets.each do |ticket|
       transition_ticket_if_has_status ticket, 1, 11
     end
   end
-  def resolve_tickets
+  def resolve_tickets(tickets)
     tickets.each do |ticket|
       transition_ticket_if_has_status ticket, 3, 21
     end
   end
-  def release_tickets(t = tickets)
-    t.each do |ticket|
+  def release_tickets(tickets)
+    tickets.each do |ticket|
       transition_ticket_if_has_status ticket, 5, 101
     end
   end
-  def transition_ticket_if_has_status(ticket, status, action)
-    issue = jira_server.getIssue ticket
+  def transition_ticket_if_has_status(issue, status, action)
     if issue.status == status.to_s
       begin
-        jira_server.progressWorkflowAction ticket, action.to_s, []
+        jira_server.progressWorkflowAction issue.key, action.to_s, []
       rescue => e
         puts "Error updating ticket: #{e.message}"
       end
     end
-  end
-  def associated_tickets(branch)
-    jira_server.getIssuesFromJqlSearch "project = 'SCWEBAPP' and 'Git Branch' ~ '#{branch}'", 1000
   end
 
   def run_cmd(cmd)

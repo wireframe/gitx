@@ -7,17 +7,16 @@ include Socialcast
 branch = current_branch
 raise "Cannot release reserved branch" if %w{master staging}.include?(branch)
 
-assert_tickets_provided
+tickets = assert_tickets_provided(ARGV, branch)
 
 exit unless Readline.readline("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
 
 run_cmd 'git update'
-
 integrate branch, 'master'
 
-update_tickets :branch => branch
-release_tickets
+update_tickets tickets, :branch => branch
+release_tickets tickets
 
-run_cmd "git promote #{ARGV.join(' ')}"
-run_cmd "git integrate #{ARGV.join(' ')}"
+integrate branch, 'next_release'
+integrate branch, 'staging'
 run_cmd "grb rm #{branch}"

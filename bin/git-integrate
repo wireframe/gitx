@@ -1,14 +1,17 @@
 #!/usr/bin/env ruby
 
+# if the branch has already been integrated, the tickets can be inferred and looked up from jira
+# usage:
+# git integrate <ticket_id> <ticket_id2>...
+
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
-assert_tickets_provided
+branch = current_branch
+tickets = assert_tickets_provided(ARGV, branch)
 
 run_cmd 'git update'
-
-branch = current_branch
 integrate(branch, 'staging')
 
-update_tickets :branch => branch, :in_staging => true
-start_tickets
+update_tickets tickets, :branch => branch, :in_staging => true
+start_tickets tickets
