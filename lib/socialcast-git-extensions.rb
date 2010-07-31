@@ -73,8 +73,8 @@ module Socialcast
       transition_ticket_if_has_status ticket, 3, 21
     end
   end
-  def release_tickets
-    tickets.each do |ticket|
+  def release_tickets(t = tickets)
+    t.each do |ticket|
       transition_ticket_if_has_status ticket, 5, 101
     end
   end

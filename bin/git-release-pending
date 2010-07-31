@@ -33,13 +33,11 @@ branches.each do |branch|
     issues_in_branch = associated_tickets(branch)
     puts "Related tickets on branch #{branch}: #{issues_in_branch.collect(&:key).join(' ')}"
 
-    issues_in_branch.each do |issue|
+    releasable_tickets = issues_in_branch.select do |issue|
       puts "#{issue.key} - #{issue.summary}"
-      next unless Readline.readline("Mark this issue as released? (y/n)? ") == 'y'
-
-      release_action = '101'
-      jira_server.progressWorkflowAction issue.key, release_action, []
+      Readline.readline("Mark this issue as released? (y/n)? ") == 'y'
     end
+    release_tickets releasable_tickets
   else
     puts "#{branch} has NOT yet been merged into master"
   end
