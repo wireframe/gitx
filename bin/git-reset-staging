@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-require 'readline'
 include Socialcast
 
 reset_branch('staging')
