@@ -6,8 +6,8 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extension
 require 'readline'
 include Socialcast
 
-def interactively_validate_branch_name(proposed_branch_name)
-  parameterize.strip = parameterize.strip.strip.parameterize
+def validate_branch_name(proposed_branch_name)
+  proposed_branch_name = proposed_branch_name.strip.parameterize
   if !(proposed_branch_name =~ /^[A-Za-z0-9\-_]+$/)
     puts "'#{proposed_branch_name}' isn't a valid branch name; stick with letters, numbers, dashes, and underscores."
     return nil
@@ -16,10 +16,10 @@ def interactively_validate_branch_name(proposed_branch_name)
   proposed_branch_name
 end
 
-branch_name = nil
-until branch_name
+branch_name = validate_branch_name ARGV.join(' ')
+until branch_name.present?
   proposed_branch_name = Readline.readline("What would you like to name your branch? ")
-  branch_name = interactively_validate_branch_name(proposed_branch_name)
+  branch_name = validate_branch_name(proposed_branch_name)
 end
 
 run_cmd 'git checkout master'
