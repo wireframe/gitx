@@ -46,12 +46,12 @@ module Socialcast
   end
 
   def assert_tickets_provided(ticket_ids, branch)
-    tickets = tickets_from_branch_and_arguments(ticket_ids, branch)
+    tickets = tickets_from_arguments_or_branch(ticket_ids, branch)
     raise "JIRA ticket id or existing JIRA Git Branch is required to run this process" unless tickets.any?
     tickets
   end
-  def tickets_from_branch_and_arguments(ticket_ids, branch)
-    tickets_from_arguments(ticket_ids) + tickets_from_branch(branch)
+  def tickets_from_arguments_or_branch(ticket_ids, branch)
+    ticket_ids.any? ? tickets_from_arguments(ticket_ids) : tickets_from_branch(branch)
   end
   def tickets_from_arguments(ticket_ids)
     ticket_ids.collect do |key|
