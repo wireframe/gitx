@@ -6,6 +6,9 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extension
 require 'readline'
 include Socialcast
 
+tickets = tickets_from_arguments ARGV
+raise "JIRA ticket id is required to run this process" unless tickets.any?
+
 def validate_branch_name(proposed_branch_name)
   proposed_branch_name = proposed_branch_name.strip.parameterize
   if !(proposed_branch_name =~ /^[A-Za-z0-9\-_]+$/)
@@ -16,7 +19,7 @@ def validate_branch_name(proposed_branch_name)
   proposed_branch_name
 end
 
-branch_name = validate_branch_name ARGV.join(' ')
+branch_name = nil
 until branch_name.present?
   proposed_branch_name = Readline.readline("What would you like to name your branch? ")
   branch_name = validate_branch_name(proposed_branch_name)
@@ -25,3 +28,6 @@ end
 run_cmd 'git checkout master'
 run_cmd 'git pull'
 run_cmd "git checkout -b #{branch_name}"
+
+update_tickets tickets, :branch => branch_name
+start_tickets tickets
