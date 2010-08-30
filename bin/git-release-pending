@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-require 'readline'
 include Socialcast
 
 run_cmd 'git checkout master'
@@ -32,7 +31,7 @@ branches.each do |branch|
     puts "All changes in #{branch} have been merged into master"
     releasable_tickets = tickets_from_branch(branch).select do |issue|
       puts "#{issue.key} - #{issue.summary}"
-      Readline.readline("Mark this issue as released? (y/n)? ") == 'y'
+      HighLine.ask("Mark this issue as released? (y/n)? ") == 'y'
     end
     release_tickets releasable_tickets
   else

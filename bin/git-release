@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-require 'readline'
 include Socialcast
 
 branch = current_branch
@@ -9,7 +8,7 @@ raise "Cannot release reserved branch" if %w{master staging}.include?(branch)
 
 tickets = assert_tickets_provided(ARGV, branch)
 
-exit unless Readline.readline("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
+exit unless HighLine.ask("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
 
 run_cmd 'git update'
 integrate branch, 'master'

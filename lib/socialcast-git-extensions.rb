@@ -1,7 +1,7 @@
 require 'jira4r'
-
-require 'active_support/all'
 require 'grit'
+require 'active_support/all'
+require 'highline/import'
 
 module Socialcast
   GIT_BRANCH_FIELD = 'customfield_10010'
@@ -17,10 +17,6 @@ module Socialcast
     @credentials
   end
   def jira_server
-    #make sure soap4r is installed
-    require 'jira4r'
-    require "highline/import.rb"
-
     return @jira if @jira
     if !File.exists?(JIRA_CREDENTIALS_FILE)
       input = {}

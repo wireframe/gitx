@@ -3,26 +3,18 @@
 #start a new git branch with latest changes from master
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-require 'readline'
 include Socialcast
 
 tickets = tickets_from_arguments ARGV
 raise "JIRA ticket id is required to run this process" unless tickets.any?
 
-def validate_branch_name(proposed_branch_name)
-  proposed_branch_name = proposed_branch_name.strip.parameterize
-  if !(proposed_branch_name =~ /^[A-Za-z0-9\-_]+$/)
-    puts "'#{proposed_branch_name}' isn't a valid branch name; stick with letters, numbers, dashes, and underscores."
-    return nil
-  end
-
-  proposed_branch_name
-end
-
-branch_name = nil
-until branch_name.present?
-  proposed_branch_name = Readline.readline("What would you like to name your branch? ")
-  branch_name = validate_branch_name(proposed_branch_name)
+repo = Grit::Repo.new(Dir.pwd)
+remote_branches = repo.remotes.collect {|b| b.name.split('/').last }
+until branch_name = HighLine.ask("What would you like to name your branch?") {|q| 
+    q.validate = Proc.new { |branch|
+      branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)
+    }
+  }
 end
 
 run_cmd 'git checkout master'
