@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{socialcast-git-extensions}
-  s.version = "1.3.2"
+  s.version = "1.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Sonnek"]
-  s.date = %q{2010-08-30}
+  s.date = %q{2010-09-09}
   s.description = %q{git extension scripts for socialcast workflow}
   s.email = %q{ryan@socialcast.com}
   s.executables = ["git-integrate", "git-promote", "git-prune-merged", "git-release", "git-release-pending", "git-reset-staging", "git-start", "git-track", "git-update", "git-wtf"]

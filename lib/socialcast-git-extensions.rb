@@ -35,7 +35,7 @@ module Socialcast
       @jira.login credentials[:username], credentials[:password]
       return @jira
     rescue => e
-      HighLine.say "<%= color('Error: #{e.message}', :red)"
+      print_error e
       File.delete config_file
       raise e
     end
@@ -59,7 +59,7 @@ module Socialcast
   end
   def update_tickets(tickets, options = {})
     tickets.each do |ticket|
-      HighLine.say "Updating ticket: <%= color('#{ticket.key}', :bold) %> - #{ticket.summary}"
+      HighLine.say "Updating ticket: <%= color('#{ticket.key}', :green) %> - #{ticket.summary}"
       fields = []
       fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
       fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
@@ -90,16 +90,19 @@ module Socialcast
       begin
         jira_server.progressWorkflowAction issue.key, action.to_s, []
       rescue => e
-        HighLine.say "<%= color('Error: #{e.message}', :red)"
+        print_error e
       end
     end
   end
   def print_issue(issue)
-    HighLine.say "<%= color('#{issue.key}', :bold) - #{issue.summary}"
+    HighLine.say "<%= color('#{issue.key}', :green) - #{issue.summary}"
+  end
+  def print_error(e)
+    HighLine.say "<%= color('Error: #{e.message}', :red)"
   end
 
   def run_cmd(cmd)
-    HighLine.say "Running: <%= color('#{cmd}', :bold) %>"
+    HighLine.say "\n> <%= color('#{cmd}', :red) %>"
     raise "#{cmd} failed" unless system cmd
   end
 
@@ -128,7 +131,7 @@ module Socialcast
   end
 
   def integrate(branch, destination_branch = 'staging')
-    HighLine.say "integrating <%= color('#{branch}', :bold) %> into <%= color('#{destination_branch}', :bold) %>"
+    HighLine.say "integrating <%= color('#{branch}', :green) %> into <%= color('#{destination_branch}', :green) %>"
     run_cmd "git remote prune origin"
     unless destination_branch == 'master'
       run_cmd "git branch -D #{destination_branch}" rescue nil
