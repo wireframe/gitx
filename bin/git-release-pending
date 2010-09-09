@@ -19,23 +19,23 @@ issues_with_no_branch = issues.reject do |issue|
   issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
 end
 if issues_with_no_branch.any?
-  puts "\n\nThe following tickets do not have a git branch configured:"
+  HighLine.say "<%= color('The following tickets do NOT have a git branch properly configured:', :red) %>"
   issues_with_no_branch.each do |issue|
-    puts "#{issue.key} - #{issue.summary}"
+    print_issue issue
   end
 end
 
 branches.each do |branch|
-  puts "\n\nChecking state of branch #{branch}:"
+  HighLine.say "The changes on branch <%= color('#{branch}', :bold) %> "
   if branches(:merged => true, :remote => true).include?(branch)
-    puts "All changes in #{branch} have been merged into master"
+    HighLine.say "<%= color('HAVE', :bold) %> been merged into master"
     releasable_tickets = tickets_from_branch(branch).select do |issue|
-      puts "#{issue.key} - #{issue.summary}"
-      HighLine.ask("Mark this issue as released? (y/n)? ") == 'y'
+      print_issue issue
+      HighLine.agree("Mark this issue as released? (y/n)")
     end
     release_tickets releasable_tickets
   else
-    puts "#{branch} has NOT yet been merged into master"
+    HighLine.say "<%= color('HAVE NOT', :bold) %> been merged into master"
   end
 end
 

@@ -8,7 +8,7 @@ raise "Cannot release reserved branch" if %w{master staging}.include?(branch)
 
 tickets = assert_tickets_provided(ARGV, branch)
 
-exit unless HighLine.ask("This will release #{branch} to production.  Are you sure (y/n)? ") == 'y'
+exit unless HighLine.agree("Release #{branch} to production? (y/n)")
 
 run_cmd 'git update'
 integrate branch, 'master'
