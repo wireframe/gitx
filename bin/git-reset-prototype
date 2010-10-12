@@ -3,14 +3,14 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
-reset_branch('staging')
-reset_branch('last_known_good_staging')
+reset_branch('prototype')
+reset_branch('last_known_good_prototype')
 
 filter_id = '10103'
 issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
 
-HighLine.say "Updating the following tickets to no longer be in staging:"
+HighLine.say "Updating the following tickets to no longer be in prototype:"
 issues.each do |issue|
   print_issue issue
-  jira_server.updateIssue issue.key, [Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, [''])]
+  jira_server.updateIssue issue.key, [Jira4R::V2::RemoteFieldValue.new(IN_PROTOTYPE_FIELD, ['false'])]
 end

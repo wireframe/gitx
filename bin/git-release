@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extension
 include Socialcast
 
 branch = current_branch
-raise "Cannot release reserved branch" if %w{master staging}.include?(branch)
+raise "Cannot release reserved branch" if %w{master staging prototype}.include?(branch)
 
 tickets = assert_tickets_provided(ARGV, branch)
 
@@ -16,6 +16,6 @@ integrate branch, 'master'
 update_tickets tickets, :branch => branch
 release_tickets tickets
 
-integrate branch, 'next_release'
 integrate branch, 'staging'
+integrate 'staging', 'prototype'
 run_cmd "grb rm #{branch}"

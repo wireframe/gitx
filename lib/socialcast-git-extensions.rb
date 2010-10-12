@@ -5,6 +5,7 @@ require 'highline/import'
 
 module Socialcast
   GIT_BRANCH_FIELD = 'customfield_10010'
+  IN_PROTOTYPE_FIELD = 'customfield_10033'
   IN_STAGING_FIELD = 'customfield_10020'
   JIRA_CREDENTIALS_FILE = File.expand_path('~/.jira_key')
 
@@ -62,6 +63,7 @@ module Socialcast
       HighLine.say "Updating ticket: <%= color('#{ticket.key}', :green) %> - #{ticket.summary}"
       fields = []
       fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
+      fields << Jira4R::V2::RemoteFieldValue.new(IN_PROTOTYPE_FIELD, ['true']) if options[:in_prototype]
       fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
       begin
         jira_server.updateIssue ticket.key, fields

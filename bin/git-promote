@@ -7,9 +7,9 @@ branch = current_branch
 tickets = assert_tickets_provided(ARGV, branch)
 
 run_cmd 'git update'
-integrate(branch, 'next_release')
+integrate(branch, 'staging')
 
-update_tickets tickets, :branch => branch, :in_staging => true
+update_tickets tickets, :branch => branch, :in_prototype => true, :in_staging => true
 resolve_tickets tickets
 
-integrate(branch, 'staging')
+integrate('staging', 'prototype')
