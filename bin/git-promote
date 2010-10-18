@@ -13,3 +13,4 @@ update_tickets tickets, :branch => branch, :in_prototype => true, :in_staging =>
 resolve_tickets tickets
 
 integrate('staging', 'prototype')
+run_cmd "git checkout #{branch}"
