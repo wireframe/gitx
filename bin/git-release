@@ -18,4 +18,5 @@ release_tickets tickets
 
 integrate branch, 'staging'
 integrate 'staging', 'prototype'
+run_cmd "git checkout master"
 run_cmd "grb rm #{branch}"
