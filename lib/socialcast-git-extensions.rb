@@ -60,15 +60,15 @@ module Socialcast
   end
   def update_tickets(tickets, options = {})
     tickets.each do |ticket|
-      HighLine.say "Updating ticket: <%= color('#{ticket.key}', :green) %> - #{ticket.summary}"
+      print_issue ticket
       fields = []
       fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) if options[:branch]
-      fields << Jira4R::V2::RemoteFieldValue.new(IN_PROTOTYPE_FIELD, ['true']) if options[:in_prototype]
-      fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, ['true']) if options[:in_staging]
+      fields << Jira4R::V2::RemoteFieldValue.new(IN_PROTOTYPE_FIELD, [options[:in_prototype].to_s]) if options[:in_prototype]
+      fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, [options[:in_staging].to_s]) if options[:in_staging]
       begin
         jira_server.updateIssue ticket.key, fields
       rescue => e
-        HighLine.say "<%= color('Error: #{e.message}', :red)"
+        HighLine.say "<%= color('Error: #{e.message}', :red) %>"
       end
     end
   end
@@ -97,7 +97,7 @@ module Socialcast
     end
   end
   def print_issue(issue)
-    HighLine.say "<%= color('#{issue.key}', :green) - #{issue.summary}"
+    HighLine.say "<%= color('#{issue.key}', :green) %> - #{issue.summary}"
   end
   def print_error(e)
     HighLine.say "<%= color('Error: #{e.message}', :red)"

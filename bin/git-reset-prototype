@@ -6,11 +6,8 @@ include Socialcast
 reset_branch('prototype')
 reset_branch('last_known_good_prototype')
 
-filter_id = '10103'
+filter_id = '10151'
 issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
 
-HighLine.say "Updating the following tickets to no longer be in prototype:"
-issues.each do |issue|
-  print_issue issue
-  jira_server.updateIssue issue.key, [Jira4R::V2::RemoteFieldValue.new(IN_PROTOTYPE_FIELD, ['false'])]
-end
+HighLine.say "\n<%= color('Updating the following tickets to no longer be in prototype:', :red) %>"
+update_tickets issues, :in_prototype => false
