@@ -7,6 +7,8 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
+is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
+
 branch = current_branch
 tickets = assert_tickets_provided(ARGV, branch)
 
@@ -15,3 +17,5 @@ integrate(branch, 'prototype')
 
 update_tickets tickets, :branch => branch, :in_prototype => true
 start_tickets tickets
+
+run_cmd "socialcast share '#worklog integrating #{branch} into prototype #scgitx'" unless is_quiet

@@ -3,6 +3,8 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
+is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
+
 run_cmd 'git checkout master'
 run_cmd 'git pull'
 run_cmd 'git pull origin last_known_good_staging'
@@ -40,3 +42,5 @@ branches.each do |branch|
 end
 
 run_cmd 'git prune-merged -r'
+
+run_cmd "socialcast share '#worklog releasing staging branch to production #scgitx'" unless is_quiet

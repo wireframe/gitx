@@ -6,6 +6,7 @@ include Socialcast
 branch = current_branch
 raise "Cannot release reserved branch" if %w{master staging prototype}.include?(branch)
 
+is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 tickets = assert_tickets_provided(ARGV, branch)
 
 exit unless HighLine.agree("<%= color('Release #{branch} to production? (y/n)', :green) %>")
@@ -20,3 +21,5 @@ integrate branch, 'staging'
 integrate 'staging', 'prototype'
 run_cmd "git checkout master"
 run_cmd "grb rm #{branch}"
+
+run_cmd "socialcast share '#worklog releasing #{branch} to production #scgitx'" unless is_quiet

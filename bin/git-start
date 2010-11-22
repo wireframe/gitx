@@ -5,6 +5,7 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
+is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 tickets = tickets_from_arguments ARGV
 raise "JIRA ticket id is required to run this process" unless tickets.any?
 
@@ -23,3 +24,5 @@ run_cmd "git checkout -b #{branch_name}"
 
 update_tickets tickets, :branch => branch_name
 start_tickets tickets
+
+run_cmd "socialcast share '#worklog starting work on #{branch_name} #scgitx'" unless is_quiet
