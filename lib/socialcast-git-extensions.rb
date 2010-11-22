@@ -104,7 +104,7 @@ module Socialcast
   end
 
   def run_cmd(cmd)
-    HighLine.say "\n> <%= color('#{cmd}', :red) %>"
+    HighLine.say "\n> <%= color('#{cmd.gsub("'", '')}', :red) %>"
     raise "#{cmd} failed" unless system cmd
   end
 
