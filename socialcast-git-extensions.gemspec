@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{socialcast-git-extensions}
-  s.version = "1.5.5"
+  s.version = "1.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Sonnek"]
-  s.date = %q{2010-11-11}
+  s.date = %q{2010-11-22}
   s.description = %q{git extension scripts for socialcast workflow}
   s.email = %q{ryan@socialcast.com}
   s.executables = ["git-integrate", "git-promote", "git-prune-merged", "git-release", "git-release-staging", "git-reset-prototype", "git-start", "git-track", "git-update", "git-wtf"]
@@ -60,6 +60,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_runtime_dependency(%q<git_remote_branch>, [">= 0"])
       s.add_runtime_dependency(%q<highline>, [">= 0"])
+      s.add_runtime_dependency(%q<socialcast>, [">= 0.2.0"])
     else
       s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_dependency(%q<grit>, [">= 0"])
@@ -67,6 +68,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<git_remote_branch>, [">= 0"])
       s.add_dependency(%q<highline>, [">= 0"])
+      s.add_dependency(%q<socialcast>, [">= 0.2.0"])
     end
   else
     s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
@@ -75,6 +77,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<git_remote_branch>, [">= 0"])
     s.add_dependency(%q<highline>, [">= 0"])
+    s.add_dependency(%q<socialcast>, [">= 0.2.0"])
   end
 end
 
