@@ -64,7 +64,7 @@ module Socialcast
       fields = []
       fields << Jira4R::V2::RemoteFieldValue.new(GIT_BRANCH_FIELD, [options[:branch]]) unless options[:branch].nil?
       fields << Jira4R::V2::RemoteFieldValue.new(IN_PROTOTYPE_FIELD, [options[:in_prototype].to_s]) unless options[:in_prototype].nil?
-      fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, [options[:in_staging].to_s]) unless options[:in_staging].nil?
+      fields << Jira4R::V2::RemoteFieldValue.new(IN_STAGING_FIELD, [options[:in_staging] ? 'true' : '']) unless options[:in_staging].nil?
       begin
         jira_server.updateIssue ticket.key, fields
       rescue => e
