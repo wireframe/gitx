@@ -10,7 +10,7 @@ begin
     gem.email = "ryan@socialcast.com"
     gem.homepage = "http://github.com/wireframe/socialcast-git-extensions"
     gem.authors = ["Ryan Sonnek"]
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
+    gem.add_development_dependency "shoulda", ">= 0"
     gem.add_runtime_dependency "grit", ">= 0"
     gem.add_runtime_dependency "wireframe-jira4r", ">= 0"
     gem.add_runtime_dependency "activesupport", ">= 0"

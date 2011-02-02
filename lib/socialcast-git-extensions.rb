@@ -77,7 +77,7 @@ module Socialcast
   STANDARD_WORKFLOW_TYPES << 2 #feature
   STANDARD_WORKFLOW_TYPES << 9 #story
 
-  WORKFLOW_MAPPINGS {
+  WORKFLOW_MAPPINGS = {
     :start => {:standard => 11, :other => 21},
     :resolve => {:standard => 21, :other => nil},
     :release => {:standard => 101, :other => 31}
