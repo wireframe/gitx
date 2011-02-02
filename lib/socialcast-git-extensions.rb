@@ -109,7 +109,7 @@ module Socialcast
     HighLine.say "<%= color('#{issue.key}', :green) %> - #{issue.summary}"
   end
   def print_error(message)
-    HighLine.say "<%= color('Error: ', :red) %> - #{message}"
+    HighLine.say "<%= color('Error: ', :red) %> #{message}"
   end
 
   def run_cmd(cmd)
