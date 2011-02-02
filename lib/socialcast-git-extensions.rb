@@ -36,7 +36,7 @@ module Socialcast
       @jira.login credentials[:username], credentials[:password]
       return @jira
     rescue => e
-      print_error e
+      print_error e.message
       File.delete config_file
       raise e
     end
@@ -68,39 +68,48 @@ module Socialcast
       begin
         jira_server.updateIssue ticket.key, fields
       rescue => e
-        HighLine.say "<%= color('Error: #{e.message}', :red) %>"
+        print_error e.message
       end
     end
   end
+  STANDARD_WORKFLOW_TYPES = []
+  STANDARD_WORKFLOW_TYPES << 1 #bug
+  STANDARD_WORKFLOW_TYPES << 2 #feature
+  STANDARD_WORKFLOW_TYPES << 9 #story
+
+  WORKFLOW_MAPPINGS {
+    :start => {:standard => 11, :other => 21},
+    :resolve => {:standard => 21, :other => nil},
+    :release => {:standard => 101, :other => 31}
+  }
   def start_tickets(tickets)
-    tickets.each do |ticket|
-      transition_ticket_if_has_status ticket, 1, 11
-    end
+    transition_tickets tickets, :start
   end
   def resolve_tickets(tickets)
-    tickets.each do |ticket|
-      transition_ticket_if_has_status ticket, 3, 21
-    end
+    start_tickets tickets
+    transition_tickets tickets, :resolve
   end
   def release_tickets(tickets)
-    tickets.each do |ticket|
-      transition_ticket_if_has_status ticket, 5, 101
-    end
+    resolve_tickets tickets
+    transition_tickets tickets, :release
   end
-  def transition_ticket_if_has_status(issue, status, action)
-    if issue.status == status.to_s
+  def transition_tickets(tickets, action)
+    tickets.each do |ticket|
       begin
-        jira_server.progressWorkflowAction issue.key, action.to_s, []
+        mappings = WORKFLOW_MAPPINGS[action]
+        transition = STANDARD_WORKFLOW_TYPES.include?(ticket.type.to_i) ? mappings[:standard] : mappings[:other]
+        next unless transition
+        jira_server.progressWorkflowAction ticket.key, transition.to_s, []
       rescue => e
-        print_error e
+        print_error "Unable to transition issue #{ticket.key} to #{action}"
       end
     end
   end
   def print_issue(issue)
     HighLine.say "<%= color('#{issue.key}', :green) %> - #{issue.summary}"
   end
-  def print_error(e)
-    HighLine.say "<%= color('Error: #{e.message}', :red)"
+  def print_error(message)
+    HighLine.say "<%= color('Error: ', :red) %> - #{message}"
   end
 
   def run_cmd(cmd)
