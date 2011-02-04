@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{socialcast-git-extensions}
-  s.version = "2.0.3"
+  s.version = "2.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Sonnek"]
-  s.date = %q{2011-02-02}
+  s.date = %q{2011-02-04}
   s.description = %q{git extension scripts for socialcast workflow}
   s.email = %q{ryan@socialcast.com}
-  s.executables = ["git-release-staging", "git-track", "git-start", "git-reset-prototype", "git-integrate", "git-update", "git-wtf", "git-reset-staging", "git-release", "git-prune-merged", "git-promote"]
+  s.executables = ["git-release-staging", "git-track", "git-start", "git-reset-prototype", "git-integrate", "git-update", "git-wtf", "git-share", "git-reset-staging", "git-release", "git-prune-merged", "git-promote"]
   s.extra_rdoc_files = [
     "LICENSE",
     "README.rdoc"
@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
     "bin/git-release-staging",
     "bin/git-reset-prototype",
     "bin/git-reset-staging",
+    "bin/git-share",
     "bin/git-start",
     "bin/git-track",
     "bin/git-update",
