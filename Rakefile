@@ -16,7 +16,7 @@ begin
     gem.add_runtime_dependency "activesupport", ">= 0"
     gem.add_runtime_dependency "git_remote_branch", ">= 0"
     gem.add_runtime_dependency 'highline', '>= 0'
-    gem.add_runtime_dependency 'socialcast', '>= 0.3.3'
+    gem.add_runtime_dependency 'socialcast', '>= 0.3.4'
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::RubygemsDotOrgTasks.new
