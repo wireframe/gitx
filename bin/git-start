@@ -7,7 +7,7 @@ include Socialcast
 
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 tickets = tickets_from_arguments ARGV
-raise "JIRA ticket id is required to run this process" unless tickets.any?
+abort("JIRA ticket id is required to run this process") unless tickets.any?
 
 example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sort_by { rand }.first
 repo = Grit::Repo.new(Dir.pwd)

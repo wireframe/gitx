@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extension
 include Socialcast
 
 branch = current_branch
-raise "Cannot release reserved branch" if %w{master staging prototype}.include?(branch)
+abort("Cannot release reserved branch") if %w{master staging prototype}.include?(branch)
 
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 tickets = assert_tickets_provided(ARGV, branch)

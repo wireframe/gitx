@@ -44,7 +44,7 @@ module Socialcast
 
   def assert_tickets_provided(ticket_ids, branch)
     tickets = tickets_from_arguments_or_branch(ticket_ids, branch)
-    raise "JIRA ticket id or existing JIRA Git Branch is required to run this process" unless tickets.any?
+    abort("JIRA ticket id or existing JIRA Git Branch is required to run this process") unless tickets.any?
     tickets
   end
   def tickets_from_arguments_or_branch(ticket_ids, branch)
