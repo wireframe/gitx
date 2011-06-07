@@ -6,13 +6,15 @@ include Socialcast
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 
 branch = current_branch
-tickets = assert_tickets_provided(ARGV, branch)
+tickets = tickets_from_arguments_or_branch(ARGV, branch)
 
 run_cmd 'git update'
 integrate(branch, 'staging')
 
-update_tickets tickets, :branch => branch, :in_prototype => true, :in_staging => true
-resolve_tickets tickets
+if tickets.any?
+  update_tickets tickets, :branch => branch, :in_prototype => true, :in_staging => true
+  resolve_tickets tickets
+end
 
 integrate('staging', 'prototype')
 run_cmd "git checkout #{branch}"
