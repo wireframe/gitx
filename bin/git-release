@@ -7,15 +7,17 @@ branch = current_branch
 abort("Cannot release reserved branch") if %w{master staging prototype}.include?(branch)
 
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
-tickets = assert_tickets_provided(ARGV, branch)
+tickets = tickets_from_arguments_or_branch(ARGV, branch)
 
 exit unless HighLine.agree("<%= color('Release #{branch} to production? (y/n)', :green) %>")
 
 run_cmd 'git update'
 integrate branch, 'master'
 
-update_tickets tickets, :branch => branch
-release_tickets tickets
+if tickets.any?
+  update_tickets tickets, :branch => branch
+  release_tickets tickets
+end
 
 integrate branch, 'staging'
 integrate 'staging', 'prototype'
