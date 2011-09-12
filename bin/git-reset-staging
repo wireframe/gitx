@@ -6,11 +6,5 @@ include Socialcast
 reset_branch('staging')
 reset_branch('last_known_good_staging')
 
-filter_id = '10102'
-issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
-
-HighLine.say "\n<%= color('Updating the following tickets to no longer be in staging:', :red) %>"
-update_tickets issues, :in_staging => false
-
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 run_cmd "socialcast share '#worklog resetting staging branch #scgitx'" unless is_quiet
