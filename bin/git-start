@@ -6,25 +6,21 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extension
 include Socialcast
 
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
-tickets = tickets_from_arguments ARGV
 
-example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sort_by { rand }.first
-repo = Grit::Repo.new(Dir.pwd)
-remote_branches = repo.remotes.collect {|b| b.name.split('/').last }
-until branch_name = HighLine.ask("What would you like to name your branch? (ex: #{example_branch})") {|q| 
-    q.validate = Proc.new { |branch|
-      branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)
+unless branch_name = ARGV.first
+  example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sort_by { rand }.first
+  repo = Grit::Repo.new(Dir.pwd)
+  remote_branches = repo.remotes.collect {|b| b.name.split('/').last }
+  until branch_name = HighLine.ask("What would you like to name your branch? (ex: #{example_branch})") {|q| 
+      q.validate = Proc.new { |branch|
+        branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)
+      }
     }
-  }
+  end
 end
 
 run_cmd 'git checkout master'
 run_cmd 'git pull'
 run_cmd "git checkout -b #{branch_name}"
-
-if tickets.any?
-  update_tickets tickets, :branch => branch_name
-  start_tickets tickets
-end
 
 run_cmd "socialcast share '#worklog starting work on #{branch_name} #scgitx'" unless is_quiet

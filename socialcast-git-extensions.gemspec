@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "socialcast-git-extensions"
 
   s.add_runtime_dependency(%q<grit>, [">= 0"])
-  s.add_runtime_dependency(%q<wireframe-jira4r>, [">= 0"])
   s.add_runtime_dependency(%q<activesupport>, [">= 0"])
   s.add_runtime_dependency(%q<git_remote_branch>, [">= 0"])
   s.add_runtime_dependency(%q<highline>, [">= 0"])
