@@ -10,14 +10,8 @@ include Socialcast
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 
 branch = current_branch
-tickets = tickets_from_arguments_or_branch(ARGV, branch)
 
 run_cmd 'git update'
 integrate(branch, 'prototype')
-
-if tickets.any?
-  update_tickets tickets, :branch => branch, :in_prototype => true
-  start_tickets tickets
-end
 
 run_cmd "socialcast share '#worklog integrating #{branch} into prototype #scgitx'" unless is_quiet

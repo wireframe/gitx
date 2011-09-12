@@ -10,37 +10,6 @@ run_cmd 'git pull'
 run_cmd 'git pull origin last_known_good_staging'
 run_cmd 'git push origin HEAD'
 
-filter_id = '10102'
-issues = jira_server.getIssuesFromFilterWithLimit filter_id, 0, 1000
-branches = issues.collect do |issue|
-  field = issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
-  field ? field.values.first : nil
-end.uniq.compact
-
-issues_with_no_branch = issues.reject do |issue| 
-  issue.customFieldValues.detect {|k| k.customfieldId == GIT_BRANCH_FIELD }
-end
-if issues_with_no_branch.any?
-  HighLine.say "\n<%= color('The following tickets do NOT have a git branch properly configured:', :red) %>"
-  issues_with_no_branch.each do |issue|
-    print_issue issue
-  end
-end
-
-branches.each do |branch|
-  HighLine.say "\nThe changes on branch <%= color('#{branch}', :green) %> "
-  if branches(:merged => true, :remote => true).include?(branch)
-    HighLine.say "<%= color('HAVE', :green) %> been merged into master"
-    releasable_tickets = tickets_from_branch(branch).select do |issue|
-      print_issue issue
-      HighLine.agree("Mark this issue as released? (y/n)")
-    end
-    release_tickets releasable_tickets
-  else
-    HighLine.say "<%= color('HAVE NOT', :red) %> been merged into master"
-  end
-end
-
 run_cmd 'git prune-merged -r'
 
 run_cmd "socialcast share '#worklog releasing staging branch to production #scgitx'" unless is_quiet
