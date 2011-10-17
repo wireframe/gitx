@@ -28,14 +28,15 @@ module Socialcast
     end
     branches
   end
-  def reset_branch(branch)
-    run_cmd "git checkout master"
+  def reset_branch(branch, head_branch = 'master')
+    return if branch == head_branch
+    run_cmd "git checkout #{head_branch}"
     run_cmd "git pull"
     run_cmd "git branch -D #{branch}" rescue nil
     run_cmd "git push origin :#{branch}" rescue nil
     run_cmd "git checkout -b #{branch}"
     run_cmd "grb publish #{branch}"
-    run_cmd "git checkout master"
+    run_cmd "git checkout #{head_branch}"
   end
 
   def integrate(branch, destination_branch = 'staging')
