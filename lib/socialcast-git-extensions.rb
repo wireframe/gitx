@@ -29,6 +29,7 @@ module Socialcast
     branches
   end
   def reset_branch(branch, head_branch = 'master')
+    return if branch == head_branch
     run_cmd "git checkout #{head_branch}"
     run_cmd "git pull"
     run_cmd "git branch -D #{branch}" rescue nil

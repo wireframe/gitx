@@ -3,13 +3,9 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
-if head_branch = ARGV.first
-  reset_branch('staging', head_branch)
-  reset_branch('last_known_good_staging', head_branch) unless head_branch == 'last_known_good_staging'
-else
-  reset_branch('staging')
-  reset_branch('last_known_good_staging')
-end
+head_branch = ARGV.first || 'last_known_good_stging'
+reset_branch('staging', head_branch)
+reset_branch('last_known_good_staging', head_branch)
 
 is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 run_cmd "socialcast share '#worklog resetting staging branch #scgitx'" unless is_quiet
