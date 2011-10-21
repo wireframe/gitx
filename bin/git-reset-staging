@@ -3,7 +3,7 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
 include Socialcast
 
-head_branch = ARGV.first || 'last_known_good_stging'
+head_branch = ARGV.first || 'last_known_good_staging'
 reset_branch('staging', head_branch)
 reset_branch('last_known_good_staging', head_branch)
 
