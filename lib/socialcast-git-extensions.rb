@@ -1,5 +1,4 @@
 require 'grit'
-require 'active_support/all'
 require 'highline/import'
 require 'rest_client'
 require 'json'
