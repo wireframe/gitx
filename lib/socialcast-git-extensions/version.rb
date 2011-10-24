@@ -1,7 +1,5 @@
 module Socialcast
-  module Git
-    module Extensions
-      VERSION = "2.2.1"
-    end
+  module Gitx
+    VERSION = "2.2.2"
   end
 end

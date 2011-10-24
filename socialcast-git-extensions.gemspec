@@ -4,7 +4,7 @@ require "socialcast-git-extensions/version"
 
 Gem::Specification.new do |s|
   s.name        = "socialcast-git-extensions"
-  s.version     = Socialcast::Git::Extensions::VERSION
+  s.version     = Socialcast::Gitx::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Ryan Sonnek"]
   s.email       = ["ryan@socialcast.com"]
