@@ -18,4 +18,7 @@ coverage
 rdoc
 pkg
 
+#bundler
+Gemfile.lock
+
 ## PROJECT::SPECIFIC
