@@ -3,9 +3,8 @@
 #start a new git branch with latest changes from master
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast
-
-is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
+include Socialcast::Gitx
+include Socialcast::Git
 
 unless branch_name = ARGV.first
   example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sort_by { rand }.first
@@ -23,4 +22,4 @@ run_cmd 'git checkout master'
 run_cmd 'git pull'
 run_cmd "git checkout -b #{branch_name}"
 
-run_cmd "socialcast share '#worklog starting work on #{branch_name} #scgitx'" unless is_quiet
+share "#worklog starting work on #{branch_name} #scgitx"

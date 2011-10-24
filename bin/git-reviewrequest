@@ -5,9 +5,9 @@
 # git reviewrequest
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast
-
-is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
+include Socialcast::Gitx
+include Socialcast::Git
+include Socialcast::Github
 
 branch = current_branch
 username = `git config -z --global --get github.user`.strip
@@ -16,4 +16,4 @@ password = HighLine.ask("Github password: ") { |q| q.echo = false }
 run_cmd 'git update'
 
 url = create_pull_request username, password, branch
-run_cmd "socialcast share '@SocialcastDevelopers #reviewrequest for #{branch} #scgitx' --url #{url}" unless is_quiet
+share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", url

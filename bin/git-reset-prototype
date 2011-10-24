@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast
+include Socialcast::Gitx
+include Socialcast::Git
 
 head_branch = ARGV.first || 'master'
 reset_branch('prototype', head_branch)
@@ -9,5 +10,4 @@ reset_branch('last_known_good_prototype', head_branch)
 
 HighLine.say "\n<%= color('Updating the following tickets to no longer be in prototype:', :red) %>"
 
-is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
-run_cmd "socialcast share '#worklog resetting prototype branch #scgitx'" unless is_quiet
+share "#worklog resetting prototype branch #scgitx"

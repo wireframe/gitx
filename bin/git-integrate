@@ -5,13 +5,12 @@
 # git integrate <ticket_id> <ticket_id2>...
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast
-
-is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
+include Socialcast::Gitx
+include Socialcast::Git
 
 branch = current_branch
 
 run_cmd 'git update'
 integrate(branch, 'prototype')
 
-run_cmd "socialcast share '#worklog integrating #{branch} into prototype #scgitx'" unless is_quiet
+share "#worklog integrating #{branch} into prototype #scgitx"

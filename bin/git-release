@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast
+include Socialcast::Gitx
+include Socialcast::Git
 
 branch = current_branch
 abort("Cannot release reserved branch") if %w{master staging prototype}.include?(branch)
-
-is_quiet = ARGV.delete("--quiet") || ARGV.delete("-q")
 
 exit unless HighLine.agree("<%= color('Release #{branch} to production? (y/n)', :green) %>")
 
@@ -18,4 +17,4 @@ integrate 'staging', 'prototype'
 run_cmd "git checkout master"
 run_cmd "grb rm #{branch}"
 
-run_cmd "socialcast share '#worklog releasing #{branch} to production #scgitx'" unless is_quiet
+share "#worklog releasing #{branch} to production #scgitx"
