@@ -19,6 +19,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<git_remote_branch>, [">= 0"])
   s.add_runtime_dependency(%q<highline>, [">= 0"])
   s.add_runtime_dependency(%q<socialcast>, [">= 0.3.4"])
+  s.add_runtime_dependency(%q<rest-client>, [">= 1.4.0"])
+  s.add_runtime_dependency(%q<json_pure>, [">= 0"])
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
