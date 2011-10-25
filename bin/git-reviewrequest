@@ -16,4 +16,4 @@ password = HighLine.ask("Github password: ") { |q| q.echo = false }
 run_cmd 'git update'
 
 url = create_pull_request username, password, branch
-share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", url
+share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx \n #{url}", {:url => nil, :message_type => 'review_request'}

@@ -8,10 +8,11 @@ module Socialcast
       HighLine.say "\n> <%= color('#{cmd.gsub("'", '')}', :red) %>"
       raise "#{cmd} failed" unless system cmd
     end
-    def share(message, url = nil)
+    def share(message, options = {})
       return if ARGV.delete("--quiet") || ARGV.delete("-q")
       cmd = "socialcast share '#{message}'"
-      cmd += " --url #{url}" if url
+      cmd += " --url #{options[:url]}" if options[:url]
+      cmd += " --message_type #{options[:message_type]}" if options[:message_type]
       run_cmd cmd
     end
   end
