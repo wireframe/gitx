@@ -4,6 +4,7 @@ require 'grit'
 module Socialcast
   module Git
     include Socialcast::Gitx
+    RESERVED_BRANCHES = %w{ HEAD master last_known_good_master staging last_known_good_staging next_release last_known_good_next_release }
 
     def current_branch
       repo = Grit::Repo.new(Dir.pwd)
@@ -11,7 +12,6 @@ module Socialcast
     end
     def branches(options = {})
       branches = []
-      reserved_branches = %w{ HEAD master last_known_good_master staging last_known_good_staging next_release last_known_good_next_release }
       args = []
       args << '-r' if options[:remote]
       args << '--merged' if options[:merged]
@@ -19,7 +19,7 @@ module Socialcast
       output.each do |branch|
         branch = branch.gsub(/\*/, '').strip.split(' ').first
         branch = branch.split('/').last if options[:remote]
-        branches << branch unless reserved_branches.include?(branch)
+        branches << branch unless RESERVED_BRANCHES.include?(branch)
       end
       branches
     end
