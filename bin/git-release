@@ -5,7 +5,7 @@ include Socialcast::Gitx
 include Socialcast::Git
 
 branch = current_branch
-abort("Cannot release reserved branch") if Socialcast::Git::RESERVED_BRANCHES.include?(branch)
+protect_reserved_branches!(branch, 'release')
 
 exit unless HighLine.agree("<%= color('Release #{branch} to production? (y/n)', :green) %>")
 
