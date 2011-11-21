@@ -19,4 +19,4 @@ repo = `git config -z --get remote.origin.url`.strip
 # ex: git@github.com:socialcast/socialcast-git-extensions.git
 repo = repo.scan(/:(.+\/.+)\./).first.first
 url = create_pull_request username, password, branch, repo
-share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", url
+share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", {:url => url, :message_type => 'review_request'}
