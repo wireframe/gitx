@@ -10,7 +10,6 @@ include Socialcast::Git
 
 branch = current_branch
 protect_reserved_branches!(branch, 'integrate')
-exit 1
 
 run_cmd 'git update'
 integrate(branch, 'prototype')
