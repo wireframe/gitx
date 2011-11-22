@@ -7,8 +7,6 @@ include Socialcast::Git
 branch = current_branch
 protect_reserved_branches!(branch, 'promote')
 
-exit 1
-
 run_cmd 'git update'
 integrate(branch, 'staging')
 
