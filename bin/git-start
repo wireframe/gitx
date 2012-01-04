@@ -3,7 +3,6 @@
 #start a new git branch with latest changes from master
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Gitx
 include Socialcast::Git
 
 unless branch_name = ARGV.first

@@ -4,7 +4,6 @@
 #usage -r --remote to prune remote branches
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Gitx
 include Socialcast::Git
 
 remote = ARGV.delete("--remote") || ARGV.delete("-r")

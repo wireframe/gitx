@@ -1,4 +1,3 @@
-require File.join(File.dirname(__FILE__), '..', 'socialcast-git-extensions')
 require 'grit'
 
 module Socialcast

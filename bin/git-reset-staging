@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Gitx
 include Socialcast::Git
 
 head_branch = ARGV.first || 'last_known_good_staging'

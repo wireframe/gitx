@@ -5,7 +5,6 @@
 # git integrate <ticket_id> <ticket_id2>...
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Gitx
 include Socialcast::Git
 
 branch = current_branch

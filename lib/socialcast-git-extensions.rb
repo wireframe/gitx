@@ -1,6 +1,4 @@
 require 'highline/import'
-require 'socialcast-git-extensions/git'
-require 'socialcast-git-extensions/github'
 
 module Socialcast
   module Gitx
@@ -20,3 +18,6 @@ module Socialcast
     end
   end
 end
+
+require 'socialcast-git-extensions/git'
+require 'socialcast-git-extensions/github'
