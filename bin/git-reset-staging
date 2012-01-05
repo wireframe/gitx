@@ -4,7 +4,5 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extension
 include Socialcast::Git
 
 head_branch = ARGV.first || 'last_known_good_staging'
-reset_branch('staging', head_branch)
+reset_branch('staging', head_branch, :share => (head_branch != 'last_known_good_staging')
 reset_branch('last_known_good_staging', head_branch)
-
-share "#worklog resetting staging branch #scgitx"

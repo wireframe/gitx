@@ -20,17 +20,23 @@ module Socialcast
         branch = branch.split('/').last if options[:remote]
         branches << branch unless RESERVED_BRANCHES.include?(branch)
       end
-      branches
+      branches.uniq
     end
-    def reset_branch(branch, head_branch = 'master')
+    def reset_branch(branch, head_branch = 'master', options = {})
       return if branch == head_branch
+
+      HighLine.say "resetting <%= color('#{branch}', :green) %> branch to <%= color('#{head_branch}', :green) %>"
+
       run_cmd "git checkout #{head_branch}"
       run_cmd "git pull"
+      removed_branches = branches :remote => true, :merged => "origin/#{branch}"
       run_cmd "git branch -D #{branch}" rescue nil
       run_cmd "git push origin :#{branch}" rescue nil
       run_cmd "git checkout -b #{branch}"
       run_cmd "grb publish #{branch}"
       run_cmd "git checkout #{head_branch}"
+
+      share "#worklog resetting #{branch} branch to #{head_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.collect {|b| '* ' + b + "\n" } }" if options[:share]
     end
 
     def integrate(branch, destination_branch = 'staging')
