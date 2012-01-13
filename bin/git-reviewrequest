@@ -22,5 +22,6 @@ url = create_pull_request username, password, branch, repo
 if url
   share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", {:url => url, :message_type => 'review_request'}
 else
-  puts "Skipping socialcast announcement"
+  HighLine.say "Skipping socialcast announcement"
+  exit 1
 end
