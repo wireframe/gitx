@@ -3,8 +3,8 @@ require 'json'
 
 module Socialcast
   module Github
-    def create_pull_request(username, password, branch, repo)
-      payload = {:title => branch, :base => 'master', :head => branch}.to_json
+    def create_pull_request(username, password, branch, repo, body)
+      payload = {:title => branch, :base => 'master', :head => branch, :body => body}.to_json
       begin
         HighLine.say "Creating pull request for #{branch} against master in #{repo}"
         response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :user => username, :password => password, :payload => payload, :headers => {:accept => :json, :content_type => :json}).execute

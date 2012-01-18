@@ -11,13 +11,14 @@ include Socialcast::Github
 branch = current_branch
 username = `git config -z --global --get github.user`.strip
 password = HighLine.ask("Github password: ") { |q| q.echo = false }
+description = HighLine.ask("Pull Request description (blank line to complete)") { |q| q.gather = /^\W*$/}
 
 run_cmd 'git update'
 
 repo = `git config -z --get remote.origin.url`.strip
 # ex: git@github.com:socialcast/socialcast-git-extensions.git
 repo = repo.scan(/:(.+\/.+)\./).first.first
-url = create_pull_request username, password, branch, repo
+url = create_pull_request username, password, branch, repo, description.join("\n")
 
 if url
   share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", {:url => url, :message_type => 'review_request'}
