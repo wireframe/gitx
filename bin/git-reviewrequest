@@ -28,7 +28,7 @@ Tempfile.open('reviewrequest.md') do |f|
   description.gsub!(/^\#.*/, '')
 end
 
-short_description = description.split.first(5).join("\n")
+short_description = description.split("\n").first(5).join("\n")
 stats = `git diff --stat master...#{branch}`
 
 repo = `git config -z --get remote.origin.url`.strip
