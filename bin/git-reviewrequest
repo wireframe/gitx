@@ -5,6 +5,7 @@
 # git reviewrequest
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'string_ext.rb')
 include Socialcast::Git
 include Socialcast::Github
 
@@ -24,17 +25,30 @@ if index = (ARGV.index('-d') || ARGV.index('--description'))
 else
   require 'tempfile'
   Tempfile.open('reviewrequest.md') do |f|
-    f << "\n\n\n# Describe your pull request\n# Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/\n# Why not include a screenshot? Format is ![title](url)"
+    helper_tip = <<-EOS.dedent
+      # Describe your pull request
+      # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
+      # Why not include a screenshot? Format is ![title](url)
+    EOS
+    f << "\n\n#{helper_tip}"
     f.flush
 
     editor = ENV['EDITOR'] || 'vi'
-    editor = "#{editor} -w" if %w{mate emacs}.include?(editor)
-    pid = fork { exec "#{editor} #{f.path}" }
+    flags = case editor
+    when 'mate', 'emacs'
+      '-w'
+    when 'mvim'
+      '-f'
+    else
+      ''
+    end
+    pid = fork { exec "#{editor} #{flags} #{f.path}" }
     Process.waitpid(pid)
     description = File.read(f.path)
-    description.gsub!(/^\#.*/, '')
+    description = description.gsub(/^\#.*/, '').chomp.strip
   end
 end
+
 short_description = description.split("\n").first(5).join("\n")
 stats = `git diff --stat master...#{branch}`
 
