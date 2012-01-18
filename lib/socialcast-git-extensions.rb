@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'highline/import'
 
 module Socialcast
@@ -11,10 +12,11 @@ module Socialcast
     end
     def share(message, options = {})
       return if ARGV.delete("--quiet") || ARGV.delete("-q")
-      cmd = "socialcast share '#{message}'"
-      cmd += " --url #{options[:url]}" if options[:url]
-      cmd += " --message_type #{options[:message_type]}" if options[:message_type]
-      run_cmd cmd
+      require 'socialcast'
+      require 'socialcast/message'
+      Socialcast::Message.configure_from_credentials
+      Socialcast::Message.create options.merge(:body => message)
+      say "Message has been shared"
     end
   end
 end
