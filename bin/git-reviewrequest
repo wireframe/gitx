@@ -60,7 +60,7 @@ if changes.length > 5
   end
   dir_counts = Hash.new(0)
   dirs.each {|dir| dir_counts[dir] += 1 }
-  changes = dir_counts.to_a.sort_by {|k,v| v}.reverse.first(5).map {|k,v| "#{k} (#{v} file)"}
+  changes = dir_counts.to_a.sort_by {|k,v| v}.reverse.first(5).map {|k,v| "#{k} (#{v} file#{'s' if v > 1})"}
 end
 change_summary = (changes + [stats]).join("\n")
 
