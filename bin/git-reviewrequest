@@ -50,7 +50,19 @@ else
 end
 
 short_description = description.split("\n").first(5).join("\n")
-stats = `git diff --stat master...#{branch}`
+changes = `git diff --stat master...#{branch}`.split("\n")
+file_changes = changes.pop
+if file_changes.length > 5
+  dirs = file_changes.map do |file_change|
+    filename = "/#{file_change.split.first}"
+    dir = filename.gsub(/\/[^\/]+$/, '')}
+    dir
+  end
+  dir_counts = Hash.new(0)
+  dirs.each {|dir| dir_counts[dir] += 1 }
+  changes = dir_counts.to_a.sort_by {|k,v| v}.reverse.first(5).map {|k,v| "#{k} (#{v})"}
+end
+stats = (changes + [file_changes]).join("\n")
 
 repo = `git config -z --get remote.origin.url`.strip
 # ex: git@github.com:socialcast/socialcast-git-extensions.git
