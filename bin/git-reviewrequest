@@ -11,17 +11,41 @@ include Socialcast::Github
 branch = current_branch
 username = `git config -z --global --get github.user`.strip
 password = HighLine.ask("Github password: ") { |q| q.echo = false }
-description = HighLine.ask("Pull Request description (blank line to complete)") { |q| q.gather = /^\W*$/}
 
 run_cmd 'git update'
+
+description = ""
+if index = (ARGV.index('-d') || ARGV.index('--description'))
+  description = ARGV[index + 1]
+  if description.nil?
+    puts "Usage: #git-reviewrequest -d <description>"
+    exit 1
+  end
+else
+  require 'tempfile'
+  Tempfile.open('reviewrequest.md') do |f|
+    f << "\n\n\n# Describe your pull request\n# Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/\n# Why not include a screenshot? Format is ![title](url)"
+    f.flush
+
+    editor = ENV['EDITOR'] || 'vi'
+    editor = "#{editor} -w" if %w{mate emacs}.include?(editor)
+    pid = fork { exec "#{editor} #{f.path}" }
+    Process.waitpid(pid)
+    description = File.read(f.path)
+    description.gsub!(/^\#.*/, '')
+  end
+end
+short_description = description.split("\n").first(5).join("\n")
+stats = `git diff --stat master...#{branch}`
 
 repo = `git config -z --get remote.origin.url`.strip
 # ex: git@github.com:socialcast/socialcast-git-extensions.git
 repo = repo.scan(/:(.+\/.+)\./).first.first
-url = create_pull_request username, password, branch, repo, description.join("\n")
+url = create_pull_request username, password, branch, repo, description
 
 if url
-  share "@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", {:url => url, :message_type => 'review_request'}
+  review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, stats].join("\n\n")
+  share review_message, {:url => url, :message_type => 'review_request'}
 else
   HighLine.say "Skipping socialcast announcement"
   exit 1
