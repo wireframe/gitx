@@ -1,1 +1,1 @@
-rvm use ree-1.8.7@socialcast-git-extensions --create
+rvm use default@socialcast-git-extensions --create
