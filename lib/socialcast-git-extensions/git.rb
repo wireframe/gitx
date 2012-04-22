@@ -36,7 +36,7 @@ module Socialcast
       run_cmd "grb publish #{branch}"
       run_cmd "git checkout #{head_branch}"
 
-      share "#worklog resetting #{branch} branch to #{head_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.collect {|b| '* ' + b + "\n" } }" if options[:share]
+      share "#worklog resetting #{branch} branch to #{head_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }" if options[:share]
     end
 
     def integrate(branch, destination_branch = 'staging')
