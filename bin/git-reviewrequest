@@ -11,7 +11,10 @@ include Socialcast::Github
 
 branch = current_branch
 username = `git config -z --global --get github.user`.strip
-password = HighLine.ask("Github password: ") { |q| q.echo = false }
+fail "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" if username.empty?
+password = HighLine.ask("Github password for #{username}: ") { |q| q.echo = false }
+
+exit(1) unless token = request_token(username, password)
 
 run_cmd 'git update'
 
@@ -67,7 +70,7 @@ change_summary = (changes + [stats]).join("\n")
 repo = `git config -z --get remote.origin.url`.strip
 # ex: git@github.com:socialcast/socialcast-git-extensions.git
 repo = repo.scan(/:(.+\/.+)\./).first.first
-url = create_pull_request username, password, branch, repo, description
+url = create_pull_request token, branch, repo, description
 
 if url
   review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, change_summary].join("\n\n")
