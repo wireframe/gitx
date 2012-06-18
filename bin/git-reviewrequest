@@ -50,7 +50,7 @@ else
 end
 
 short_description = description.split("\n").first(5).join("\n")
-changes = `git diff --stat master...#{branch}`.split("\n")
+changes = `git diff --stat origin/master...#{branch}`.split("\n")
 stats = changes.pop
 if changes.length > 5
   dirs = changes.map do |file_change|
