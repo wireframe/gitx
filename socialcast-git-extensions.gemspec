@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<grit>, [">= 0"])
   s.add_runtime_dependency(%q<git_remote_branch>, [">= 0"])
   s.add_runtime_dependency(%q<highline>, [">= 0"])
-  s.add_runtime_dependency(%q<socialcast>, [">= 0.3.4"])
+  s.add_runtime_dependency(%q<socialcast>, [">= 1.1.3"])
   s.add_runtime_dependency(%q<rest-client>, [">= 1.4.0"])
   s.add_runtime_dependency(%q<json_pure>, [">= 0"])
   s.add_development_dependency(%q<rake>, ["0.9.2.2"])
