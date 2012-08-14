@@ -65,8 +65,9 @@ end
 change_summary = (changes + [stats]).join("\n")
 
 repo = `git config -z --get remote.origin.url`.strip
-# ex: git@github.com:socialcast/socialcast-git-extensions.git
-repo = repo.scan(/:(.+\/.+)\./).first.first
+# ex: git@github.com:socialcast/socialcast-git-extensions.git OR https://github.com/socialcast/socialcast.git
+repo = repo.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
+
 url = create_pull_request username, password, branch, repo, description
 
 if url
