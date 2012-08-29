@@ -5,14 +5,16 @@ require 'socialcast'
 require 'socialcast-git-extensions'
 require 'socialcast-git-extensions/string_ext'
 require 'socialcast-git-extensions/git'
+require 'socialcast-git-extensions/github'
 
 module Socialcast
   module Gitx
     class CLI < Thor
       include Socialcast::Git
+      include Socialcast::Gitx::Github
 
       BASE_BRANCH = 'master'
-      DEFAULT_PULL_REQUEST_DESCRIPTION = <<-EOS.dedent
+      PULL_REQUEST_DESCRIPTION = "\n\n" + <<-EOS.dedent
         # Describe your pull request
         # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
         # Why not include a screenshot? Format is ![title](url)
@@ -33,23 +35,15 @@ module Socialcast
         token = authorization_token
 
         invoke :update
-        description = options[:description] || editor_input("\n\n#{DEFAULT_PULL_REQUEST_DESCRIPTION}")
+
+        description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
         branch = current_branch
         repo = current_repo
-        payload = {:title => branch, :base => BASE_BRANCH, :head => branch, :body => description}.to_json
-
-        say "Creating pull request for #{branch} against #{BASE_BRANCH} in #{repo}"
-        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => {:accept => :json, :content_type => :json, 'Authorization' => "token #{token}"}).execute
-        data = JSON.parse response.body
-        url = data['html_url']
+        create_pull_request token, branch, repo, description
 
         short_description = description.split("\n").first(5).join("\n")
         review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, changelog_summary(branch)].join("\n\n")
         share review_message, {:url => url, :message_type => 'review_request'}
-      rescue RestClient::Exception => e
-        data = JSON.parse e.http_body
-        say "Failed to create pull request: #{data['message']}"
-        throw e
       end
 
       desc 'update', 'Update the current branch with latest upstream changes'
@@ -97,29 +91,6 @@ module Socialcast
           description = File.read(f.path)
           description.gsub(/^\#.*/, '').chomp.strip
         end
-      end
-
-      # request github authorization token
-      # store the token in ~/.socialcast/credentials.yml for future reuse
-      # @see http://developer.github.com/v3/oauth/#scopes
-      def authorization_token
-        credentials = Socialcast.credentials
-        return credentials[:scgitx_token] if credentials[:scgitx_token]
-
-        username = `git config -z --global --get github.user`.strip
-        raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" if username.empty?
-        password = ask("Github password for #{username}: ") { |q| q.echo = false }
-
-        payload = {:scopes => ['repo'], :note => 'Socialcast Git eXtension', :note_url => 'https://github.com/socialcast/socialcast-git-extensions'}.to_json
-        response = RestClient::Request.new(:url => "https://api.github.com/authorizations", :method => "POST", :user => username, :password => password, :payload => payload, :headers => {:accept => :json, :content_type => :json}).execute
-        data = JSON.parse response.body
-        token = data['token']
-        Socialcast.credentials = credentials.merge(:scgitx_token => token)
-        token
-      rescue RestClient::Exception => e
-        data = JSON.parse e.http_body
-        say "Failed to obtain OAuth authorization token: #{data['message']}"
-        throw e
       end
 
       # share message in socialcast
