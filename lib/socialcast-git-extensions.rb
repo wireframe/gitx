@@ -21,5 +21,10 @@ module Socialcast
   end
 end
 
-require 'socialcast-git-extensions/git'
-require 'socialcast-git-extensions/github'
+# use these for testing locally
+require File.join(File.dirname(__FILE__), 'socialcast-git-extensions/git.rb')
+require File.join(File.dirname(__FILE__), 'socialcast-git-extensions/github.rb')
+
+# use these for packaged gem
+# require 'socialcast-git-extensions/git'
+# require 'socialcast-git-extensions/github'
