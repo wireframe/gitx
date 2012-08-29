@@ -3,6 +3,7 @@ require 'rest_client'
 require 'json'
 require 'socialcast'
 require 'socialcast-git-extensions'
+require 'socialcast-git-extensions/string_ext'
 require 'socialcast-git-extensions/git'
 
 module Socialcast
@@ -12,12 +13,18 @@ module Socialcast
 
       BASE_BRANCH = 'master'
       DEFAULT_PULL_REQUEST_DESCRIPTION = <<-EOS.dedent
-
-
         # Describe your pull request
         # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
         # Why not include a screenshot? Format is ![title](url)
       EOS
+
+      method_option :quiet, :type => :boolean, :aliases => '-q'
+      method_option :trace, :type => :boolean, :aliases => '-v'
+      def initialize(*args)
+        super(*args)
+        RestClient.proxy = ENV['HTTPS_PROXY'] if ENV.has_key?('HTTPS_PROXY')
+        RestClient.log = Logger.new(STDOUT) if options[:trace]
+      end
 
       desc "reviewrequest", "Create a pull request on github"
       method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
@@ -25,15 +32,13 @@ module Socialcast
       def reviewrequest
         token = authorization_token
 
-        options[:description] ||= editor_input(DEFAULT_PULL_REQUEST_DESCRIPTION)
-
         invoke :update
+        description = options[:description] || editor_input("\n\n#{DEFAULT_PULL_REQUEST_DESCRIPTION}")
         branch = current_branch
         repo = current_repo
-        payload = {:title => branch, :base => BASE_BRANCH, :head => branch, :body => options[:description]}.to_json
+        payload = {:title => branch, :base => BASE_BRANCH, :head => branch, :body => description}.to_json
 
         say "Creating pull request for #{branch} against #{BASE_BRANCH} in #{repo}"
-        RestClient.proxy = ENV['HTTPS_PROXY'] if ENV.has_key?('HTTPS_PROXY')
         response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => {:accept => :json, :content_type => :json, 'Authorization' => "token #{token}"}).execute
         data = JSON.parse response.body
         url = data['html_url']
@@ -47,18 +52,12 @@ module Socialcast
         throw e
       end
 
-      # update the current branch with the latest upstream changes
+      desc 'update', 'Update the current branch with latest upstream changes'
       def update
         run_cmd 'git update'
       end
 
       private
-
-      def current_repo
-        repo = `git config -z --get remote.origin.url`.strip
-        # ex: git@github.com:socialcast/socialcast-git-extensions.git
-        repo.scan(/:(.+\/.+)\./).first.first
-      end
 
       # build a summary of changes
       def changelog_summary(branch)
@@ -78,7 +77,7 @@ module Socialcast
       end
 
       # launch configured editor to retreive message/string
-      def editor_input(initial_text = ''
+      def editor_input(initial_text = '')
         require 'tempfile'
         Tempfile.open('reviewrequest.md') do |f|
           f << initial_text
@@ -121,6 +120,17 @@ module Socialcast
         data = JSON.parse e.http_body
         say "Failed to obtain OAuth authorization token: #{data['message']}"
         throw e
+      end
+
+      # share message in socialcast
+      # skip sharing message if CLI quiet option is present
+      def share(message, params = {})
+        return if options[:quiet]
+        require 'socialcast'
+        require 'socialcast/message'
+        Socialcast::Message.configure_from_credentials
+        Socialcast::Message.create params.merge(:body => message)
+        say "Message has been shared"
       end
     end
   end

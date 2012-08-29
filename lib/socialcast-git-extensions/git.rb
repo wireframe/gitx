@@ -9,6 +9,13 @@ module Socialcast
       repo = Grit::Repo.new(Dir.pwd)
       Grit::Head.current(repo).name
     end
+
+    def current_repo
+      repo = `git config -z --get remote.origin.url`.strip
+      # ex: git@github.com:socialcast/socialcast-git-extensions.git
+      repo.scan(/:(.+\/.+)\./).first.first
+    end
+
     def branches(options = {})
       branches = []
       args = []
