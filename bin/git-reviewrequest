@@ -4,74 +4,9 @@
 # usage:
 # git reviewrequest
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'string_ext.rb')
-include Socialcast::Git
-include Socialcast::Github
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
 
-branch = current_branch
-exit(1) unless token = request_token
-
-run_cmd 'git update'
-
-description = ""
-if index = (ARGV.index('-d') || ARGV.index('--description'))
-  description = ARGV[index + 1]
-  if description.nil?
-    puts "Usage: #git-reviewrequest -d <description>"
-    exit 1
-  end
-else
-  require 'tempfile'
-  Tempfile.open('reviewrequest.md') do |f|
-    helper_tip = <<-EOS.dedent
-      # Describe your pull request
-      # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
-      # Why not include a screenshot? Format is ![title](url)
-    EOS
-    f << "\n\n#{helper_tip}"
-    f.flush
-
-    editor = ENV['EDITOR'] || 'vi'
-    flags = case editor
-    when 'mate', 'emacs'
-      '-w'
-    when 'mvim'
-      '-f'
-    else
-      ''
-    end
-    pid = fork { exec "#{editor} #{flags} #{f.path}" }
-    Process.waitpid(pid)
-    description = File.read(f.path)
-    description = description.gsub(/^\#.*/, '').chomp.strip
-  end
-end
-
-short_description = description.split("\n").first(5).join("\n")
-changes = `git diff --stat origin/master...#{branch}`.split("\n")
-stats = changes.pop
-if changes.length > 5
-  dirs = changes.map do |file_change|
-    filename = "#{file_change.split.first}"
-    dir = filename.gsub(/\/[^\/]+$/, '')
-    dir
-  end
-  dir_counts = Hash.new(0)
-  dirs.each {|dir| dir_counts[dir] += 1 }
-  changes = dir_counts.to_a.sort_by {|k,v| v}.reverse.first(5).map {|k,v| "#{k} (#{v} file#{'s' if v > 1})"}
-end
-change_summary = (changes + [stats]).join("\n")
-
-repo = `git config -z --get remote.origin.url`.strip
-# ex: git@github.com:socialcast/socialcast-git-extensions.git
-repo = repo.scan(/:(.+\/.+)\./).first.first
-url = create_pull_request token, branch, repo, description
-
-if url
-  review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, change_summary].join("\n\n")
-  share review_message, {:url => url, :message_type => 'review_request'}
-else
-  HighLine.say "Skipping socialcast announcement"
-  exit 1
-end
+# script = Socialcast::Gitx::CLI.new(args, options, config)
+# script.invoke(:task, first_arg, second_arg, third_arg)
+script = Socialcast::Gitx::CLI.new
+script.invoke(:reviewrequest)
