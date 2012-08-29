@@ -5,8 +5,5 @@
 # git reviewrequest
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
-
-# script = Socialcast::Gitx::CLI.new(args, options, config)
-# script.invoke(:task, first_arg, second_arg, third_arg)
 script = Socialcast::Gitx::CLI.new
 script.invoke(:reviewrequest)
