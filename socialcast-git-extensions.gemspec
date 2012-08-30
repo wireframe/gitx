@@ -21,7 +21,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<json_pure>, [">= 0"])
   s.add_runtime_dependency(%q<thor>, [">= 0"])
   s.add_development_dependency(%q<rake>, ["0.9.2.2"])
-  s.add_development_dependency(%q<shoulda>, ["2.11.3"])
+  s.add_development_dependency "rspec", '>= 2.11.0'
+  s.add_development_dependency "pry", '>= 0'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

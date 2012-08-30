@@ -5,6 +5,7 @@ require 'socialcast'
 module Socialcast
   module Gitx
     module Github
+      private
       # request github authorization token
       # store the token in ~/.socialcast/credentials.yml for future reuse
       # @see http://developer.github.com/v3/oauth/#scopes
@@ -30,11 +31,11 @@ module Socialcast
 
       # @see http://developer.github.com/v3/pulls/
       def create_pull_request(token, branch, repo, body)
-        payload = {:title => branch, :base => 'master', :head => branch, :body => body}.to_json
+        payload = {:title => branch, :base => Socialcast::Gitx::BASE_BRANCH, :head => branch, :body => body}.to_json
         say "Creating pull request for "
         say "#{branch} ", :green
         say "against "
-        say "master ", :green
+        say "#{Socialcast::Gitx::BASE_BRANCH} ", :green
         say "in "
         say repo, :green
         response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => {:accept => :json, :content_type => :json, 'Authorization' => "token #{token}"}).execute

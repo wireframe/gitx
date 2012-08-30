@@ -9,7 +9,6 @@ module Socialcast
       include Socialcast::Gitx::Git
       include Socialcast::Gitx::Github
 
-      BASE_BRANCH = 'master'
       PULL_REQUEST_DESCRIPTION = "\n\n" + <<-EOS.dedent
         # Describe your pull request
         # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
@@ -49,21 +48,21 @@ module Socialcast
         say 'updating '
         say "#{branch} ", :green
         say "to have most recent changes from "
-        say BASE_BRANCH, :green
+        say Socialcast::Gitx::BASE_BRANCH, :green
 
         run_cmd "git pull origin #{branch}" rescue nil
-        run_cmd "git pull origin #{BASE_BRANCH}"
+        run_cmd "git pull origin #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd 'git push origin HEAD'
         run_cmd 'git remote prune origin'
       end
 
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
       def cleanup
-        run_cmd "git checkout #{BASE_BRANCH}"
+        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd "git pull"
 
         say "Deleting branches that have been merged into "
-        say BASE_BRANCH, :green
+        say Socialcast::Gitx::BASE_BRANCH, :green
         branches(:merged => true).each do |branch|
           run_cmd "git branch -d #{branch}"
         end
@@ -92,7 +91,7 @@ module Socialcast
           end
         end
 
-        run_cmd "git checkout #{BASE_BRANCH}"
+        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd 'git pull'
         run_cmd "git checkout -b #{branch_name}"
 
@@ -116,7 +115,9 @@ module Socialcast
       end
 
       desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
-      def nuke(bad_branch, good_branch='last_known_good_master')
+      method_option :destination, :type => :string, :aliases => '-d', :desc => 'destination branch to reset to'
+      def nuke(bad_branch)
+        good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{Socialcast::Gitx::BASE_BRANCH})") || Socialcast::Gitx::BASE_BRANCH
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
         removed_branches = reset_branch(bad_branch, good_branch)
         reset_branch("last_known_good_#{bad_branch}", good_branch)
@@ -132,20 +133,19 @@ module Socialcast
         return unless yes?("Release #{branch} to production? (y/n)", :green)
 
         update
-        integrate branch, 'master'
-        integrate branch, 'staging'
-        run_cmd "git checkout #{BASE_BRANCH}"
+        integrate_branch branch, Socialcast::Gitx::BASE_BRANCH
+        integrate_branch branch, 'staging'
+        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd "grb rm #{branch}"
 
         share "#worklog releasing #{branch} to production #scgitx"
       end
 
-
       private
 
       # build a summary of changes
       def changelog_summary(branch)
-        changes = `git diff --stat origin/#{BASE_BRANCH}...#{branch}`.split("\n")
+        changes = `git diff --stat origin/#{Socialcast::Gitx::BASE_BRANCH}...#{branch}`.split("\n")
         stats = changes.pop
         if changes.length > 5
           dirs = changes.map do |file_change|

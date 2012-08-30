@@ -5,6 +5,7 @@ module Socialcast
     module Git
       RESERVED_BRANCHES = %w{ HEAD master staging prototype next_release }
 
+      private
       def assert_not_protected_branch!(branch, action)
         raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
       end
