@@ -46,7 +46,11 @@ module Socialcast
       def update
         branch = current_branch
 
-        say "updating <%= color('#{branch}', :green) %> to have most recent changes from <%= color('#{BASE_BRANCH}', :green) %>"
+        say 'updating '
+        say "#{branch} ", :green
+        say "to have most recent changes from "
+        say BASE_BRANCH, :green
+
         run_cmd "git pull origin #{branch}" rescue nil
         run_cmd "git pull origin #{BASE_BRANCH}"
         run_cmd 'git push origin HEAD'
@@ -59,7 +63,10 @@ module Socialcast
         run_cmd "git checkout #{BASE_BRANCH}"
         run_cmd "git pull"
 
-        say "Deleting <%= color('#{remote ? 'remote' : 'local'}', :green) %> branches that have been merged into <%= color('#{BASE_BRANCH}', :green) %>"
+        say "Deleting "
+        say "#{remote ? 'remote' : 'local'} ", :green
+        say "branches that have been merged into "
+        say BASE_BRANCH, :green
         branches(:merged => true).each do |branch|
           run_cmd "git branch -d #{branch}"
         end
@@ -126,7 +133,7 @@ module Socialcast
         branch = current_branch
         assert_not_protected_branch!(branch, 'release')
 
-        return unless agree("<%= color('Release #{branch} to production? (y/n)', :green) %>")
+        return unless yes?("Release #{branch} to production? (y/n)", :green)
 
         run_cmd 'git update'
         integrate branch, 'master'

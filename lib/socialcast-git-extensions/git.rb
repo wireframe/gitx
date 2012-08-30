@@ -43,7 +43,10 @@ module Socialcast
       def reset_branch(branch, head_branch = 'master')
         raise "Can not reset #{branch} to #{head_branch}" if branch == head_branch
         raise "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(branch)
-        say "resetting <%= color('#{branch}', :green) %> branch to <%= color('#{head_branch}', :green) %>"
+        say "Resetting "
+        say "#{branch} ", :green
+        say " branch to "
+        say head_branch, :green
 
         run_cmd "git checkout #{head_branch}"
         run_cmd "git pull"
@@ -61,7 +64,11 @@ module Socialcast
       def integrate(branch, destination_branch = 'staging')
         assert_not_protected_branch!(branch, 'integrate')
         raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch)
-        say "integrating <%= color('#{branch}', :green) %> into <%= color('#{destination_branch}', :green) %>"
+        say "Integrating "
+        say "#{branch} ", :green
+        say "into "
+        say destination_branch, :green
+
         run_cmd "git remote prune origin"
         run_cmd "git checkout #{destination_branch}"
         run_cmd "git pull . #{branch}"
