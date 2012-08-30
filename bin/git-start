@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
-script = Socialcast::Gitx::CLI.new
-script.invoke(:start, ARGV)
+Socialcast::Gitx::CLI.start (['start'] + ARGV)
