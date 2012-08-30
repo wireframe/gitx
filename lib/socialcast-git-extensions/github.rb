@@ -24,8 +24,7 @@ module Socialcast
         Socialcast.credentials = credentials.merge(:scgitx_token => token)
         token
       rescue RestClient::Exception => e
-        data = JSON.parse e.http_body
-        say "Failed to obtain OAuth authorization token: #{data['message']}", :red
+        process_error e
         throw e
       end
 
@@ -42,9 +41,13 @@ module Socialcast
         data = JSON.parse response.body
         url = data['html_url']
       rescue RestClient::Exception => e
+        process_error e
+        throw e
+      end
+
+      def process_error(e)
         data = JSON.parse e.http_body
         say "Failed to create pull request: #{data['message']}", :red
-        throw e
       end
     end
   end
