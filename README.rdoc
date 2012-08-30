@@ -2,6 +2,9 @@
 
 = Core Git Extensions
 
+=== Options
+* --quiet => supress posting message in Socialcast
+
 == git start <new_branch_name (optional)>
 
 update local repository with latest upstream changes and create a new feature branch
