@@ -183,6 +183,23 @@ describe Socialcast::Gitx::CLI do
         ]
       end
     end
+    context 'when target branch == staging and --destination == last_known_good_staging' do
+      before do
+        @script = Socialcast::Gitx::CLI.new
+        @script.invoke :nuke, ['staging'], {:destination => 'last_known_good_staging'}
+      end
+      it 'should run expected commands' do
+        Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout last_known_good_staging",
+          "git pull",
+          "git branch -D staging",
+          "git push origin :staging",
+          "git checkout -b staging",
+          "grb publish staging",
+          "git checkout last_known_good_staging",
+        ]
+      end
+    end
     context 'when target branch == prototype and destination prompt == nil' do
       before do
         Socialcast::Gitx::CLI.any_instance.should_receive(:ask).and_return('')

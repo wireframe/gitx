@@ -122,7 +122,7 @@ module Socialcast
         good_branch = Socialcast::Gitx::BASE_BRANCH if good_branch.length == 0
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
         removed_branches = reset_branch(bad_branch, good_branch)
-        reset_branch("last_known_good_#{bad_branch}", good_branch)
+        reset_branch("last_known_good_#{bad_branch}", good_branch) unless "last_known_good_#{bad_branch}" == good_branch
 
         post "#worklog resetting #{bad_branch} branch to #{good_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }"
       end
