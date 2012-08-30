@@ -115,7 +115,7 @@ module Socialcast
         post "#worklog integrating #{branch} into #{target_branch} #scgitx"
       end
 
-      desc 'nuke', 'nuke the current aggregate branch and reset it to a known good state'
+      desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
       def nuke(bad_branch, good_branch='last_known_good_master')
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
         removed_branches = reset_branch(bad_branch, good_branch)
