@@ -41,7 +41,7 @@ module Socialcast
         post review_message, {:url => url, :message_type => 'review_request'}
       end
 
-      desc 'update', 'Update the current branch with latest upstream changes'
+      desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
       def update
         branch = current_branch
 
@@ -98,7 +98,7 @@ module Socialcast
         post "#worklog starting work on #{branch_name} #scgitx"
       end
 
-      desc 'share', 'publish the current branch for peer review'
+      desc 'share', 'Share the current branch in the remote repository'
       def share
         run_cmd "grb publish #{current_branch}"
       end

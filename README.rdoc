@@ -1,9 +1,40 @@
 = socialcast-git-extensions
 
-Description goes here.
+= Core Git Extensions
+
+== git start <new_branch_name (optional)>
+
+update local repository with latest upstream changes and create a new feature branch
+
+== git update
+
+update the local feature branch with latest remote changes plus upstream released changes.
+
+== git integrate <aggregate_branch_name (optional, default: prototype)>
+
+integrate the current feature branch into an aggregate branch (ex: prototype, staging)
+
+== git reviewrequest
+
+create a pull request on github for peer review of the current branch.
+
+== git release
+
+release the current feature branch to master
+
+= Extra Git Extensions
+
+== git cleanup
+
+delete released branches after they have been merged into master.
+
+== git nuke <aggregate_branch_name>
+
+reset an aggregate branch (ex: prototype, staging) back to a known good state.
+
 
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
@@ -14,4 +45,4 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2010 Ryan Sonnek. See LICENSE for details.
+Copyright (c) 2010 Socialcast, Inc. See LICENSE for details.
