@@ -3,10 +3,10 @@ require 'grit'
 module Socialcast
   module Gitx
     module Git
-      RESERVED_BRANCHES = %w{ HEAD master last_known_good_master staging last_known_good_staging next_release last_known_good_next_release }
+      RESERVED_BRANCHES = %w{ HEAD master staging prototype next_release }
 
       def assert_not_protected_branch!(branch, action)
-        raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch)
+        raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
       end
 
       # lookup the current branch of the PWD
@@ -59,6 +59,7 @@ module Socialcast
 
       # integrate a branch into a destination aggregate branch
       def integrate(branch, destination_branch = 'staging')
+        assert_not_protected_branch!(branch, 'integrate')
         raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch)
         say "integrating <%= color('#{branch}', :green) %> into <%= color('#{destination_branch}', :green) %>"
         run_cmd "git remote prune origin"

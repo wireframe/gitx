@@ -105,7 +105,6 @@ module Socialcast
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches'
       def integrate(target_branch)
         branch = current_branch
-        assert_not_protected_branch!(branch, 'integrate')
 
         run_cmd 'git update'
         integrate(branch, target_branch)
