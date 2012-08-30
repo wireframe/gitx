@@ -40,7 +40,7 @@ module Socialcast
       AGGREGATE_BRANCHES = %w{ staging prototype }
       # reset the specified branch to the same set of commits as the destination branch
       # used to revert commits on aggregate branches back to a known good state
-      def reset_branch(branch, head_branch = 'last_known_good_master')
+      def reset_branch(branch, head_branch)
         raise "Can not reset #{branch} to #{head_branch}" if branch == head_branch
         raise "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(branch)
         say "Resetting "

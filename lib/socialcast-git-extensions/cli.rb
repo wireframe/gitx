@@ -116,7 +116,7 @@ module Socialcast
       end
 
       desc 'nuke', 'nuke the current aggregate branch and reset it to a known good state'
-      def nuke(bad_branch, good_branch)
+      def nuke(bad_branch, good_branch='last_known_good_master')
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
         removed_branches = reset_branch(bad_branch, good_branch)
         reset_branch("last_known_good_#{bad_branch}", good_branch)
