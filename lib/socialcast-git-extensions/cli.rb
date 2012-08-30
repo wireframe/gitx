@@ -1,7 +1,5 @@
 require "thor"
 require 'rest_client'
-require 'json'
-require 'socialcast'
 require 'socialcast-git-extensions'
 require 'socialcast-git-extensions/string_ext'
 require 'socialcast-git-extensions/git'
