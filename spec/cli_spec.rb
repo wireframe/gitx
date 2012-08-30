@@ -196,7 +196,7 @@ describe Socialcast::Gitx::CLI do
           "git push origin :staging",
           "git checkout -b staging",
           "grb publish staging",
-          "git checkout last_known_good_staging",
+          "git checkout last_known_good_staging"
         ]
       end
     end
