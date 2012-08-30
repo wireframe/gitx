@@ -104,12 +104,13 @@ module Socialcast
       end
 
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches'
-      def integrate(target_branch)
+      def integrate(target_branch = 'prototype')
         branch = current_branch
 
         update
         integrate_branch(branch, target_branch)
-        integrate_branch(branch, 'prototype') if target_branch == 'staging'
+        integrate_branch(target_branch, 'prototype') if target_branch == 'staging'
+        run_cmd "git checkout #{branch}"
 
         post "#worklog integrating #{branch} into #{target_branch} #scgitx"
       end
