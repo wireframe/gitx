@@ -48,11 +48,60 @@ module Socialcast
       def update
         branch = current_branch
 
-        say "updating <%= color('#{branch}', :green) %> to have most recent changes from <%= color('#{BASE_BRANCH}', :green)"
+        say "updating <%= color('#{branch}', :green) %> to have most recent changes from <%= color('#{BASE_BRANCH}', :green) %>"
         run_cmd "git pull origin #{branch}" rescue nil
-        run_cmd 'git pull origin master'
+        run_cmd "git pull origin #{BASE_BRANCH}"
         run_cmd 'git push origin HEAD'
         run_cmd 'git remote prune origin'
+      end
+
+      desc 'prunemerged', 'Prune branches that have been merged into master from the repo'
+      method_option :remote, :type => :boolean, :aliases => '-r'
+      def prunemerged
+        run_cmd "git checkout #{BASE_BRANCH}"
+        run_cmd "git pull"
+
+        say "Deleting <%= color('#{remote ? 'remote' : 'local'}', :green) %> branches that have been merged into <%= color('#{BASE_BRANCH}', :green) %>"
+        branches(:merged => true).each do |branch|
+          run_cmd "git branch -d #{branch}"
+        end
+        if options[:remote]
+          branches(:merged => true, :remote => true).each do |branch|
+            run_cmd "grb rm #{branch}"
+          end
+        end
+      end
+
+      desc 'track', 'set the current branch to track the remote branch with the same name'
+      def track
+        branch = current_branch
+        run_cmd "git branch --set-upstream #{branch} origin/#{branch}"
+      end
+
+      desc 'start', 'start a new git branch with latest changes from master'
+      def start(branch_name = nil)
+        unless branch_name
+          example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sort_by { rand }.first
+          repo = Grit::Repo.new(Dir.pwd)
+          remote_branches = repo.remotes.collect {|b| b.name.split('/').last }
+          until branch_name = ask("What would you like to name your branch? (ex: #{example_branch})") {|q|
+              q.validate = Proc.new { |branch|
+                branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)
+              }
+            }
+          end
+        end
+
+        run_cmd "git checkout #{BASE_BRANCH}"
+        run_cmd 'git pull'
+        run_cmd "git checkout -b #{branch_name}"
+
+        share "#worklog starting work on #{branch_name} #scgitx"
+      end
+
+      desc 'share', 'publish the current branch for peer review'
+      def share
+        run_cmd "grb publish #{current_branch}"
       end
 
       private

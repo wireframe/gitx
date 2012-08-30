@@ -1,5 +1,8 @@
 require 'rubygems'
 require 'highline/import'
+require 'socialcast-git-extensions/version'
+require 'socialcast-git-extensions/git'
+require 'socialcast-git-extensions/github'
 
 module Socialcast
   module Gitx
@@ -21,5 +24,3 @@ module Socialcast
   end
 end
 
-require 'socialcast-git-extensions/git'
-require 'socialcast-git-extensions/github'
