@@ -25,7 +25,7 @@ module Socialcast
         token
       rescue RestClient::Exception => e
         data = JSON.parse e.http_body
-        say "Failed to obtain OAuth authorization token: #{data['message']}"
+        say "Failed to obtain OAuth authorization token: #{data['message']}", :red
         throw e
       end
 
@@ -43,7 +43,7 @@ module Socialcast
         url = data['html_url']
       rescue RestClient::Exception => e
         data = JSON.parse e.http_body
-        say "Failed to create pull request: #{data['message']}"
+        say "Failed to create pull request: #{data['message']}", :red
         throw e
       end
     end
