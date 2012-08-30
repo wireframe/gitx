@@ -57,23 +57,18 @@ module Socialcast
         run_cmd 'git remote prune origin'
       end
 
-      desc 'prunemerged', 'Prune branches that have been merged into master from the repo'
-      method_option :remote, :type => :boolean, :aliases => '-r'
-      def prunemerged
+      desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
+      def cleanup
         run_cmd "git checkout #{BASE_BRANCH}"
         run_cmd "git pull"
 
-        say "Deleting "
-        say "#{remote ? 'remote' : 'local'} ", :green
-        say "branches that have been merged into "
+        say "Deleting branches that have been merged into "
         say BASE_BRANCH, :green
         branches(:merged => true).each do |branch|
           run_cmd "git branch -d #{branch}"
         end
-        if options[:remote]
-          branches(:merged => true, :remote => true).each do |branch|
-            run_cmd "grb rm #{branch}"
-          end
+        branches(:merged => true, :remote => true).each do |branch|
+          run_cmd "grb rm #{branch}"
         end
       end
 

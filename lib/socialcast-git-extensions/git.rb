@@ -27,7 +27,7 @@ module Socialcast
         branches = []
         args = []
         args << '-r' if options[:remote]
-        args << "--merged #{options[:merged]}" if options[:merged]
+        args << "--merged #{options[:merged].is_a?(String) ? options[:merged] : ''}" if options[:merged]
         output = `git branch #{args.join(' ')}`.split("\n")
         output.each do |branch|
           branch = branch.gsub(/\*/, '').strip.split(' ').first
