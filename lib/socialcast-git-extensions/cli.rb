@@ -118,8 +118,9 @@ module Socialcast
       desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
       method_option :destination, :type => :string, :aliases => '-d', :desc => 'destination branch to reset to'
       def nuke(bad_branch)
-        good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{Socialcast::Gitx::BASE_BRANCH})")
-        good_branch = Socialcast::Gitx::BASE_BRANCH if good_branch.length == 0
+        default_good_branch = "last_known_good_#{bad_branch}"
+        good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{default_good_branch})")
+        good_branch = default_good_branch if good_branch.length == 0
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
         removed_branches = reset_branch(bad_branch, good_branch)
         reset_branch("last_known_good_#{bad_branch}", good_branch) unless "last_known_good_#{bad_branch}" == good_branch
