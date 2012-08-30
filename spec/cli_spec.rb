@@ -76,7 +76,7 @@ describe Socialcast::Gitx::CLI do
       before do
         Socialcast::Gitx::CLI.start ['integrate', 'staging']
       end
-      it 'should run expected commands' do
+      it 'should also integrate into prototype and run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
           "git pull origin master",
