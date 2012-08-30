@@ -107,4 +107,54 @@ describe Socialcast::Gitx::CLI do
       end
     end
   end
+
+  describe '#release' do
+    context 'when user rejects release' do
+      before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
+        @script = Socialcast::Gitx::CLI.new
+        @script.invoke :release
+      end
+      it 'should run no commands' do
+        Socialcast::Gitx::CLI.stubbed_executed_commands.should == []
+      end
+    end
+    context 'when user confirms release' do
+      before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:yes?).and_return(true)
+        @script = Socialcast::Gitx::CLI.new
+        @script.invoke :release
+      end
+      it 'should run expected commands' do
+        Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git pull origin FOO",
+          "git pull origin master",
+          "git push origin HEAD",
+          "git remote prune origin",
+          "git remote prune origin",
+          "git checkout master",
+          "git pull . FOO",
+          "git push origin HEAD",
+          "git checkout FOO",
+          "git pull origin FOO",
+          "git pull origin master",
+          "git push origin HEAD",
+          "git remote prune origin",
+          "git remote prune origin",
+          "git checkout staging",
+          "git pull . FOO",
+          "git push origin HEAD",
+          "git checkout FOO",
+          "git remote prune origin",
+          "git checkout prototype",
+          "git pull . staging",
+          "git push origin HEAD",
+          "git checkout staging",
+          "git checkout FOO",
+          "git checkout master",
+          "grb rm FOO"
+        ]
+      end
+    end
+  end
 end

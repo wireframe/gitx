@@ -139,7 +139,7 @@ module Socialcast
         run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd "grb rm #{branch}"
 
-        share "#worklog releasing #{branch} to production #scgitx"
+        post "#worklog releasing #{branch} to production #scgitx"
       end
 
       private
