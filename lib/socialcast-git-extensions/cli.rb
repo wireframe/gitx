@@ -39,7 +39,7 @@ module Socialcast
 
         short_description = description.split("\n").first(5).join("\n")
         review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, changelog_summary(branch)].join("\n\n")
-        share review_message, {:url => url, :message_type => 'review_request'}
+        post review_message, {:url => url, :message_type => 'review_request'}
       end
 
       desc 'update', 'Update the current branch with latest upstream changes'
@@ -101,7 +101,7 @@ module Socialcast
         run_cmd 'git pull'
         run_cmd "git checkout -b #{branch_name}"
 
-        share "#worklog starting work on #{branch_name} #scgitx"
+        post "#worklog starting work on #{branch_name} #scgitx"
       end
 
       desc 'share', 'publish the current branch for peer review'
@@ -117,7 +117,7 @@ module Socialcast
         integrate(branch, target_branch)
         integrate(branch, 'prototype') if target_branch == 'staging'
 
-        share "#worklog integrating #{branch} into #{target_branch} #scgitx"
+        post "#worklog integrating #{branch} into #{target_branch} #scgitx"
       end
 
       desc 'nuke', 'nuke the current aggregate branch and reset it to a known good state'
@@ -126,7 +126,7 @@ module Socialcast
         removed_branches = reset_branch(bad_branch, good_branch)
         reset_branch("last_known_good_#{bad_branch}", good_branch)
 
-        share "#worklog resetting #{branch} branch to #{good_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }" if options[:share]
+        post "#worklog resetting #{branch} branch to #{good_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }"
       end
 
       desc 'release', 'release the current branch to production'
@@ -188,15 +188,15 @@ module Socialcast
         end
       end
 
-      # share message in socialcast
+      # post a message in socialcast
       # skip sharing message if CLI quiet option is present
-      def share(message, params = {})
+      def post(message, params = {})
         return if options[:quiet]
         require 'socialcast'
         require 'socialcast/message'
         Socialcast::Message.configure_from_credentials
         Socialcast::Message.create params.merge(:body => message)
-        say "Message has been shared"
+        say "Message has been posted"
       end
     end
   end
