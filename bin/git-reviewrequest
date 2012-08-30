@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
 
-# create a github review request for the current branch
-# usage:
-# git reviewrequest
-
 require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
 script = Socialcast::Gitx::CLI.new
 script.invoke(:reviewrequest)

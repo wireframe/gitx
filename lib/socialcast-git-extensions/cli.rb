@@ -46,7 +46,13 @@ module Socialcast
 
       desc 'update', 'Update the current branch with latest upstream changes'
       def update
-        run_cmd 'git update'
+        branch = current_branch
+
+        say "updating <%= color('#{branch}', :green) %> to have most recent changes from <%= color('#{BASE_BRANCH}', :green)"
+        run_cmd "git pull origin #{branch}" rescue nil
+        run_cmd 'git pull origin master'
+        run_cmd 'git push origin HEAD'
+        run_cmd 'git remote prune origin'
       end
 
       private
