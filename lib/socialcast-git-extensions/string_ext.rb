@@ -4,4 +4,8 @@ class String
     gsub(/^#{a}/,'')
   end
   alias :dedent :undent
+
+  def starts_with?(characters)
+    self.match(/^#{characters}/) ? true : false
+  end
 end
