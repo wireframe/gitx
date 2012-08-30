@@ -21,8 +21,7 @@ describe Socialcast::Gitx::CLI do
 
   describe '#update' do
     before do
-      @script = Socialcast::Gitx::CLI.new
-      @script.invoke :update
+      Socialcast::Gitx::CLI.start ['update']
     end
     it 'should run expected commands' do
       Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
@@ -37,8 +36,7 @@ describe Socialcast::Gitx::CLI do
   describe '#integrate' do
     context 'when target branch is ommitted' do
       before do
-        @script = Socialcast::Gitx::CLI.new
-        @script.invoke :integrate
+        Socialcast::Gitx::CLI.start ['integrate']
       end
       it 'should default to prototype' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
@@ -57,8 +55,7 @@ describe Socialcast::Gitx::CLI do
     end
     context 'when target branch == prototype' do
       before do
-        @script = Socialcast::Gitx::CLI.new
-        @script.invoke :integrate, ['prototype']
+        Socialcast::Gitx::CLI.start ['integrate', 'prototype']
       end
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
@@ -77,8 +74,7 @@ describe Socialcast::Gitx::CLI do
     end
     context 'when target branch == staging' do
       before do
-        @script = Socialcast::Gitx::CLI.new
-        @script.invoke :integrate, ['staging']
+        Socialcast::Gitx::CLI.start ['integrate', 'staging']
       end
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
@@ -102,8 +98,9 @@ describe Socialcast::Gitx::CLI do
     end
     context 'when target branch != staging || prototype' do
       it 'should raise an error' do
-        @script = Socialcast::Gitx::CLI.new
-        lambda { @script.invoke :integrate, ['asdfasdf'] }.should raise_error(/Only aggregate branches are allowed for integration/)
+        lambda {
+          Socialcast::Gitx::CLI.start ['integrate', 'asdfasdfasdf']
+        }.should raise_error(/Only aggregate branches are allowed for integration/)
       end
     end
   end
@@ -112,8 +109,7 @@ describe Socialcast::Gitx::CLI do
     context 'when user rejects release' do
       before do
         Socialcast::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
-        @script = Socialcast::Gitx::CLI.new
-        @script.invoke :release
+        Socialcast::Gitx::CLI.start ['release']
       end
       it 'should run no commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == []
@@ -122,8 +118,7 @@ describe Socialcast::Gitx::CLI do
     context 'when user confirms release' do
       before do
         Socialcast::Gitx::CLI.any_instance.should_receive(:yes?).and_return(true)
-        @script = Socialcast::Gitx::CLI.new
-        @script.invoke :release
+        Socialcast::Gitx::CLI.start ['release']
       end
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
