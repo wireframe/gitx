@@ -16,6 +16,7 @@ describe Socialcast::Gitx::CLI do
   before do
     Socialcast::Gitx::CLI.stubbed_executed_commands = []
     Socialcast::Gitx::CLI.any_instance.stub(:current_branch).and_return('FOO')
+    Socialcast::Gitx::CLI.any_instance.stub(:post)
   end
 
   describe '#update' do

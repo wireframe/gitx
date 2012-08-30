@@ -135,7 +135,7 @@ module Socialcast
 
         update
         integrate_branch branch, Socialcast::Gitx::BASE_BRANCH
-        integrate_branch branch, 'staging'
+        invoke :integrate, ['staging']
         run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd "grb rm #{branch}"
 
