@@ -45,7 +45,7 @@ module Socialcast
         raise "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(branch)
         say "Resetting "
         say "#{branch} ", :green
-        say " branch to "
+        say "branch to "
         say head_branch, :green
 
         run_cmd "git checkout #{head_branch}"
