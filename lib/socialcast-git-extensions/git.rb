@@ -53,7 +53,7 @@ module Socialcast
         run_cmd "git pull"
         removed_branches = branches(:remote => true, :merged => "origin/#{branch}") - branches(:remote => true, :merged => "origin/#{head_branch}")
         run_cmd "git branch -D #{branch}" rescue nil
-        run_cmd "git push origin :#{branch}" rescue nil
+        run_cmd "git push origin --delete #{branch}" rescue nil
         run_cmd "git checkout -b #{branch}"
         run_cmd "grb publish #{branch}"
         run_cmd "git checkout #{head_branch}"
