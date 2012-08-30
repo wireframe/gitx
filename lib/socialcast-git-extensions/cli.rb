@@ -118,12 +118,13 @@ module Socialcast
       desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
       method_option :destination, :type => :string, :aliases => '-d', :desc => 'destination branch to reset to'
       def nuke(bad_branch)
-        good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{Socialcast::Gitx::BASE_BRANCH})") || Socialcast::Gitx::BASE_BRANCH
+        good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{Socialcast::Gitx::BASE_BRANCH})")
+        good_branch = Socialcast::Gitx::BASE_BRANCH if good_branch.length == 0
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
         removed_branches = reset_branch(bad_branch, good_branch)
         reset_branch("last_known_good_#{bad_branch}", good_branch)
 
-        post "#worklog resetting #{branch} branch to #{good_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }"
+        post "#worklog resetting #{bad_branch} branch to #{good_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }"
       end
 
       desc 'release', 'release the current branch to production'

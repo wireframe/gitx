@@ -157,4 +157,90 @@ describe Socialcast::Gitx::CLI do
       end
     end
   end
+
+  describe '#nuke' do
+    context 'when target branch == prototype and --destination == master' do
+      before do
+        @script = Socialcast::Gitx::CLI.new
+        @script.invoke :nuke, ['prototype'], {:destination => 'master'}
+      end
+      it 'should run expected commands' do
+        Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout last_known_good_master",
+          "git pull",
+          "git branch -D prototype",
+          "git push origin :prototype",
+          "git checkout -b prototype",
+          "grb publish prototype",
+          "git checkout last_known_good_master",
+          "git checkout last_known_good_master",
+          "git pull",
+          "git branch -D last_known_good_prototype",
+          "git push origin :last_known_good_prototype",
+          "git checkout -b last_known_good_prototype",
+          "grb publish last_known_good_prototype",
+          "git checkout last_known_good_master"
+        ]
+      end
+    end
+    context 'when target branch == prototype and destination prompt == nil' do
+      before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:ask).and_return('')
+        @script = Socialcast::Gitx::CLI.new
+        @script.invoke :nuke, ['prototype']
+      end
+      it 'defaults to master and should run expected commands' do
+        Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout last_known_good_master",
+          "git pull",
+          "git branch -D prototype",
+          "git push origin :prototype",
+          "git checkout -b prototype",
+          "grb publish prototype",
+          "git checkout last_known_good_master",
+          "git checkout last_known_good_master",
+          "git pull",
+          "git branch -D last_known_good_prototype",
+          "git push origin :last_known_good_prototype",
+          "git checkout -b last_known_good_prototype",
+          "grb publish last_known_good_prototype",
+          "git checkout last_known_good_master"
+        ]
+      end
+    end
+    context 'when target branch == prototype and destination prompt = master' do
+      before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:ask).and_return('master')
+        @script = Socialcast::Gitx::CLI.new
+        @script.invoke :nuke, ['prototype']
+      end
+      it 'should run expected commands' do
+        Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout last_known_good_master",
+          "git pull",
+          "git branch -D prototype",
+          "git push origin :prototype",
+          "git checkout -b prototype",
+          "grb publish prototype",
+          "git checkout last_known_good_master",
+          "git checkout last_known_good_master",
+          "git pull",
+          "git branch -D last_known_good_prototype",
+          "git push origin :last_known_good_prototype",
+          "git checkout -b last_known_good_prototype",
+          "grb publish last_known_good_prototype",
+          "git checkout last_known_good_master"
+        ]
+      end
+    end
+    context 'when target branch != staging || prototype' do
+      it 'should raise error' do
+        lambda {
+          Socialcast::Gitx::CLI.any_instance.should_receive(:ask).and_return('master')
+          @script = Socialcast::Gitx::CLI.new
+          @script.invoke :nuke, ['asdfasdf']
+        }.should raise_error /Only aggregate branches are allowed to be reset/
+      end
+    end
+  end
 end
