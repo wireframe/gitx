@@ -1,14 +1,12 @@
 require "thor"
 require 'rest_client'
 require 'socialcast-git-extensions'
-require 'socialcast-git-extensions/string_ext'
-require 'socialcast-git-extensions/git'
-require 'socialcast-git-extensions/github'
 
 module Socialcast
   module Gitx
     class CLI < Thor
-      include Socialcast::Git
+      include Socialcast::Gitx
+      include Socialcast::Gitx::Git
       include Socialcast::Gitx::Github
 
       BASE_BRANCH = 'master'
@@ -103,6 +101,43 @@ module Socialcast
       def share
         run_cmd "grb publish #{current_branch}"
       end
+
+      desc 'integrate', 'integrate the current branch into one of the aggregate development branches'
+      def integrate(target_branch)
+        branch = current_branch
+        assert_not_protected_branch!(branch, 'integrate')
+
+        run_cmd 'git update'
+        integrate(branch, target_branch)
+        integrate(branch, 'prototype') if target_branch == 'staging'
+
+        share "#worklog integrating #{branch} into #{target_branch} #scgitx"
+      end
+
+      desc 'nuke', 'nuke the current remote branch and reset it to a known good state'
+      def nuke(branch, head_branch = 'last_known_good_master')
+        removed_branches = reset_branch(branch, head_branch)
+        reset_branch("last_known_good_#{branch}", head_branch)
+
+        share "#worklog resetting #{branch} branch to #{head_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }" if options[:share]
+      end
+
+      desc 'release', 'release the current branch to production'
+      def release
+        branch = current_branch
+        assert_not_protected_branch!(branch, 'release')
+
+        return unless agree("<%= color('Release #{branch} to production? (y/n)', :green) %>")
+
+        run_cmd 'git update'
+        integrate branch, 'master'
+        integrate branch, 'staging'
+        run_cmd "git checkout master"
+        run_cmd "grb rm #{branch}"
+
+        share "#worklog releasing #{branch} to production #scgitx"
+      end
+
 
       private
 
