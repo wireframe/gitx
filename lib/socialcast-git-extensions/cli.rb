@@ -53,7 +53,7 @@ module Socialcast
 
         run_cmd "git pull origin #{branch}" rescue nil
         run_cmd "git pull origin #{BASE_BRANCH}"
-        run_cmd 'git push origin HEAD'
+        run_cmd 'git push origin good'
         run_cmd 'git remote prune origin'
       end
 
@@ -113,19 +113,20 @@ module Socialcast
       def integrate(target_branch)
         branch = current_branch
 
-        run_cmd 'git update'
+        invoke :update
         integrate(branch, target_branch)
         integrate(branch, 'prototype') if target_branch == 'staging'
 
         share "#worklog integrating #{branch} into #{target_branch} #scgitx"
       end
 
-      desc 'nuke', 'nuke the current remote branch and reset it to a known good state'
-      def nuke(branch, head_branch = 'last_known_good_master')
-        removed_branches = reset_branch(branch, head_branch)
-        reset_branch("last_known_good_#{branch}", head_branch)
+      desc 'nuke', 'nuke the current aggregate branch and reset it to a known good state'
+      def nuke(bad_branch, good_branch)
+        good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
+        removed_branches = reset_branch(bad_branch, good_branch)
+        reset_branch("last_known_good_#{bad_branch}", good_branch)
 
-        share "#worklog resetting #{branch} branch to #{head_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }" if options[:share]
+        share "#worklog resetting #{branch} branch to #{good_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }" if options[:share]
       end
 
       desc 'release', 'release the current branch to production'
@@ -135,10 +136,10 @@ module Socialcast
 
         return unless yes?("Release #{branch} to production? (y/n)", :green)
 
-        run_cmd 'git update'
+        invoke :update
         integrate branch, 'master'
         integrate branch, 'staging'
-        run_cmd "git checkout master"
+        run_cmd "git checkout #{BASE_BRANCH}"
         run_cmd "grb rm #{branch}"
 
         share "#worklog releasing #{branch} to production #scgitx"

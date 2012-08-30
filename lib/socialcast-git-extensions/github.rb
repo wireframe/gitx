@@ -31,7 +31,12 @@ module Socialcast
       # @see http://developer.github.com/v3/pulls/
       def create_pull_request(token, branch, repo, body)
         payload = {:title => branch, :base => 'master', :head => branch, :body => body}.to_json
-        say "Creating pull request for #{branch} against master in #{repo}"
+        say "Creating pull request for "
+        say "#{branch} ", :green
+        say "against "
+        say "master ", :green
+        say "in "
+        say repo, :green
         response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => {:accept => :json, :content_type => :json, 'Authorization' => "token #{token}"}).execute
         data = JSON.parse response.body
         url = data['html_url']
