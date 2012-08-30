@@ -61,7 +61,7 @@ module Socialcast
       end
 
       # integrate a branch into a destination aggregate branch
-      def integrate(branch, destination_branch = 'staging')
+      def integrate_branch(branch, destination_branch = 'staging')
         assert_not_protected_branch!(branch, 'integrate')
         raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch)
         say "Integrating "

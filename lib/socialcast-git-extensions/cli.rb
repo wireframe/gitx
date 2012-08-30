@@ -30,7 +30,7 @@ module Socialcast
       def reviewrequest
         token = authorization_token
 
-        invoke :update
+        update
 
         description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
         branch = current_branch
@@ -53,7 +53,7 @@ module Socialcast
 
         run_cmd "git pull origin #{branch}" rescue nil
         run_cmd "git pull origin #{BASE_BRANCH}"
-        run_cmd 'git push origin good'
+        run_cmd 'git push origin HEAD'
         run_cmd 'git remote prune origin'
       end
 
@@ -108,9 +108,9 @@ module Socialcast
       def integrate(target_branch)
         branch = current_branch
 
-        invoke :update
-        integrate(branch, target_branch)
-        integrate(branch, 'prototype') if target_branch == 'staging'
+        update
+        integrate_branch(branch, target_branch)
+        integrate_branch(branch, 'prototype') if target_branch == 'staging'
 
         post "#worklog integrating #{branch} into #{target_branch} #scgitx"
       end
@@ -131,7 +131,7 @@ module Socialcast
 
         return unless yes?("Release #{branch} to production? (y/n)", :green)
 
-        invoke :update
+        update
         integrate branch, 'master'
         integrate branch, 'staging'
         run_cmd "git checkout #{BASE_BRANCH}"
