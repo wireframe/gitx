@@ -3,7 +3,8 @@ require 'grit'
 module Socialcast
   module Gitx
     module Git
-      RESERVED_BRANCHES = %w{ HEAD master staging prototype next_release }
+      AGGREGATE_BRANCHES = %w{ staging prototype }
+      RESERVED_BRANCHES = %w{ HEAD master next_release } + AGGREGATE_BRANCHES
 
       private
       def assert_not_protected_branch!(branch, action)
@@ -38,7 +39,6 @@ module Socialcast
         branches.uniq
       end
 
-      AGGREGATE_BRANCHES = %w{ staging prototype }
       # reset the specified branch to the same set of commits as the destination branch
       # used to revert commits on aggregate branches back to a known good state
       def reset_branch(branch, head_branch)
