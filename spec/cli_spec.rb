@@ -27,8 +27,7 @@ describe Socialcast::Gitx::CLI do
       Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
         'git pull origin FOO',
         'git pull origin master',
-        'git push origin HEAD',
-        'git remote prune origin'
+        'git push origin HEAD'
       ]
     end
   end
@@ -43,9 +42,8 @@ describe Socialcast::Gitx::CLI do
           "git pull origin FOO",
           "git pull origin master",
           "git push origin HEAD",
-          "git remote prune origin",
-          "git remote prune origin",
           "git checkout prototype",
+          "git pull origin prototype",
           "git pull . FOO",
           "git push origin HEAD",
           "git checkout FOO",
@@ -62,9 +60,8 @@ describe Socialcast::Gitx::CLI do
           "git pull origin FOO",
           "git pull origin master",
           "git push origin HEAD",
-          "git remote prune origin",
-          "git remote prune origin",
           "git checkout prototype",
+          "git pull origin prototype",
           "git pull . FOO",
           "git push origin HEAD",
           "git checkout FOO",
@@ -81,14 +78,13 @@ describe Socialcast::Gitx::CLI do
           "git pull origin FOO",
           "git pull origin master",
           "git push origin HEAD",
-          "git remote prune origin",
-          "git remote prune origin",
           "git checkout staging",
+          "git pull origin staging",
           "git pull . FOO",
           "git push origin HEAD",
           "git checkout FOO",
-          "git remote prune origin",
           "git checkout prototype",
+          "git pull origin prototype",
           "git pull . staging",
           "git push origin HEAD",
           "git checkout staging",
@@ -125,29 +121,29 @@ describe Socialcast::Gitx::CLI do
           "git pull origin FOO",
           "git pull origin master",
           "git push origin HEAD",
-          "git remote prune origin",
-          "git remote prune origin",
           "git checkout master",
+          "git pull origin master",
           "git pull . FOO",
           "git push origin HEAD",
           "git checkout FOO",
+          "git checkout master",
           "git pull origin FOO",
           "git pull origin master",
           "git push origin HEAD",
-          "git remote prune origin",
-          "git remote prune origin",
           "git checkout staging",
+          "git pull origin staging",
           "git pull . FOO",
           "git push origin HEAD",
           "git checkout FOO",
-          "git remote prune origin",
           "git checkout prototype",
+          "git pull origin prototype",
           "git pull . staging",
           "git push origin HEAD",
           "git checkout staging",
           "git checkout FOO",
           "git checkout master",
-          "grb rm FOO"
+          "git pull",
+          "git remote prune origin"
         ]
       end
     end
@@ -259,8 +255,7 @@ describe Socialcast::Gitx::CLI do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
           "git pull origin master",
-          "git push origin HEAD",
-          "git remote prune origin"
+          "git push origin HEAD"
         ]
       end
     end
@@ -275,14 +270,13 @@ describe Socialcast::Gitx::CLI do
         "git pull origin FOO",
         "git pull origin master",
         "git push origin HEAD",
-        "git remote prune origin",
-        "git remote prune origin",
         "git checkout staging",
+        "git pull origin staging",
         "git pull . FOO",
         "git push origin HEAD",
         "git checkout FOO",
-        "git remote prune origin",
         "git checkout prototype",
+        "git pull origin prototype",
         "git pull . staging",
         "git push origin HEAD",
         "git checkout staging",

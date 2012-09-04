@@ -70,8 +70,8 @@ module Socialcast
         say "into "
         say destination_branch, :green
 
-        run_cmd "git remote prune origin"
         run_cmd "git checkout #{destination_branch}"
+        run_cmd "git pull origin #{destination_branch}"
         run_cmd "git pull . #{branch}"
         run_cmd "git push origin HEAD"
         run_cmd "git checkout #{branch}"

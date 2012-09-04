@@ -53,13 +53,13 @@ module Socialcast
         run_cmd "git pull origin #{branch}" rescue nil
         run_cmd "git pull origin #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd 'git push origin HEAD'
-        run_cmd 'git remote prune origin'
       end
 
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
       def cleanup
         run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd "git pull"
+        run_cmd 'git remote prune origin'
 
         say "Deleting branches that have been merged into "
         say Socialcast::Gitx::BASE_BRANCH, :green
@@ -145,7 +145,7 @@ module Socialcast
         integrate_branch branch, Socialcast::Gitx::BASE_BRANCH
         run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
         invoke :integrate, ['staging', '--quiet']
-        run_cmd "grb rm #{branch}"
+        cleanup
 
         post "#worklog releasing #{branch} to production #scgitx"
       end
