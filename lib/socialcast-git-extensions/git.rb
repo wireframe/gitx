@@ -77,9 +77,48 @@ module Socialcast
         run_cmd "git checkout #{branch}"
       end
 
-      private
       def aggregate_branch?(branch)
         AGGREGATE_BRANCHES.include?(branch) || branch.starts_with?('last_known_good')
+      end
+
+      # build a summary of changes
+      def changelog_summary(branch)
+        changes = `git diff --stat origin/#{Socialcast::Gitx::BASE_BRANCH}...#{branch}`.split("\n")
+        stats = changes.pop
+        if changes.length > 5
+          dirs = changes.map do |file_change|
+            filename = "#{file_change.split.first}"
+            dir = filename.gsub(/\/[^\/]+$/, '')
+            dir
+          end
+          dir_counts = Hash.new(0)
+          dirs.each {|dir| dir_counts[dir] += 1 }
+          changes = dir_counts.to_a.sort_by {|k,v| v}.reverse.first(5).map {|k,v| "#{k} (#{v} file#{'s' if v > 1})"}
+        end
+        (changes + [stats]).join("\n")
+      end
+
+      # launch configured editor to retreive message/string
+      def editor_input(initial_text = '')
+        require 'tempfile'
+        Tempfile.open('reviewrequest.md') do |f|
+          f << initial_text
+          f.flush
+
+          editor = ENV['EDITOR'] || 'vi'
+          flags = case editor
+          when 'mate', 'emacs'
+            '-w'
+          when 'mvim'
+            '-f'
+          else
+            ''
+          end
+          pid = fork { exec "#{editor} #{flags} #{f.path}" }
+          Process.waitpid(pid)
+          description = File.read(f.path)
+          description.gsub(/^\#.*/, '').chomp.strip
+        end
       end
     end
   end

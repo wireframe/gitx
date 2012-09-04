@@ -115,6 +115,12 @@ module Socialcast
         post "#worklog integrating #{branch} into #{target_branch} #scgitx"
       end
 
+      desc 'promote', '(DEPRECATED) promote the current branch into stagign'
+      def integrate(target_branch = 'prototype')
+        say 'DEPRECATED: Use `git integrate staging` instead', :red
+        integrate 'staging'
+      end
+
       desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
       method_option :destination, :type => :string, :aliases => '-d', :desc => 'destination branch to reset to'
       def nuke(bad_branch)
@@ -145,46 +151,6 @@ module Socialcast
       end
 
       private
-
-      # build a summary of changes
-      def changelog_summary(branch)
-        changes = `git diff --stat origin/#{Socialcast::Gitx::BASE_BRANCH}...#{branch}`.split("\n")
-        stats = changes.pop
-        if changes.length > 5
-          dirs = changes.map do |file_change|
-            filename = "#{file_change.split.first}"
-            dir = filename.gsub(/\/[^\/]+$/, '')
-            dir
-          end
-          dir_counts = Hash.new(0)
-          dirs.each {|dir| dir_counts[dir] += 1 }
-          changes = dir_counts.to_a.sort_by {|k,v| v}.reverse.first(5).map {|k,v| "#{k} (#{v} file#{'s' if v > 1})"}
-        end
-        (changes + [stats]).join("\n")
-      end
-
-      # launch configured editor to retreive message/string
-      def editor_input(initial_text = '')
-        require 'tempfile'
-        Tempfile.open('reviewrequest.md') do |f|
-          f << initial_text
-          f.flush
-
-          editor = ENV['EDITOR'] || 'vi'
-          flags = case editor
-          when 'mate', 'emacs'
-            '-w'
-          when 'mvim'
-            '-f'
-          else
-            ''
-          end
-          pid = fork { exec "#{editor} #{flags} #{f.path}" }
-          Process.waitpid(pid)
-          description = File.read(f.path)
-          description.gsub(/^\#.*/, '').chomp.strip
-        end
-      end
 
       # post a message in socialcast
       # skip sharing message if CLI quiet option is present
