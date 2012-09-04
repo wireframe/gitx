@@ -1,5 +1,5 @@
 module Socialcast
   module Gitx
-    VERSION = "3.0.0.pre4"
+    VERSION = "3.0.0"
   end
 end
