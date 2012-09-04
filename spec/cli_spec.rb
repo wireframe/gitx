@@ -243,4 +243,29 @@ describe Socialcast::Gitx::CLI do
       end
     end
   end
+
+  describe '#promote' do
+    before do
+      Socialcast::Gitx::CLI.start ['promote']
+    end
+    it 'should integrate into staging' do
+      Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+        "git pull origin FOO",
+        "git pull origin master",
+        "git push origin HEAD",
+        "git remote prune origin",
+        "git remote prune origin",
+        "git checkout staging",
+        "git pull . FOO",
+        "git push origin HEAD",
+        "git checkout FOO",
+        "git remote prune origin",
+        "git checkout prototype",
+        "git pull . staging",
+        "git push origin HEAD",
+        "git checkout staging",
+        "git checkout FOO"
+      ]
+    end
+  end
 end
