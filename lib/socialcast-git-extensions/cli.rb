@@ -64,10 +64,10 @@ module Socialcast
         say "Deleting branches that have been merged into "
         say Socialcast::Gitx::BASE_BRANCH, :green
         branches(:merged => true).each do |branch|
-          run_cmd "git branch -d #{branch}"
+          run_cmd "git branch -d #{branch}" unless aggregate_branch?(branch)
         end
         branches(:merged => true, :remote => true).each do |branch|
-          run_cmd "grb rm #{branch}"
+          run_cmd "grb rm #{branch}" unless aggregate_branch?(branch)
         end
       end
 
