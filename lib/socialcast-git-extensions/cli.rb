@@ -116,7 +116,7 @@ module Socialcast
       end
 
       desc 'promote', '(DEPRECATED) promote the current branch into stagign'
-      def integrate(target_branch = 'prototype')
+      def promote(target_branch = 'prototype')
         say 'DEPRECATED: Use `git integrate staging` instead', :red
         integrate 'staging'
       end
