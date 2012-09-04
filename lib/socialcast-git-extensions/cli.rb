@@ -115,7 +115,7 @@ module Socialcast
         post "#worklog integrating #{branch} into #{target_branch} #scgitx"
       end
 
-      desc 'promote', '(DEPRECATED) promote the current branch into stagign'
+      desc 'promote', '(DEPRECATED) promote the current branch into staging'
       def promote(target_branch = 'prototype')
         say 'DEPRECATED: Use `git integrate staging` instead', :red
         integrate 'staging'
