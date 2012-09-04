@@ -244,6 +244,28 @@ describe Socialcast::Gitx::CLI do
     end
   end
 
+  describe '#reviewrequest' do
+    context 'when description != null' do
+      before do
+        stub_request(:post, "https://api.github.com/repos/socialcast/socialcast-git-extensions/pulls").
+          to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
+
+        Socialcast::Gitx::CLI.start ['reviewrequest', '--description', 'testing']
+      end
+      it 'should create github pull request' do
+
+      end
+      it 'should run expected commands' do
+        Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git pull origin FOO",
+          "git pull origin master",
+          "git push origin HEAD",
+          "git remote prune origin"
+        ]
+      end
+    end
+  end
+
   describe '#promote' do
     before do
       Socialcast::Gitx::CLI.start ['promote']

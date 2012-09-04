@@ -34,7 +34,7 @@ module Socialcast
         description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
         branch = current_branch
         repo = current_repo
-        create_pull_request token, branch, repo, description
+        url = create_pull_request token, branch, repo, description
 
         short_description = description.split("\n").first(5).join("\n")
         review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, changelog_summary(branch)].join("\n\n")
