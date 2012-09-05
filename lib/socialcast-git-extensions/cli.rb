@@ -131,7 +131,14 @@ module Socialcast
         removed_branches = reset_branch(bad_branch, good_branch)
         reset_branch("last_known_good_#{bad_branch}", good_branch) unless "last_known_good_#{bad_branch}" == good_branch
 
-        post "#worklog resetting #{bad_branch} branch to #{good_branch} #scgitx\n\nthe following branches were affected:\n#{removed_branches.map{|b| '* ' + b}.join("\n") }"
+        message_parts = []
+        message_parts << "#worklog resetting #{bad_branch} branch to #{good_branch} #scgitx"
+        if removed_branches.any?
+          message_parts << ""
+          message_parts << "the following branches were affected:"
+          messgae_parts += removed_branches.map{|b| '* ' + b}
+        end
+        post message_parts.join("\n")
       end
 
       desc 'release', 'release the current branch to production'
@@ -144,7 +151,7 @@ module Socialcast
         update
         integrate_branch branch, Socialcast::Gitx::BASE_BRANCH
         run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
-        invoke :integrate, ['staging', '--quiet']
+        integrate_branch('master', 'staging')
         cleanup
 
         post "#worklog releasing #{branch} to production #scgitx"

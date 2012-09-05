@@ -21,8 +21,10 @@ describe Socialcast::Gitx::CLI do
 
   describe '#update' do
     before do
+      Socialcast::Gitx::CLI.any_instance.should_not_receive(:post)
       Socialcast::Gitx::CLI.start ['update']
     end
+    it 'should not post message to socialcast' do end # see expectations
     it 'should run expected commands' do
       Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
         'git pull origin FOO',
@@ -35,8 +37,10 @@ describe Socialcast::Gitx::CLI do
   describe '#integrate' do
     context 'when target branch is ommitted' do
       before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#worklog integrating FOO into prototype #scgitx")
         Socialcast::Gitx::CLI.start ['integrate']
       end
+      it 'should post message to socialcast' do end # see expectations
       it 'should default to prototype' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
@@ -53,8 +57,10 @@ describe Socialcast::Gitx::CLI do
     end
     context 'when target branch == prototype' do
       before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#worklog integrating FOO into prototype #scgitx")
         Socialcast::Gitx::CLI.start ['integrate', 'prototype']
       end
+      it 'should post message to socialcast' do end # see expectations
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
@@ -71,8 +77,10 @@ describe Socialcast::Gitx::CLI do
     end
     context 'when target branch == staging' do
       before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#worklog integrating FOO into staging #scgitx")
         Socialcast::Gitx::CLI.start ['integrate', 'staging']
       end
+      it 'should post message to socialcast' do end # see expectations
       it 'should also integrate into prototype and run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
@@ -113,9 +121,11 @@ describe Socialcast::Gitx::CLI do
     end
     context 'when user confirms release' do
       before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#worklog releasing FOO to production #scgitx")
         Socialcast::Gitx::CLI.any_instance.should_receive(:yes?).and_return(true)
         Socialcast::Gitx::CLI.start ['release']
       end
+      it 'should post message to socialcast' do end # see expectations
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
@@ -127,20 +137,11 @@ describe Socialcast::Gitx::CLI do
           "git push origin HEAD",
           "git checkout FOO",
           "git checkout master",
-          "git pull origin FOO",
-          "git pull origin master",
-          "git push origin HEAD",
           "git checkout staging",
           "git pull origin staging",
-          "git pull . FOO",
+          "git pull . master",
           "git push origin HEAD",
-          "git checkout FOO",
-          "git checkout prototype",
-          "git pull origin prototype",
-          "git pull . staging",
-          "git push origin HEAD",
-          "git checkout staging",
-          "git checkout FOO",
+          "git checkout master",
           "git checkout master",
           "git pull",
           "git remote prune origin"
@@ -152,8 +153,10 @@ describe Socialcast::Gitx::CLI do
   describe '#nuke' do
     context 'when target branch == prototype and --destination == master' do
       before do
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#worklog resetting prototype branch to last_known_good_master #scgitx")
         Socialcast::Gitx::CLI.start ['nuke', 'prototype', '--destination', 'master']
       end
+      it 'should publish message into socialcast' do end # see expectations
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git checkout last_known_good_master",
@@ -248,9 +251,7 @@ describe Socialcast::Gitx::CLI do
 
         Socialcast::Gitx::CLI.start ['reviewrequest', '--description', 'testing']
       end
-      it 'should create github pull request' do
-
-      end
+      it 'should create github pull request' do end # see expectations
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
