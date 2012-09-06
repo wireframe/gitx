@@ -62,6 +62,7 @@ module Socialcast
       end
 
       # integrate a branch into a destination aggregate branch
+      # blow away the local aggregate branch to ensure pulling into most recent "clean" branch
       def integrate_branch(branch, destination_branch)
         assert_not_protected_branch!(branch, 'integrate') unless aggregate_branch?(destination_branch)
         raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch) || destination_branch == Socialcast::Gitx::BASE_BRANCH
@@ -70,8 +71,8 @@ module Socialcast
         say "into "
         say destination_branch, :green
 
+        run_cmd "git branch -D #{destination_branch}"
         run_cmd "git checkout #{destination_branch}"
-        run_cmd "git pull origin #{destination_branch}"
         run_cmd "git pull . #{branch}"
         run_cmd "git push origin HEAD"
         run_cmd "git checkout #{branch}"

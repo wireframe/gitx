@@ -149,8 +149,10 @@ module Socialcast
         return unless yes?("Release #{branch} to production? (y/n)", :green)
 
         update
-        integrate_branch branch, Socialcast::Gitx::BASE_BRANCH
-        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
+        run_cmd 'git checkout master'
+        run_cmd 'git pull origin master'
+        run_cmd "git pull . #{branch}"
+        run_cmd "git push origin HEAD"
         integrate_branch('master', 'staging')
         cleanup
 
