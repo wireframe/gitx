@@ -136,7 +136,7 @@ module Socialcast
         if removed_branches.any?
           message_parts << ""
           message_parts << "the following branches were affected:"
-          messgae_parts += removed_branches.map{|b| '* ' + b}
+          message_parts += removed_branches.map{|b| ['*', b].join(' ')}
         end
         post message_parts.join("\n")
       end
