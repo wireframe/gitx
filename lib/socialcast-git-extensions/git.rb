@@ -73,6 +73,7 @@ module Socialcast
 
         run_cmd "git branch -D #{destination_branch}"
         run_cmd "git checkout #{destination_branch}"
+        run_cmd "git pull origin #{destination_branch}"
         run_cmd "git pull . #{branch}"
         run_cmd "git push origin HEAD"
         run_cmd "git checkout #{branch}"
