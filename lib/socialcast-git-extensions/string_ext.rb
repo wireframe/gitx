@@ -6,6 +6,6 @@ class String
   alias :dedent :undent
 
   def starts_with?(characters)
-    self.match(/^#{characters}/) ? true : false
+    !!self.match(/^#{characters}/)
   end
 end

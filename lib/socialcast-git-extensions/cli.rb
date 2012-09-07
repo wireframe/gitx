@@ -128,8 +128,9 @@ module Socialcast
         good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{default_good_branch})")
         good_branch = default_good_branch if good_branch.length == 0
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
+
         removed_branches = reset_branch(bad_branch, good_branch)
-        reset_branch("last_known_good_#{bad_branch}", good_branch) unless "last_known_good_#{bad_branch}" == good_branch
+        reset_branch("last_known_good_#{bad_branch}", good_branch)
 
         message_parts = []
         message_parts << "#worklog resetting #{bad_branch} branch to #{good_branch} #scgitx"
@@ -149,8 +150,8 @@ module Socialcast
         return unless yes?("Release #{branch} to production? (y/n)", :green)
 
         update
-        run_cmd 'git checkout master'
-        run_cmd 'git pull origin master'
+        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
+        run_cmd "git pull origin #{Socialcast::Gitx::BASE_BRANCH}"
         run_cmd "git pull . #{branch}"
         run_cmd "git push origin HEAD"
         integrate_branch('master', 'staging')

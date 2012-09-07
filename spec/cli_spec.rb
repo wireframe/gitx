@@ -165,20 +165,24 @@ describe Socialcast::Gitx::CLI do
       it 'should publish message into socialcast' do end # see expectations
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout master",
+          "git branch -D last_known_good_master",
           "git checkout last_known_good_master",
-          "git pull",
+          "git pull origin last_known_good_master",
           "git branch -D prototype",
           "git push origin --delete prototype",
           "git checkout -b prototype",
           "grb publish prototype",
+          "git checkout master",
+          "git checkout master",
+          "git branch -D last_known_good_master",
           "git checkout last_known_good_master",
-          "git checkout last_known_good_master",
-          "git pull",
+          "git pull origin last_known_good_master",
           "git branch -D last_known_good_prototype",
           "git push origin --delete last_known_good_prototype",
           "git checkout -b last_known_good_prototype",
           "grb publish last_known_good_prototype",
-          "git checkout last_known_good_master"
+          "git checkout master"
         ]
       end
     end
@@ -188,13 +192,15 @@ describe Socialcast::Gitx::CLI do
       end
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout master",
+          "git branch -D last_known_good_staging",
           "git checkout last_known_good_staging",
-          "git pull",
+          "git pull origin last_known_good_staging",
           "git branch -D staging",
           "git push origin --delete staging",
           "git checkout -b staging",
           "grb publish staging",
-          "git checkout last_known_good_staging"
+          "git checkout master"
         ]
       end
     end
@@ -205,13 +211,15 @@ describe Socialcast::Gitx::CLI do
       end
       it 'defaults to last_known_good_prototype and should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout master",
+          "git branch -D last_known_good_prototype",
           "git checkout last_known_good_prototype",
-          "git pull",
+          "git pull origin last_known_good_prototype",
           "git branch -D prototype",
           "git push origin --delete prototype",
           "git checkout -b prototype",
           "grb publish prototype",
-          "git checkout last_known_good_prototype"
+          "git checkout master"
         ]
       end
     end
@@ -222,20 +230,24 @@ describe Socialcast::Gitx::CLI do
       end
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+          "git checkout master",
+          "git branch -D last_known_good_master",
           "git checkout last_known_good_master",
-          "git pull",
+          "git pull origin last_known_good_master",
           "git branch -D prototype",
           "git push origin --delete prototype",
           "git checkout -b prototype",
           "grb publish prototype",
+          "git checkout master",
+          "git checkout master",
+          "git branch -D last_known_good_master",
           "git checkout last_known_good_master",
-          "git checkout last_known_good_master",
-          "git pull",
+          "git pull origin last_known_good_master",
           "git branch -D last_known_good_prototype",
           "git push origin --delete last_known_good_prototype",
           "git checkout -b last_known_good_prototype",
           "grb publish last_known_good_prototype",
-          "git checkout last_known_good_master"
+          "git checkout master"
         ]
       end
     end

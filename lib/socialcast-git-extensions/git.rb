@@ -40,23 +40,24 @@ module Socialcast
       end
 
       # reset the specified branch to the same set of commits as the destination branch
-      # used to revert commits on aggregate branches back to a known good state
+      # reverts commits on aggregate branches back to a known good state
+      # returns list of branches that were removed
       def reset_branch(branch, head_branch)
-        raise "Can not reset #{branch} to #{head_branch}" if branch == head_branch
+        return [] if branch == head_branch
         raise "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(branch)
         say "Resetting "
         say "#{branch} ", :green
         say "branch to "
         say head_branch, :green
 
-        run_cmd "git checkout #{head_branch}"
-        run_cmd "git pull"
+        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
+        refresh_branch_from_remote head_branch
         removed_branches = branches(:remote => true, :merged => "origin/#{branch}") - branches(:remote => true, :merged => "origin/#{head_branch}")
         run_cmd "git branch -D #{branch}" rescue nil
         run_cmd "git push origin --delete #{branch}" rescue nil
         run_cmd "git checkout -b #{branch}"
         run_cmd "grb publish #{branch}"
-        run_cmd "git checkout #{head_branch}"
+        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
 
         removed_branches
       end
@@ -71,12 +72,17 @@ module Socialcast
         say "into "
         say destination_branch, :green
 
-        run_cmd "git branch -D #{destination_branch}"
-        run_cmd "git checkout #{destination_branch}"
-        run_cmd "git pull origin #{destination_branch}"
+        refresh_branch_from_remote destination_branch
         run_cmd "git pull . #{branch}"
         run_cmd "git push origin HEAD"
         run_cmd "git checkout #{branch}"
+      end
+
+      # nuke local branch and pull fresh version from remote repo
+      def refresh_branch_from_remote(destination_branch)
+        run_cmd "git branch -D #{destination_branch}" rescue nil
+        run_cmd "git checkout #{destination_branch}"
+        run_cmd "git pull origin #{destination_branch}"
       end
 
       def aggregate_branch?(branch)
