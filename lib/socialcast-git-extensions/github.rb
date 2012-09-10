@@ -28,6 +28,7 @@ module Socialcast
         throw e
       end
 
+      # returns the url of the created pull request
       # @see http://developer.github.com/v3/pulls/
       def create_pull_request(token, branch, repo, body)
         payload = {:title => branch, :base => Socialcast::Gitx::BASE_BRANCH, :head => branch, :body => body}.to_json
@@ -40,6 +41,7 @@ module Socialcast
         response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => {:accept => :json, :content_type => :json, 'Authorization' => "token #{token}"}).execute
         data = JSON.parse response.body
         url = data['html_url']
+        url
       rescue RestClient::Exception => e
         process_error e
         throw e

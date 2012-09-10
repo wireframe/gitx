@@ -38,7 +38,7 @@ module Socialcast
 
         short_description = description.split("\n").first(5).join("\n")
         review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, changelog_summary(branch)].join("\n\n")
-        post review_message, {:url => url, :message_type => 'review_request'}
+        post review_message, :url => url, :message_type => 'review_request'
       end
 
       desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
@@ -168,6 +168,7 @@ module Socialcast
         return if options[:quiet]
         require 'socialcast'
         require 'socialcast/message'
+        ActiveResource::Base.logger = Logger.new(STDOUT) if options[:trace]
         Socialcast::Message.configure_from_credentials
         Socialcast::Message.create params.merge(:body => message)
         say "Message has been posted"

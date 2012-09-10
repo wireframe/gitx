@@ -267,9 +267,11 @@ describe Socialcast::Gitx::CLI do
         stub_request(:post, "https://api.github.com/repos/socialcast/socialcast-git-extensions/pulls").
           to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
 
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("@SocialcastDevelopers #reviewrequest for FOO #scgitx\n\ntesting\n\n", :url => 'http://github.com/repo/project/pulls/1', :message_type => 'review_request')
         Socialcast::Gitx::CLI.start ['reviewrequest', '--description', 'testing']
       end
       it 'should create github pull request' do end # see expectations
+      it 'should post socialcast message' do end # see expectations
       it 'should run expected commands' do
         Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
           "git pull origin FOO",
