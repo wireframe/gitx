@@ -159,7 +159,7 @@ describe Socialcast::Gitx::CLI do
         prototype_branches = %w( dev-foo dev-bar )
         master_branches = %w( dev-foo )
         Socialcast::Gitx::CLI.any_instance.should_receive(:branches).and_return(prototype_branches, master_branches, prototype_branches, master_branches)
-        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#worklog resetting prototype branch to last_known_good_master #scgitx\n\nthe following branches were affected:\n* dev-bar")
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#worklog resetting prototype branch to last_known_good_master #scgitx\n/cc @SocialcastDevelopers\n\nthe following branches were affected:\n* dev-bar")
         Socialcast::Gitx::CLI.start ['nuke', 'prototype', '--destination', 'master']
       end
       it 'should publish message into socialcast' do end # see expectations
@@ -267,7 +267,7 @@ describe Socialcast::Gitx::CLI do
         stub_request(:post, "https://api.github.com/repos/socialcast/socialcast-git-extensions/pulls").
           to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
 
-        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("@SocialcastDevelopers #reviewrequest for FOO #scgitx\n\ntesting\n\n", :url => 'http://github.com/repo/project/pulls/1', :message_type => 'review_request')
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#reviewrequest for FOO #scgitx\n\n/cc @SocialcastDevelopers\n\ntesting\n\n", :url => 'http://github.com/repo/project/pulls/1', :message_type => 'review_request')
         Socialcast::Gitx::CLI.start ['reviewrequest', '--description', 'testing']
       end
       it 'should create github pull request' do end # see expectations

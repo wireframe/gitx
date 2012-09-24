@@ -35,9 +35,10 @@ module Socialcast
         branch = current_branch
         repo = current_repo
         url = create_pull_request token, branch, repo, description
+        say "Pull request created: #{url}"
 
         short_description = description.split("\n").first(5).join("\n")
-        review_message = ["@SocialcastDevelopers #reviewrequest for #{branch} #scgitx", short_description, changelog_summary(branch)].join("\n\n")
+        review_message = ["#reviewrequest for #{branch} #scgitx", "/cc @SocialcastDevelopers", short_description, changelog_summary(branch)].join("\n\n")
         post review_message, :url => url, :message_type => 'review_request'
       end
 
@@ -134,6 +135,7 @@ module Socialcast
 
         message_parts = []
         message_parts << "#worklog resetting #{bad_branch} branch to #{good_branch} #scgitx"
+        message_parts << "/cc @SocialcastDevelopers"
         if removed_branches.any?
           message_parts << ""
           message_parts << "the following branches were affected:"
