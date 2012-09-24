@@ -42,6 +42,8 @@ module Socialcast
         post review_message, :url => url, :message_type => 'review_request'
       end
 
+      # TODO: use --no-edit to skip merge messages
+      # TODO: use pull --rebase to skip merge commit
       desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
       def update
         branch = current_branch
