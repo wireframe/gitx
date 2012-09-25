@@ -172,7 +172,8 @@ describe Socialcast::Gitx::CLI do
           "git branch -D prototype",
           "git push origin --delete prototype",
           "git checkout -b prototype",
-          "grb publish prototype",
+          "git push origin prototype",
+          "git branch --set-upstream prototype origin/prototype",
           "git checkout master",
           "git checkout master",
           "git branch -D last_known_good_master",
@@ -181,7 +182,8 @@ describe Socialcast::Gitx::CLI do
           "git branch -D last_known_good_prototype",
           "git push origin --delete last_known_good_prototype",
           "git checkout -b last_known_good_prototype",
-          "grb publish last_known_good_prototype",
+          "git push origin last_known_good_prototype",
+          "git branch --set-upstream last_known_good_prototype origin/last_known_good_prototype",
           "git checkout master"
         ]
       end
@@ -199,7 +201,8 @@ describe Socialcast::Gitx::CLI do
           "git branch -D staging",
           "git push origin --delete staging",
           "git checkout -b staging",
-          "grb publish staging",
+          "git push origin staging",
+          "git branch --set-upstream staging origin/staging",
           "git checkout master"
         ]
       end
@@ -218,7 +221,8 @@ describe Socialcast::Gitx::CLI do
           "git branch -D prototype",
           "git push origin --delete prototype",
           "git checkout -b prototype",
-          "grb publish prototype",
+          "git push origin prototype",
+          "git branch --set-upstream prototype origin/prototype",
           "git checkout master"
         ]
       end
@@ -237,7 +241,8 @@ describe Socialcast::Gitx::CLI do
           "git branch -D prototype",
           "git push origin --delete prototype",
           "git checkout -b prototype",
-          "grb publish prototype",
+          "git push origin prototype",
+          "git branch --set-upstream prototype origin/prototype",
           "git checkout master",
           "git checkout master",
           "git branch -D last_known_good_master",
@@ -246,7 +251,8 @@ describe Socialcast::Gitx::CLI do
           "git branch -D last_known_good_prototype",
           "git push origin --delete last_known_good_prototype",
           "git checkout -b last_known_good_prototype",
-          "grb publish last_known_good_prototype",
+          "git push origin last_known_good_prototype",
+          "git branch --set-upstream last_known_good_prototype origin/last_known_good_prototype",
           "git checkout master"
         ]
       end

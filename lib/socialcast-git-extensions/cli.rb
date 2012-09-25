@@ -76,8 +76,7 @@ module Socialcast
 
       desc 'track', 'set the current branch to track the remote branch with the same name'
       def track
-        branch = current_branch
-        run_cmd "git branch --set-upstream #{branch} origin/#{branch}"
+        track_branch current_branch
       end
 
       desc 'start', 'start a new git branch with latest changes from master'
@@ -103,8 +102,7 @@ module Socialcast
 
       desc 'share', 'Share the current branch in the remote repository'
       def share
-        run_cmd "git push origin #{current_branch}"
-        track
+        share_branch current_branch
       end
 
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches'

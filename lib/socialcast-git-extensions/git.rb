@@ -56,10 +56,20 @@ module Socialcast
         run_cmd "git branch -D #{branch}" rescue nil
         run_cmd "git push origin --delete #{branch}" rescue nil
         run_cmd "git checkout -b #{branch}"
-        run_cmd "grb publish #{branch}"
+        share_branch branch
         run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
 
         removed_branches
+      end
+
+      # share the local branch in the remote repo
+      def share_branch(branch)
+        run_cmd "git push origin #{branch}"
+        track_branch branch
+      end
+
+      def track_branch(branch)
+        run_cmd "git branch --set-upstream #{branch} origin/#{branch}"
       end
 
       # integrate a branch into a destination aggregate branch
