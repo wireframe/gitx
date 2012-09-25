@@ -103,7 +103,8 @@ module Socialcast
 
       desc 'share', 'Share the current branch in the remote repository'
       def share
-        run_cmd "grb publish #{current_branch}"
+        run_cmd "git push origin #{current_branch}"
+        track
       end
 
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches'
