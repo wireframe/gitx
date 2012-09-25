@@ -132,8 +132,8 @@ module Socialcast
         good_branch = default_good_branch if good_branch.length == 0
         good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
 
-        removed_branches = reset_branch(bad_branch, good_branch)
-        reset_branch("last_known_good_#{bad_branch}", good_branch)
+        removed_branches = nuke_branch(bad_branch, good_branch)
+        nuke_branch("last_known_good_#{bad_branch}", good_branch)
 
         message_parts = []
         message_parts << "#worklog resetting #{bad_branch} branch to #{good_branch} #scgitx"

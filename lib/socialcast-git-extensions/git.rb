@@ -42,7 +42,7 @@ module Socialcast
       # reset the specified branch to the same set of commits as the destination branch
       # reverts commits on aggregate branches back to a known good state
       # returns list of branches that were removed
-      def reset_branch(branch, head_branch)
+      def nuke_branch(branch, head_branch)
         return [] if branch == head_branch
         raise "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(branch)
         say "Resetting "
@@ -81,8 +81,8 @@ module Socialcast
       # nuke local branch and pull fresh version from remote repo
       def refresh_branch_from_remote(destination_branch)
         run_cmd "git branch -D #{destination_branch}" rescue nil
+        run_cmd "git fetch origin"
         run_cmd "git checkout #{destination_branch}"
-        run_cmd "git pull origin #{destination_branch}"
       end
 
       def aggregate_branch?(branch)
