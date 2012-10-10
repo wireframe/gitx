@@ -12,7 +12,7 @@ module Socialcast
       PULL_REQUEST_DESCRIPTION = "\n\n" + <<-EOS.dedent
         # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
         # Links to screencasts or screenshots with a desciption of what this is showcasing. For architectual changes please include diagrams that will make it easier for the reviewer to understand the change. Format is ![title](url).
-        # Link to ticket describing feature/bug (plantain, JIRA, bugzilla). Format is ![title](url).
+        # Link to ticket describing feature/bug (plantain, JIRA, bugzilla). Format is [title](url).
         # Brief description of the change, and how it accomplishes the task they set out to do.
       EOS
 
