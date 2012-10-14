@@ -36,14 +36,14 @@ module Socialcast
         end
 
         review_mention = if review_buddies
-          username = `git config -z --global --get github.user`.strip
-          user = review_buddies[username]
+          github_username = `git config -z --global --get github.user`.strip
+          current_user = review_buddies[github_username]
 
-          if user && review_buddies[user['buddy']]
-            "Assigned to @" + review_buddies[user['buddy']]['socialcast_username']
+          if current_user && review_buddies[current_user['buddy']]
+            "Assigned to @" + review_buddies[current_user['buddy']]['socialcast_username']
           end
         end
-        
+
         description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
         branch = current_branch
         repo = current_repo
