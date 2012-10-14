@@ -31,6 +31,19 @@ module Socialcast
 
         update
 
+        review_buddies = if ENV.has_key?('SCGITX_REVIEW_BUDDIES_PATH')
+          YAML.load_file(ENV['SCGITX_REVIEW_BUDDIES_PATH'])
+        end
+
+        review_mention = if review_buddies
+          username = `git config -z --global --get github.user`.strip
+          user = review_buddies[username]
+
+          if user && review_buddies[user['buddy']]
+            "Assigned to @" + review_buddies[user['buddy']]['socialcast_username']
+          end
+        end
+        
         description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
         branch = current_branch
         repo = current_repo
@@ -38,7 +51,7 @@ module Socialcast
         say "Pull request created: #{url}"
 
         short_description = description.split("\n").first(5).join("\n")
-        review_message = ["#reviewrequest for #{branch} #scgitx", "/cc @SocialcastDevelopers", short_description, changelog_summary(branch)].join("\n\n")
+        review_message = ["#reviewrequest for #{branch} #scgitx", "/cc @SocialcastDevelopers", review_mention, short_description, changelog_summary(branch)].join("\n\n")
         post review_message, :url => url, :message_type => 'review_request'
       end
 
