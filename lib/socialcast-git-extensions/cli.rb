@@ -10,9 +10,10 @@ module Socialcast
       include Socialcast::Gitx::Github
 
       PULL_REQUEST_DESCRIPTION = "\n\n" + <<-EOS.dedent
-        # Describe your pull request
         # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
-        # Why not include a screenshot? Format is ![title](url)
+        # Links to screencasts or screenshots with a desciption of what this is showcasing. For architectual changes please include diagrams that will make it easier for the reviewer to understand the change. Format is ![title](url).
+        # Link to ticket describing feature/bug (plantain, JIRA, bugzilla). Format is [title](url).
+        # Brief description of the change, and how it accomplishes the task they set out to do.
       EOS
 
       method_option :quiet, :type => :boolean, :aliases => '-q'
