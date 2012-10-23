@@ -1,8 +1,0 @@
-#!/usr/bin/env ruby
-
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Git
-
-head_branch = ARGV.first || 'master'
-reset_branch('prototype', head_branch, :share => true)
-reset_branch('last_known_good_prototype', head_branch)

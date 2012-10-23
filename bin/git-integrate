@@ -1,16 +1,4 @@
 #!/usr/bin/env ruby
 
-# if the branch has already been integrated, the tickets can be inferred and looked up from jira
-# usage:
-# git integrate <ticket_id> <ticket_id2>...
-
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Git
-
-branch = current_branch
-protect_reserved_branches!(branch, 'integrate')
-
-run_cmd 'git update'
-integrate(branch, 'prototype')
-
-share "#worklog integrating #{branch} into prototype #scgitx"
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
+Socialcast::Gitx::CLI.start (['integrate'] + ARGV)

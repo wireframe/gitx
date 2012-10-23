@@ -1,25 +1,19 @@
 require 'rubygems'
-require 'highline/import'
+require 'socialcast-git-extensions/version'
+require 'socialcast-git-extensions/string_ext'
+require 'socialcast-git-extensions/git'
+require 'socialcast-git-extensions/github'
 
 module Socialcast
   module Gitx
-    def protect_reserved_branches!(branch, mode)
-      abort("Cannot #{mode} reserved branch") if Socialcast::Git::RESERVED_BRANCHES.include?(branch)
-    end
+    BASE_BRANCH = 'master'
+
+    private
+    # execute a shell command and raise an error if non-zero exit code is returned
     def run_cmd(cmd)
-      HighLine.say "\n> <%= color('#{cmd.gsub("'", '')}', :red) %>"
+      say "\n$ "
+      say cmd.gsub("'", ''), :red
       raise "#{cmd} failed" unless system cmd
-    end
-    def share(message, options = {})
-      return if ARGV.delete("--quiet") || ARGV.delete("-q")
-      require 'socialcast'
-      require 'socialcast/message'
-      Socialcast::Message.configure_from_credentials
-      Socialcast::Message.create options.merge(:body => message)
-      say "Message has been shared"
     end
   end
 end
-
-require 'socialcast-git-extensions/git'
-require 'socialcast-git-extensions/github'

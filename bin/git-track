@@ -1,8 +1,4 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Git
-
-branch = current_branch
-
-run_cmd "git branch --set-upstream #{branch} origin/#{branch}"
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
+Socialcast::Gitx::CLI.start (['track'] + ARGV)

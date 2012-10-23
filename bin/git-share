@@ -1,10 +1,4 @@
 #!/usr/bin/env ruby
 
-# publish the current branch for others to review
-# usage:
-# git share
-
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Git
-
-run_cmd "grb publish #{current_branch}"
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
+Socialcast::Gitx::CLI.start (['share'] + ARGV)

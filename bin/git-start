@@ -1,24 +1,4 @@
 #!/usr/bin/env ruby
 
-#start a new git branch with latest changes from master
-
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Git
-
-unless branch_name = ARGV.first
-  example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sort_by { rand }.first
-  repo = Grit::Repo.new(Dir.pwd)
-  remote_branches = repo.remotes.collect {|b| b.name.split('/').last }
-  until branch_name = HighLine.ask("What would you like to name your branch? (ex: #{example_branch})") {|q| 
-      q.validate = Proc.new { |branch|
-        branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)
-      }
-    }
-  end
-end
-
-run_cmd 'git checkout master'
-run_cmd 'git pull'
-run_cmd "git checkout -b #{branch_name}"
-
-share "#worklog starting work on #{branch_name} #scgitx"
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
+Socialcast::Gitx::CLI.start (['start'] + ARGV)

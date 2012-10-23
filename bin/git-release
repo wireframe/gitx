@@ -1,19 +1,4 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Git
-
-branch = current_branch
-protect_reserved_branches!(branch, 'release')
-
-exit unless HighLine.agree("<%= color('Release #{branch} to production? (y/n)', :green) %>")
-
-run_cmd 'git update'
-integrate branch, 'master'
-
-integrate branch, 'staging'
-integrate 'staging', 'prototype'
-run_cmd "git checkout master"
-run_cmd "grb rm #{branch}"
-
-share "#worklog releasing #{branch} to production #scgitx"
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
+Socialcast::Gitx::CLI.start (['release'] + ARGV)

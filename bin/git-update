@@ -1,12 +1,4 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions.rb')
-include Socialcast::Git
-
-branch = current_branch
-
-HighLine.say "updating <%= color('#{branch}', :green) %> to have most recent changes from master"
-run_cmd "git pull origin #{branch}" rescue nil
-run_cmd 'git pull origin master'
-run_cmd 'git push origin HEAD'
-run_cmd 'git remote prune origin'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'socialcast-git-extensions', 'cli.rb')
+Socialcast::Gitx::CLI.start (['update'] + ARGV)
