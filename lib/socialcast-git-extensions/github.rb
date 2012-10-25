@@ -13,7 +13,7 @@ module Socialcast
         credentials = Socialcast.credentials
         return credentials[:scgitx_token] if credentials[:scgitx_token]
 
-        username = `git config -z --global --get github.user`.strip
+        username = current_user
         raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" if username.empty?
         password = ask("Github password for #{username}: ") { |q| q.echo = false }
 

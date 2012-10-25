@@ -24,6 +24,12 @@ module Socialcast
         repo.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
       end
 
+      # lookup the current github.user
+      # ex: 'wireframe'
+      def current_user
+        `git config -z --global --get github.user`.strip
+      end
+
       # retrieve a list of branches
       def branches(options = {})
         branches = []

@@ -40,11 +40,10 @@ module Socialcast
         end
 
         review_mention = if review_buddies
-          github_username = `git config -z --global --get github.user`.strip
-          current_user = review_buddies[github_username]
+          review_requestor = review_buddies[current_user]
 
-          if current_user && review_buddies[current_user['buddy']]
-            "Assigned to @" + review_buddies[current_user['buddy']]['socialcast_username']
+          if review_requestor && review_buddies[review_requestor['buddy']]
+            "Assigned to @" + review_buddies[review_requestor['buddy']]['socialcast_username']
           end
         end
 
