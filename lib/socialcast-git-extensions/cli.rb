@@ -32,12 +32,7 @@ module Socialcast
 
         update
 
-        review_buddies = if ENV.has_key?('SCGITX_REVIEW_BUDDIES_PATH')
-          YAML.load_file(ENV['SCGITX_REVIEW_BUDDIES_PATH'])
-        else
-          default_location = Pathname(([Dir.pwd, '/config/scgitx_review_buddies.yml']).join)
-          default_location.exist? ? YAML.load_file(default_location) : nil
-        end
+        review_buddies = load_review_buddies
 
         review_mention = if review_buddies
           review_requestor = review_buddies[current_user]

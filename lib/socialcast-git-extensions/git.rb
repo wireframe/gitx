@@ -144,6 +144,17 @@ module Socialcast
           description.gsub(/^\#.*/, '').chomp.strip
         end
       end
+
+      # load Git review buddies YAML
+      # Ex: ENV['SCGITX_REVIEW_BUDDIES_PATH'] or default $PWD/config/scgitx_review_buddies.yml
+      def load_review_buddies
+        if ENV.has_key?('SCGITX_REVIEW_BUDDIES_PATH')
+          YAML.load_file(ENV['SCGITX_REVIEW_BUDDIES_PATH'])
+        else
+          default_location = Pathname(([Dir.pwd, '/config/scgitx_review_buddies.yml']).join)
+          default_location.exist? ? YAML.load_file(default_location) : nil
+        end
+      end
     end
   end
 end

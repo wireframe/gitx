@@ -16,6 +16,7 @@ describe Socialcast::Gitx::CLI do
   before do
     Socialcast::Gitx::CLI.stubbed_executed_commands = []
     Socialcast::Gitx::CLI.any_instance.stub(:current_branch).and_return('FOO')
+    Socialcast::Gitx::CLI.any_instance.stub(:current_user).and_return('wireframe')
     Socialcast::Gitx::CLI.any_instance.stub(:post)
   end
 
@@ -268,12 +269,37 @@ describe Socialcast::Gitx::CLI do
   end
 
   describe '#reviewrequest' do
-    context 'when description != null' do
+    context 'when there are no review_buddies specified' do
+      before do
+        Socialcast::Gitx::CLI.any_instance.stub(:load_review_buddies).and_return(nil)
+      end
+      context 'when description != null' do
+        before do
+          stub_request(:post, "https://api.github.com/repos/socialcast/socialcast-git-extensions/pulls").
+            to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
+
+          Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#reviewrequest for FOO #scgitx\n\n/cc @SocialcastDevelopers\n\ntesting\n\n", :url => 'http://github.com/repo/project/pulls/1', :message_type => 'review_request')
+          Socialcast::Gitx::CLI.start ['reviewrequest', '--description', 'testing']
+        end
+        it 'should create github pull request' do end # see expectations
+        it 'should post socialcast message' do end # see expectations
+        it 'should run expected commands' do
+          Socialcast::Gitx::CLI.stubbed_executed_commands.should == [
+            "git pull origin FOO",
+            "git pull origin master",
+            "git push origin HEAD"
+          ]
+        end
+      end
+    end
+
+    context 'when review_buddies are specified via a /config YML file' do
       before do
         stub_request(:post, "https://api.github.com/repos/socialcast/socialcast-git-extensions/pulls").
           to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
 
-        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#reviewrequest for FOO #scgitx\n\n/cc @SocialcastDevelopers\n\ntesting\n\n", :url => 'http://github.com/repo/project/pulls/1', :message_type => 'review_request')
+        # The Review Buddy should be @mentioned in the message
+        Socialcast::Gitx::CLI.any_instance.should_receive(:post).with("#reviewrequest for FOO #scgitx\n\n/cc @SocialcastDevelopers\n\nAssigned to @VanMiranda\n\ntesting\n\n", :url => 'http://github.com/repo/project/pulls/1', :message_type => 'review_request')
         Socialcast::Gitx::CLI.start ['reviewrequest', '--description', 'testing']
       end
       it 'should create github pull request' do end # see expectations
