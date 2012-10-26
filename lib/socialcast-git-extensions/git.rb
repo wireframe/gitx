@@ -24,8 +24,8 @@ module Socialcast
         repo.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
       end
 
-      # lookup the current github.user
-      # ex: 'wireframe'
+      # @returns [String] github username (ex: 'wireframe') of the current github.user
+      # @returns empty [String] when no github.user is set on the system
       def current_user
         `git config -z --global --get github.user`.strip
       end

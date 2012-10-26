@@ -32,14 +32,8 @@ module Socialcast
 
         update
 
-        review_buddies = load_review_buddies
-
-        review_mention = if review_buddies
-          review_requestor = review_buddies[current_user]
-
-          if review_requestor && review_buddies[review_requestor['buddy']]
-            "Assigned to @" + review_buddies[review_requestor['buddy']]['socialcast_username']
-          end
+        review_mention = if buddy = socialcast_review_buddy(current_user)
+          "Assigned to @#{buddy}"
         end
 
         description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
