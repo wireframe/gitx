@@ -22,7 +22,7 @@ integrate the current feature branch into an aggregate branch (ex: prototype, st
 create a pull request on github for peer review of the current branch.
 
 === Optional:
-Create a Review Buddy mapping that will reference the local Github username and @mention a pre-assigned review buddy in Socialcast in the Review Request message.  Specify the mapping by creating a YML file relative to the Repo Root: `config/scgitx_review_buddies.yml` with the following format:
+Create a Review Buddy mapping that will reference the local Github username and @mention a pre-assigned review buddy in the Socialcast Review Request message.  Specify the mapping by creating a YML file relative to the Repo Root: config/scgitx_review_buddies.yml with the following format:
 
     emilyjames: # Github Username "emilyjames"
       socialcast_username: "EmilyJames" # Socialcast UserName
