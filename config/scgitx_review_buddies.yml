@@ -1,7 +1,0 @@
-# Map github usernames to Socialcast usernames and assign review buddies
-vanm:
-  socialcast_username: VanMiranda
-  buddy: wireframe
-wireframe:
-  socialcast_username: RyanSonnek 
-  buddy: vanm
