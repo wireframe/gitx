@@ -146,7 +146,7 @@ module Socialcast
       end
 
       # load SC Git Extensions Config YAML
-      # @returns [Hash] of configuration options from YAML file
+      # @returns [Hash] of configuration options from YAML file (if it exists)
       def config
         @config ||= begin
           if config_file.exist?
@@ -157,7 +157,7 @@ module Socialcast
         end
       end
       
-      # @returns a [String] or [Pathname] for the scgitx.yml Config File
+      # @returns a [Pathname] for the scgitx.yml Config File
       # from either ENV['SCGITX_CONFIG_PATH'] or default $PWD/config/scgitx.yml
       def config_file
         Pathname((ENV['SCGITX_CONFIG_PATH'] || ([Dir.pwd, '/config/scgitx.yml']).join))
