@@ -55,14 +55,10 @@ module Socialcast
       # @returns [String] socialcast username to assign the review to
       # @returns [nil] when no buddy system configured or user not found
       def socialcast_review_buddy(current_user)
-        review_buddies = load_review_buddies
-
-        if review_buddies
-          review_requestor = review_buddies[current_user]
-
-          if review_requestor && review_buddies[review_requestor['buddy']]
-            review_buddies[review_requestor['buddy']]['socialcast_username']
-          end
+        review_requestor = review_buddies[current_user]
+        
+        if review_requestor && review_buddies[review_requestor['buddy']]
+          review_buddies[review_requestor['buddy']]['socialcast_username']
         end
       end
     end

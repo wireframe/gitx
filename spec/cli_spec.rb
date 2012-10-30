@@ -271,7 +271,7 @@ describe Socialcast::Gitx::CLI do
   describe '#reviewrequest' do
     context 'when there are no review_buddies specified' do
       before do
-        Socialcast::Gitx::CLI.any_instance.stub(:load_review_buddies).and_return(nil)
+        Socialcast::Gitx::CLI.any_instance.stub(:config_file).and_return(Pathname(''))
       end
       context 'when description != null' do
         before do

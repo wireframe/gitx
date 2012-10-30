@@ -160,12 +160,12 @@ module Socialcast
       # @returns a [String] or [Pathname] for the scgitx.yml Config File
       # from either ENV['SCGITX_CONFIG_PATH'] or default $PWD/config/scgitx.yml
       def config_file
-        ENV['SCGITX_CONFIG_PATH'] || Pathname(([Dir.pwd, '/config/scgitx.yml']).join)
+        Pathname((ENV['SCGITX_CONFIG_PATH'] || ([Dir.pwd, '/config/scgitx.yml']).join))
       end
 
       # load Review buddies from the SCGITX Configuration YML
       # @returns [Hash] of review buddy mapping from Config YML (ex: {'wireframe' => {'socialcast_username' => 'RyanSonnek', 'buddy' => 'vanm'}})
-      def load_review_buddies
+      def review_buddies
         config['review_buddies'] || {}
       end
     end
