@@ -146,23 +146,27 @@ module Socialcast
       end
 
       # load SC Git Extensions Config YAML
-      # Ex: ENV['SCGITX_CONFIG_PATH'] or default $PWD/config/scgitx.yml
-      def load_scgitx_config
-        if ENV.has_key?('SCGITX_CONFIG_PATH')
-          YAML.load_file(ENV['SCGITX_CONFIG_PATH'])
-        else
-          default_location = Pathname(([Dir.pwd, '/config/scgitx.yml']).join)
-          default_location.exist? ? YAML.load_file(default_location) : nil
+      # @returns [Hash] of configuration options from YAML file
+      def config
+        @config ||= begin
+          if config_file.exist?
+            YAML.load_file(config_file)
+          else
+            {}
+          end
         end
+      end
+      
+      # @returns a [String] or [Pathname] for the scgitx.yml Config File
+      # from either ENV['SCGITX_CONFIG_PATH'] or default $PWD/config/scgitx.yml
+      def config_file
+        ENV['SCGITX_CONFIG_PATH'] || Pathname(([Dir.pwd, '/config/scgitx.yml']).join)
       end
 
       # load Review buddies from the SCGITX Configuration YML
       # @returns [Hash] of review buddy mapping from Config YML (ex: {'wireframe' => {'socialcast_username' => 'RyanSonnek', 'buddy' => 'vanm'}})
       def load_review_buddies
-        config_yml = load_scgitx_config
-        if config_yml && config_yml['review_buddies']
-          config_yml['review_buddies']
-        end
+        config['review_buddies'] || {}
       end
     end
   end
