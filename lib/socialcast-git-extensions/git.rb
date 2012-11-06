@@ -1,4 +1,5 @@
 require 'grit'
+require 'pathname'
 
 module Socialcast
   module Gitx
