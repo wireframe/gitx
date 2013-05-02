@@ -7,8 +7,10 @@ module Socialcast
     module Github
       private
       # request github authorization token
+      # User-Agent is required
       # store the token in ~/.socialcast/credentials.yml for future reuse
       # @see http://developer.github.com/v3/oauth/#scopes
+      # @see http://developer.github.com/v3/#user-agent-required
       def authorization_token
         credentials = Socialcast.credentials
         return credentials[:scgitx_token] if credentials[:scgitx_token]
@@ -18,7 +20,7 @@ module Socialcast
         password = ask("Github password for #{username}: ") { |q| q.echo = false }
 
         payload = {:scopes => ['repo'], :note => 'Socialcast Git eXtension', :note_url => 'https://github.com/socialcast/socialcast-git-extensions'}.to_json
-        response = RestClient::Request.new(:url => "https://api.github.com/authorizations", :method => "POST", :user => username, :password => password, :payload => payload, :headers => {:accept => :json, :content_type => :json}).execute
+        response = RestClient::Request.new(:url => "https://api.github.com/authorizations", :method => "POST", :user => username, :password => password, :payload => payload, :headers => {:accept => :json, :content_type => :json, :user_agent => 'socialcast-git-extensions'}).execute
         data = JSON.parse response.body
         token = data['token']
         Socialcast.credentials = credentials.merge(:scgitx_token => token)
