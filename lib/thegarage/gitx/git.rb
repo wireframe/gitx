@@ -33,12 +33,12 @@ module Thegarage
 
       # @returns [String] auth token stored in git (current repo, user config or installed global settings)
       def github_auth_token
-        `git config -z --get thegarage.gitx.github_auth_token`.strip
+        `git config -z --get thegarage.gitx.githubauthtoken`.strip
       end
 
       # store new auth token in the local project git config
       def github_auth_token=(new_token)
-        `git config thegarage.gitx.github_auth_token "#{new_token}"`
+        `git config thegarage.gitx.githubauthtoken "#{new_token}"`
       end
 
       # retrieve a list of branches
