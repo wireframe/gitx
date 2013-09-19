@@ -142,7 +142,7 @@ module Thegarage
 
           editor = ENV['EDITOR'] || 'vi'
           flags = case editor
-          when 'mate', 'emacs'
+          when 'mate', 'emacs', 'subl'
             '-w'
           when 'mvim'
             '-f'
