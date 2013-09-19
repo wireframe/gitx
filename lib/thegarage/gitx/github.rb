@@ -15,7 +15,7 @@ module Thegarage
       # @see http://developer.github.com/v3/#user-agent-required
       def authorization_token
         auth_token = github_auth_token
-        return auth_token if auth_token
+        return auth_token unless auth_token.blank?
 
         username = current_user
         raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" if username.empty?
