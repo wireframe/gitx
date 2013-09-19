@@ -18,7 +18,5 @@ coverage
 rdoc
 pkg
 
-#bundler
+## bundler
 Gemfile.lock
-
-## PROJECT::SPECIFIC

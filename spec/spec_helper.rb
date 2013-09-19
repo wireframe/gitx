@@ -5,7 +5,7 @@ require 'webmock/rspec'
 require 'pry'
 RSpec::Mocks::setup(Object.new)
 
-require 'socialcast-git-extensions/cli'
+require 'thegarage/gitx/cli'
 
 RSpec.configure do |config|
   config.mock_with :rspec

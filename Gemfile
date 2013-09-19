@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source 'https://rubygems.org'
 
-# Specify your gem's dependencies in socialcast-git-extensions.gemspec
+# Specify your gem's dependencies in your gemspec file
 gemspec

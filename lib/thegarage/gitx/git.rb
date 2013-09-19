@@ -1,7 +1,7 @@
 require 'grit'
 require 'pathname'
 
-module Socialcast
+module Thegarage
   module Gitx
     module Git
       AGGREGATE_BRANCHES = %w{ staging prototype }
@@ -19,7 +19,7 @@ module Socialcast
       end
 
       # lookup the current repository of the PWD
-      # ex: git@github.com:socialcast/socialcast-git-extensions.git OR https://github.com/socialcast/socialcast-git-extensions.git
+      # ex: git@github.com:socialcast/thegarage/gitx.git OR https://github.com/socialcast/thegarage/gitx.git
       def current_repo
         repo = `git config -z --get remote.origin.url`.strip
         repo.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
@@ -29,6 +29,15 @@ module Socialcast
       # @returns empty [String] when no github.user is set on the system
       def current_user
         `git config -z --global --get github.user`.strip
+      end
+
+      # @returns [String] auth token stored in git (current repo, user config or installed global settings)
+      def github_auth_token
+        `git config -z --get thegarage.gitx.github_auth_token`.strip
+      end
+
+      def github_auth_token=(new_token)
+        `git config thegarage.gitx.github_auth_token "#{new_token}"`
       end
 
       # retrieve a list of branches
@@ -57,14 +66,14 @@ module Socialcast
         say "branch to "
         say head_branch, :green
 
-        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
+        run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
         refresh_branch_from_remote head_branch
         removed_branches = branches(:remote => true, :merged => "origin/#{branch}") - branches(:remote => true, :merged => "origin/#{head_branch}")
         run_cmd "git branch -D #{branch}" rescue nil
         run_cmd "git push origin --delete #{branch}" rescue nil
         run_cmd "git checkout -b #{branch}"
         share_branch branch
-        run_cmd "git checkout #{Socialcast::Gitx::BASE_BRANCH}"
+        run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
 
         removed_branches
       end
@@ -83,7 +92,7 @@ module Socialcast
       # blow away the local aggregate branch to ensure pulling into most recent "clean" branch
       def integrate_branch(branch, destination_branch)
         assert_not_protected_branch!(branch, 'integrate') unless aggregate_branch?(destination_branch)
-        raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch) || destination_branch == Socialcast::Gitx::BASE_BRANCH
+        raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch) || destination_branch == Thegarage::Gitx::BASE_BRANCH
         say "Integrating "
         say "#{branch} ", :green
         say "into "
@@ -108,7 +117,7 @@ module Socialcast
 
       # build a summary of changes
       def changelog_summary(branch)
-        changes = `git diff --stat origin/#{Socialcast::Gitx::BASE_BRANCH}...#{branch}`.split("\n")
+        changes = `git diff --stat origin/#{Thegarage::Gitx::BASE_BRANCH}...#{branch}`.split("\n")
         stats = changes.pop
         if changes.length > 5
           dirs = changes.map do |file_change|
@@ -157,17 +166,11 @@ module Socialcast
           end
         end
       end
-      
+
       # @returns a [Pathname] for the scgitx.yml Config File
       # from either ENV['SCGITX_CONFIG_PATH'] or default $PWD/config/scgitx.yml
       def config_file
         Pathname((ENV['SCGITX_CONFIG_PATH'] || ([Dir.pwd, '/config/scgitx.yml']).join))
-      end
-
-      # load Review buddies from the SCGITX Configuration YML
-      # @returns [Hash] of review buddy mapping from Config YML (ex: {'wireframe' => {'socialcast_username' => 'RyanSonnek', 'buddy' => 'vanm'}})
-      def review_buddies
-        config['review_buddies'] || {}
       end
     end
   end
