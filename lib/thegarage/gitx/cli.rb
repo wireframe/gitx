@@ -28,10 +28,9 @@ module Thegarage
       method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
       # @see http://developer.github.com/v3/pulls/
       def reviewrequest
-        token = authorization_token
-
         update
 
+        token = authorization_token
         description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
         branch = current_branch
         repo = current_repo
@@ -125,10 +124,9 @@ module Thegarage
       def release
         branch = current_branch
         assert_not_protected_branch!(branch, 'release')
+        update
 
         return unless yes?("Release #{branch} to production? (y/n)", :green)
-
-        update
         run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
         run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
         run_cmd "git pull . #{branch}"

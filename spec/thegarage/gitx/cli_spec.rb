@@ -11,12 +11,18 @@ describe Thegarage::Gitx::CLI do
     def run_cmd(cmd)
       self.class.stubbed_executed_commands << cmd
     end
+    # stub branch to always be a known branch
+    def current_branch
+      'FOO'
+    end
+    # stub current user to always be known
+    def current_user
+      'wireframe'
+    end
   end
 
   before do
     Thegarage::Gitx::CLI.stubbed_executed_commands = []
-    Thegarage::Gitx::CLI.any_instance.stub(:current_branch).and_return('FOO')
-    Thegarage::Gitx::CLI.any_instance.stub(:current_user).and_return('wireframe')
   end
 
   describe '#update' do
@@ -86,8 +92,12 @@ describe Thegarage::Gitx::CLI do
         Thegarage::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
         Thegarage::Gitx::CLI.start ['release']
       end
-      it 'should run no commands' do
-        Thegarage::Gitx::CLI.stubbed_executed_commands.should == []
+      it 'should only run update commands' do
+        Thegarage::Gitx::CLI.stubbed_executed_commands.should == [
+          "git pull origin FOO",
+          "git pull origin master",
+          "git push origin HEAD"
+        ]
       end
     end
     context 'when user confirms release' do
@@ -233,7 +243,7 @@ describe Thegarage::Gitx::CLI do
   describe '#reviewrequest' do
     context 'when description != null' do
       before do
-        stub_request(:post, "https://api.github.com/repos/socialcast/thegarage/gitx/pulls").
+        stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
           to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
 
         Thegarage::Gitx::CLI.start ['reviewrequest', '--description', 'testing']

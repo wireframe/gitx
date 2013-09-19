@@ -28,7 +28,7 @@ module Thegarage
       # @returns [String] github username (ex: 'wireframe') of the current github.user
       # @returns empty [String] when no github.user is set on the system
       def current_user
-        `git config -z --global --get github.user`.strip
+        `git config -z --get github.user`.strip
       end
 
       # @returns [String] auth token stored in git (current repo, user config or installed global settings)
@@ -36,6 +36,7 @@ module Thegarage
         `git config -z --get thegarage.gitx.github_auth_token`.strip
       end
 
+      # store new auth token in the local project git config
       def github_auth_token=(new_token)
         `git config thegarage.gitx.github_auth_token "#{new_token}"`
       end
