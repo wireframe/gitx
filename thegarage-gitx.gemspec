@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Thegarage::Gitx::VERSION
   spec.authors       = ["Ryan Sonnek"]
   spec.email         = ["ryan.sonnek@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Git eXtensions for common development workflow}
+  spec.summary       = %q{Utility scripts for Git to increase productivity for common operations}
   spec.homepage      = ""
   spec.license       = "MIT"
 
