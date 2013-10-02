@@ -1,4 +1,3 @@
-require "thegarage/gitx/version"
 require 'thegarage/gitx/version'
 require 'thegarage/gitx/string_extensions'
 require 'thegarage/gitx/git'
@@ -12,10 +11,14 @@ module Thegarage
     private
 
     # execute a shell command and raise an error if non-zero exit code is returned
-    def run_cmd(cmd)
+    # return the string output from the command
+    def run_cmd(cmd, options = {})
       say "\n$ "
       say cmd.gsub("'", ''), :red
-      raise "#{cmd} failed" unless system cmd
+      output = `#{cmd}`
+      success = !!$?.to_i
+      raise "#{cmd} failed" unless success || options[:allow_failure]
+      output
     end
   end
 end

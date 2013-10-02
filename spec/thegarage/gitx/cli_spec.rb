@@ -8,8 +8,9 @@ describe Thegarage::Gitx::CLI do
     end
     private
     # stub out command execution and record commands for test inspection
-    def run_cmd(cmd)
+    def run_cmd(cmd, options={})
       self.class.stubbed_executed_commands << cmd
+      ''
     end
     # stub branch to always be a known branch
     def current_branch
@@ -134,46 +135,32 @@ describe Thegarage::Gitx::CLI do
         prototype_branches = %w( dev-foo dev-bar )
         master_branches = %w( dev-foo )
         Thegarage::Gitx::CLI.any_instance.should_receive(:branches).and_return(prototype_branches, master_branches, prototype_branches, master_branches)
+        Thegarage::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
         Thegarage::Gitx::CLI.start ['nuke', 'prototype', '--destination', 'master']
       end
       it 'should run expected commands' do
         Thegarage::Gitx::CLI.stubbed_executed_commands.should == [
           "git checkout master",
-          "git branch -D last_known_good_master",
-          "git fetch origin",
-          "git checkout last_known_good_master",
           "git branch -D prototype",
           "git push origin --delete prototype",
-          "git checkout -b prototype",
+          "git checkout -b prototype build-master-2013-10-01-01",
           "git push origin prototype",
           "git branch --set-upstream prototype origin/prototype",
-          "git checkout master",
-          "git checkout master",
-          "git branch -D last_known_good_master",
-          "git fetch origin",
-          "git checkout last_known_good_master",
-          "git branch -D last_known_good_prototype",
-          "git push origin --delete last_known_good_prototype",
-          "git checkout -b last_known_good_prototype",
-          "git push origin last_known_good_prototype",
-          "git branch --set-upstream last_known_good_prototype origin/last_known_good_prototype",
           "git checkout master"
         ]
       end
     end
-    context 'when target branch == staging and --destination == last_known_good_staging' do
+    context 'when target branch == staging and --destination == staging' do
       before do
-        Thegarage::Gitx::CLI.start ['nuke', 'staging', '--destination', 'last_known_good_staging']
+        Thegarage::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
+        Thegarage::Gitx::CLI.start ['nuke', 'staging', '--destination', 'staging']
       end
       it 'should run expected commands' do
         Thegarage::Gitx::CLI.stubbed_executed_commands.should == [
           "git checkout master",
-          "git branch -D last_known_good_staging",
-          "git fetch origin",
-          "git checkout last_known_good_staging",
           "git branch -D staging",
           "git push origin --delete staging",
-          "git checkout -b staging",
+          "git checkout -b staging build-staging-2013-10-02-02",
           "git push origin staging",
           "git branch --set-upstream staging origin/staging",
           "git checkout master"
@@ -183,17 +170,15 @@ describe Thegarage::Gitx::CLI do
     context 'when target branch == prototype and destination prompt == nil' do
       before do
         Thegarage::Gitx::CLI.any_instance.should_receive(:ask).and_return('')
+        Thegarage::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
         Thegarage::Gitx::CLI.start ['nuke', 'prototype']
       end
-      it 'defaults to last_known_good_prototype and should run expected commands' do
+      it 'defaults to prototype and should run expected commands' do
         Thegarage::Gitx::CLI.stubbed_executed_commands.should == [
           "git checkout master",
-          "git branch -D last_known_good_prototype",
-          "git fetch origin",
-          "git checkout last_known_good_prototype",
           "git branch -D prototype",
           "git push origin --delete prototype",
-          "git checkout -b prototype",
+          "git checkout -b prototype build-prototype-2013-10-02-03",
           "git push origin prototype",
           "git branch --set-upstream prototype origin/prototype",
           "git checkout master"
@@ -203,29 +188,17 @@ describe Thegarage::Gitx::CLI do
     context 'when target branch == prototype and destination prompt = master' do
       before do
         Thegarage::Gitx::CLI.any_instance.should_receive(:ask).and_return('master')
+        Thegarage::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
         Thegarage::Gitx::CLI.start ['nuke', 'prototype']
       end
       it 'should run expected commands' do
         Thegarage::Gitx::CLI.stubbed_executed_commands.should == [
           "git checkout master",
-          "git branch -D last_known_good_master",
-          "git fetch origin",
-          "git checkout last_known_good_master",
           "git branch -D prototype",
           "git push origin --delete prototype",
-          "git checkout -b prototype",
+          "git checkout -b prototype build-master-2013-10-01-01",
           "git push origin prototype",
           "git branch --set-upstream prototype origin/prototype",
-          "git checkout master",
-          "git checkout master",
-          "git branch -D last_known_good_master",
-          "git fetch origin",
-          "git checkout last_known_good_master",
-          "git branch -D last_known_good_prototype",
-          "git push origin --delete last_known_good_prototype",
-          "git checkout -b last_known_good_prototype",
-          "git push origin last_known_good_prototype",
-          "git branch --set-upstream last_known_good_prototype origin/last_known_good_prototype",
           "git checkout master"
         ]
       end
@@ -234,8 +207,21 @@ describe Thegarage::Gitx::CLI do
       it 'should raise error' do
         lambda {
           Thegarage::Gitx::CLI.any_instance.should_receive(:ask).and_return('master')
+          Thegarage::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
           Thegarage::Gitx::CLI.start ['nuke', 'asdfasdf']
         }.should raise_error /Only aggregate branches are allowed to be reset/
+      end
+    end
+    context 'when user does not confirm nuking the target branch' do
+      before do
+        Thegarage::Gitx::CLI.any_instance.should_receive(:ask).and_return('master')
+        Thegarage::Gitx::CLI.any_instance.should_receive(:yes?).and_return(false)
+        Thegarage::Gitx::CLI.start ['nuke', 'prototype']
+      end
+      it 'should run expected commands' do
+        Thegarage::Gitx::CLI.stubbed_executed_commands.should == [
+          "git fetch --tags"
+        ]
       end
     end
   end

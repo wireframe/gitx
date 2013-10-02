@@ -14,31 +14,34 @@ module Thegarage
 
       # lookup the current branch of the PWD
       def current_branch
-        repo = Grit::Repo.new(Dir.pwd)
-        Grit::Head.current(repo).name
+        Grit::Head.current(current_repo).name
+      end
+
+      def current_repo
+        @repo ||= Grit::Repo.new(Dir.pwd)
       end
 
       # lookup the current repository of the PWD
       # ex: git@github.com:socialcast/thegarage/gitx.git OR https://github.com/socialcast/thegarage/gitx.git
-      def current_repo
-        repo = `git config -z --get remote.origin.url`.strip
+      def current_remote_repo
+        repo = current_repo.config['remote.origin.url']
         repo.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
       end
 
       # @returns [String] github username (ex: 'wireframe') of the current github.user
       # @returns empty [String] when no github.user is set on the system
       def current_user
-        `git config -z --get github.user`.strip
+        current_repo.config['github.user']
       end
 
       # @returns [String] auth token stored in git (current repo, user config or installed global settings)
       def github_auth_token
-        `git config -z --get thegarage.gitx.githubauthtoken`.strip
+        current_repo.config['thegarage.gitx.githubauthtoken']
       end
 
       # store new auth token in the local project git config
       def github_auth_token=(new_token)
-        `git config thegarage.gitx.githubauthtoken "#{new_token}"`
+        current_repo.config['thegarage.gitx.githubauthtoken'] = new_token
       end
 
       # retrieve a list of branches
@@ -56,11 +59,9 @@ module Thegarage
         branches.uniq
       end
 
-      # reset the specified branch to the same set of commits as the destination branch
-      # reverts commits on aggregate branches back to a known good state
-      # returns list of branches that were removed
+      # reset the specified aggregate branch to the same set of commits as the destination branch
       def nuke_branch(branch, head_branch)
-        return [] if branch == head_branch
+        return if branch == head_branch
         raise "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(branch)
         say "Resetting "
         say "#{branch} ", :green
@@ -68,15 +69,11 @@ module Thegarage
         say head_branch, :green
 
         run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        refresh_branch_from_remote head_branch
-        removed_branches = branches(:remote => true, :merged => "origin/#{branch}") - branches(:remote => true, :merged => "origin/#{head_branch}")
-        run_cmd "git branch -D #{branch}" rescue nil
-        run_cmd "git push origin --delete #{branch}" rescue nil
-        run_cmd "git checkout -b #{branch}"
+        run_cmd "git branch -D #{branch}", :allow_failure => true
+        run_cmd "git push origin --delete #{branch}", :allow_failure => true
+        run_cmd "git checkout -b #{branch} #{head_branch}"
         share_branch branch
         run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-
-        removed_branches
       end
 
       # share the local branch in the remote repo
@@ -86,7 +83,7 @@ module Thegarage
       end
 
       def track_branch(branch)
-        run_cmd "git branch --set-upstream #{branch} origin/#{branch}"
+        run_cmd "git branch --set-upstream-to origin/#{branch}"
       end
 
       # integrate a branch into a destination aggregate branch
@@ -107,30 +104,13 @@ module Thegarage
 
       # nuke local branch and pull fresh version from remote repo
       def refresh_branch_from_remote(destination_branch)
-        run_cmd "git branch -D #{destination_branch}" rescue nil
+        run_cmd "git branch -D #{destination_branch}", :allow_failure => true
         run_cmd "git fetch origin"
         run_cmd "git checkout #{destination_branch}"
       end
 
       def aggregate_branch?(branch)
-        AGGREGATE_BRANCHES.include?(branch) || branch.starts_with?('last_known_good')
-      end
-
-      # build a summary of changes
-      def changelog_summary(branch)
-        changes = `git diff --stat origin/#{Thegarage::Gitx::BASE_BRANCH}...#{branch}`.split("\n")
-        stats = changes.pop
-        if changes.length > 5
-          dirs = changes.map do |file_change|
-            filename = "#{file_change.split.first}"
-            dir = filename.gsub(/\/[^\/]+$/, '')
-            dir
-          end
-          dir_counts = Hash.new(0)
-          dirs.each {|dir| dir_counts[dir] += 1 }
-          changes = dir_counts.to_a.sort_by {|k,v| v}.reverse.first(5).map {|k,v| "#{k} (#{v} file#{'s' if v > 1})"}
-        end
-        (changes + [stats]).join("\n")
+        AGGREGATE_BRANCHES.include?(branch)
       end
 
       # launch configured editor to retreive message/string
@@ -154,24 +134,6 @@ module Thegarage
           description = File.read(f.path)
           description.gsub(/^\#.*/, '').chomp.strip
         end
-      end
-
-      # load SC Git Extensions Config YAML
-      # @returns [Hash] of configuration options from YAML file (if it exists)
-      def config
-        @config ||= begin
-          if config_file.exist?
-            YAML.load_file(config_file)
-          else
-            {}
-          end
-        end
-      end
-
-      # @returns a [Pathname] for the scgitx.yml Config File
-      # from either ENV['SCGITX_CONFIG_PATH'] or default $PWD/config/scgitx.yml
-      def config_file
-        Pathname((ENV['SCGITX_CONFIG_PATH'] || ([Dir.pwd, '/config/scgitx.yml']).join))
       end
     end
   end
