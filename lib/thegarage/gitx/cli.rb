@@ -16,7 +16,6 @@ module Thegarage
         # Brief description of the change, and how it accomplishes the task they set out to do.
       EOS
 
-      method_option :quiet, :type => :boolean, :aliases => '-q'
       method_option :trace, :type => :boolean, :aliases => '-v'
       def initialize(*args)
         super(*args)
@@ -33,7 +32,7 @@ module Thegarage
         token = authorization_token
         description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
         branch = current_branch
-        repo = current_repo
+        repo = current_remote_repo
         url = create_pull_request token, branch, repo, description
         say "Pull request created: #{url}"
       end
@@ -49,7 +48,7 @@ module Thegarage
         say "to have most recent changes from "
         say Thegarage::Gitx::BASE_BRANCH, :green
 
-        run_cmd "git pull origin #{branch}" rescue nil
+        run_cmd "git pull origin #{branch}", :allow_failure => true
         run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
         run_cmd 'git push origin HEAD'
       end
@@ -111,13 +110,16 @@ module Thegarage
       desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
       method_option :destination, :type => :string, :aliases => '-d', :desc => 'destination branch to reset to'
       def nuke(bad_branch)
-        default_good_branch = "last_known_good_#{bad_branch}"
-        good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{default_good_branch})")
-        good_branch = default_good_branch if good_branch.length == 0
-        good_branch = "last_known_good_#{good_branch}" unless good_branch.starts_with?('last_known_good_')
+        good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{bad_branch})")
+        good_branch = bad_branch if good_branch.length == 0
 
-        removed_branches = nuke_branch(bad_branch, good_branch)
-        nuke_branch("last_known_good_#{bad_branch}", good_branch)
+        run_cmd "git fetch --tags"
+        good_tags = run_cmd("git tag -l 'build-#{good_branch}-*'").split
+        last_known_good_tag = good_tags.sort.last
+        raise "No known good tag found for branch: #{good_branch}.  Verify tag exists via `git tag -l 'build-#{good_branch}-*'`" unless last_known_good_tag
+        return unless yes?("Reset #{bad_branch} to #{last_known_good_tag}? (y/n)", :green)
+
+        nuke_branch(bad_branch, last_known_good_tag)
       end
 
       desc 'release', 'release the current branch to production'
