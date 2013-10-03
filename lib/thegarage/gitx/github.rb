@@ -6,6 +6,8 @@ module Thegarage
   module Gitx
     module Github
       include Thegarage::Gitx::Git
+      CLIENT_NAME = 'The Garage Git eXtensions'
+      CLIENT_URL = 'https://github.com/thegarage/thegarage-gitx'
 
       private
       # request github authorization token
@@ -21,11 +23,26 @@ module Thegarage
         raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" if username.empty?
         password = ask("Github password for #{username}: ", :echo => false)
 
-        payload = {:scopes => ['repo'], :note => 'Socialcast Git eXtension', :note_url => 'https://github.com/socialcast/thegarage/gitx'}.to_json
-        response = RestClient::Request.new(:url => "https://api.github.com/authorizations", :method => "POST", :user => username, :password => password, :payload => payload, :headers => {:accept => :json, :content_type => :json, :user_agent => 'thegarage/gitx'}).execute
+        payload = {
+          :scopes => ['repo'],
+          :note => CLIENT_NAME,
+          :note_url => CLIENT_URL
+        }.to_json
+        response = RestClient::Request.new({
+          :url => "https://api.github.com/authorizations",
+          :method => "POST",
+          :user => username,
+          :password => password,
+          :payload => payload,
+          :headers => {
+            :accept => :json,
+            :content_type => :json,
+            :user_agent => 'thegarage/gitx'
+          }
+        }).execute
         data = JSON.parse response.body
         token = data['token']
-        github_auth_token = token
+        self.github_auth_token = token
         token
       rescue RestClient::Exception => e
         process_error e

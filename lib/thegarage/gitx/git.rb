@@ -41,7 +41,7 @@ module Thegarage
 
       # store new auth token in the local project git config
       def github_auth_token=(new_token)
-        run_cmd "git config thegarage.gitx.githubauthtoken #{new_token}"
+        current_repo.config['thegarage.gitx.githubauthtoken'] = new_token
       end
 
       # retrieve a list of branches
