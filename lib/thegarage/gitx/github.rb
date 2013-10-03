@@ -19,7 +19,7 @@ module Thegarage
 
         username = current_user
         raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" if username.empty?
-        password = ask("Github password for #{username}: ") { |q| q.echo = false }
+        password = ask("Github password for #{username}: ", :echo => false)
 
         payload = {:scopes => ['repo'], :note => 'Socialcast Git eXtension', :note_url => 'https://github.com/socialcast/thegarage/gitx'}.to_json
         response = RestClient::Request.new(:url => "https://api.github.com/authorizations", :method => "POST", :user => username, :password => password, :payload => payload, :headers => {:accept => :json, :content_type => :json, :user_agent => 'thegarage/gitx'}).execute
