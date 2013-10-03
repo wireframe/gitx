@@ -2,6 +2,7 @@ require 'thegarage/gitx/version'
 require 'thegarage/gitx/string_extensions'
 require 'thegarage/gitx/git'
 require 'thegarage/gitx/github'
+require 'English'
 
 
 module Thegarage
@@ -16,7 +17,7 @@ module Thegarage
       say "\n$ "
       say cmd.gsub("'", ''), :red
       output = `#{cmd}`
-      success = !!$?.to_i
+      success = !!$CHILD_STATUS.to_i
       raise "#{cmd} failed" unless success || options[:allow_failure]
       output
     end
