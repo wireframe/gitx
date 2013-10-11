@@ -1,5 +1,5 @@
 module Thegarage
   module Gitx
-    VERSION = '1.1.0.alpha2'
+    VERSION = '1.1.0'
   end
 end

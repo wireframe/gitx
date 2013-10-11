@@ -17,7 +17,7 @@ module Thegarage
       say "\n$ "
       say cmd.gsub("'", ''), :red
       output = `#{cmd}`
-      success = !!$CHILD_STATUS.to_i
+      success = $CHILD_STATUS.to_i == 0
       raise "#{cmd} failed" unless success || options[:allow_failure]
       output
     end
