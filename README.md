@@ -9,7 +9,8 @@ Inspired by the [socialcast-git-extensions gem](https://github.com/socialcast/so
 # Git Extensions for Workflow
 
 ### Options
-* `-v` = verbose for debugging commands
+* `--trace` or `-v` = verbose output for debugging commands
+* `--pretend` or `-p` = dry run commands and do not actually invoke operations
 
 ## git start <new_branch_name (optional)>
 
