@@ -13,9 +13,6 @@ describe Thegarage::Gitx::CLI do
   before do
     # default current branch to: feature-branch
     allow(cli).to receive(:current_branch).and_return('feature-branch')
-
-    # stub any actual executions to the run method
-    # allow(cli).to receive(:run)
   end
 
 
