@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx', 'cli.rb')
-Thegarage::Gitx::CLI.start (['createtag'] + ARGV)
+Thegarage::Gitx::CLI.start (['buildtag'] + ARGV)

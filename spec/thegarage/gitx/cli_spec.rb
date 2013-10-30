@@ -300,7 +300,7 @@ describe Thegarage::Gitx::CLI do
     end
   end
 
-  describe '#createtag' do
+  describe '#buildtag' do
     let(:env_travis_branch) { nil }
     let(:env_travis_pull_request) { nil }
     let(:env_travis_build_number) { nil }
@@ -311,7 +311,7 @@ describe Thegarage::Gitx::CLI do
     end
     context 'when ENV[\'TRAVIS_BRANCH\'] is nil' do
       it 'should raise Unknown Branch error' do
-        expect { cli.createtag }.to raise_error "Unknown branch. ENV['TRAVIS_BRANCH'] is required."
+        expect { cli.buildtag }.to raise_error "Unknown branch. ENV['TRAVIS_BRANCH'] is required."
       end
     end
     context 'when the travis branch is master and the travis pull request is not false' do
@@ -319,7 +319,7 @@ describe Thegarage::Gitx::CLI do
       let(:env_travis_pull_request) { '45' }
       before do
         expect(cli).to receive(:say).with("Skipping creation of tag for pull request: #{ENV['TRAVIS_PULL_REQUEST']}")
-        cli.createtag
+        cli.buildtag
       end
       it 'tells us that it is skipping the creation of the tag' do
         should meet_expectations
@@ -330,7 +330,7 @@ describe Thegarage::Gitx::CLI do
       let(:env_travis_pull_request) { 'false' }
       before do
         expect(cli).to receive(:say).with(/Cannot create build tag for branch: #{ENV['TRAVIS_BRANCH']}/)
-        cli.createtag
+        cli.buildtag
       end
       it 'tells us that the branch is not supported' do
         should meet_expectations
@@ -344,7 +344,7 @@ describe Thegarage::Gitx::CLI do
         Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
           expect(cli).to receive(:run).with("git tag build-master-2013-10-30-10-21-28 -a -m 'Generated tag from TravisCI build 24'", capture: true).ordered
           expect(cli).to receive(:run).with("git push origin build-master-2013-10-30-10-21-28", capture: true).ordered
-          cli.createtag
+          cli.buildtag
         end
       end
       it 'should create a tag for the branch and push it to github' do

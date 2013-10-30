@@ -141,8 +141,8 @@ module Thegarage
         cleanup
       end
 
-      desc 'createtag', 'create a tag for the current Travis-CI build and push it back to origin'
-      def createtag
+      desc 'buildtag', 'create a tag for the current Travis-CI build and push it back to origin'
+      def buildtag
         travis_branch = ENV['TRAVIS_BRANCH']
         pull_request = ENV['TRAVIS_PULL_REQUEST']
         
