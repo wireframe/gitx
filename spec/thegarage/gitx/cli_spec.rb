@@ -278,11 +278,14 @@ describe Thegarage::Gitx::CLI do
   end
 
   describe '#reviewrequest' do
-    context 'when description != null' do
+    context 'when description != null and there is an existing authorization_token' do
       let(:options) { {description: 'testing'} }
+      let(:authorization_token) { '123981239123' }
       before do
         stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
           to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
+
+        expect(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered

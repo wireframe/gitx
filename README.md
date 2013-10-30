@@ -1,5 +1,7 @@
 # thegarage-gitx
 
+[![Build Status](https://travis-ci.org/thegarage/thegarage-gitx.png?branch=fix-rspec-mocks)](https://travis-ci.org/thegarage/thegarage-gitx)
+
 Useful Git eXtensions for Development workflow at The Garage.
 
 Inspired by the [socialcast-git-extensions gem](https://github.com/socialcast/socialcast-git-extensions)
