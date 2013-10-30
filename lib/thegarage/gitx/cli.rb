@@ -5,6 +5,9 @@ require 'thegarage/gitx'
 module Thegarage
   module Gitx
     class CLI < Thor
+      include Thor::Actions
+      add_runtime_options!
+
       include Thegarage::Gitx
       include Thegarage::Gitx::Git
       include Thegarage::Gitx::Github
@@ -138,8 +141,8 @@ module Thegarage
         cleanup
       end
 
-      desc 'create_tag', 'create a tag for the current Travis-CI build and push it back to origin'
-      def create_tag
+      desc 'createtag', 'create a tag for the current Travis-CI build and push it back to origin'
+      def createtag
         travis_branch = ENV['TRAVIS_BRANCH']
         pull_request = ENV['TRAVIS_PULL_REQUEST']
         
@@ -155,6 +158,22 @@ module Thegarage
           run_cmd "git tag #{git_tag} -a -m 'Generated tag from TravisCI build #{ENV['TRAVIS_BUILD_NUMBER']}'"
           run_cmd "git push origin #{git_tag}"
         end
+      end
+
+      private
+
+      # execute a shell command and raise an error if non-zero exit code is returned
+      # return the string output from the command
+      def run_cmd(cmd, options = {})
+        output = run(cmd, capture: true)
+        success = $CHILD_STATUS.to_i == 0
+        fail "#{cmd} failed" unless success || options[:allow_failure]
+        output
+      end
+
+      # check if --pretend or -p flag passed to CLI
+      def pretend?
+        options[:pretend]
       end
     end
   end
