@@ -5,6 +5,9 @@ require 'thegarage/gitx'
 module Thegarage
   module Gitx
     class CLI < Thor
+      include Thor::Actions
+      add_runtime_options!
+
       include Thegarage::Gitx
       include Thegarage::Gitx::Git
       include Thegarage::Gitx::Github
@@ -135,6 +138,23 @@ module Thegarage
         run_cmd "git push origin HEAD"
         integrate_branch('master', 'staging')
         cleanup
+      end
+
+
+      private
+
+      # execute a shell command and raise an error if non-zero exit code is returned
+      # return the string output from the command
+      def run_cmd(cmd, options = {})
+        output = run(cmd, capture: true)
+        success = $CHILD_STATUS.to_i == 0
+        fail "#{cmd} failed" unless success || options[:allow_failure]
+        output
+      end
+
+      # check if --pretend or -p flag passed to CLI
+      def pretend?
+        options[:pretend]
       end
     end
   end

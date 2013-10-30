@@ -1,36 +1,21 @@
 require 'rubygems'
 require 'bundler/setup'
-require 'rspec/mocks'
-require 'webmock/rspec'
 require 'pry'
-RSpec::Mocks::setup(Object.new)
-
+require 'webmock/rspec'
 require 'thegarage/gitx/cli'
 
+# Requires supporting ruby files with custom matchers and macros, etc,
+# in spec/support/ and its subdirectories.
+Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
+
 RSpec.configure do |config|
-  config.mock_with :rspec
+  config.treat_symbols_as_metadata_keys_with_true_values = true
+  config.run_all_when_everything_filtered = true
+  config.filter_run :focus
 
-  def capture_with_status(stream)
-    exit_status = 0
-    begin
-      stream = stream.to_s
-      eval "$#{stream} = StringIO.new"
-      begin
-        yield
-      rescue SystemExit => system_exit # catch any exit calls
-        exit_status = system_exit.status
-      end
-      result = eval("$#{stream}").string
-    ensure
-      eval("$#{stream} = #{stream.upcase}")
-    end
-    return result, exit_status
-  end
-
-  def remove_directories(*names)
-    project_dir = Pathname.new(Dir.pwd)
-    names.each do |name|
-      FileUtils.rm_rf(project_dir.join(name)) if FileTest.exists?(project_dir.join(name))
-    end
-  end
+  # Run specs in random order to surface order dependencies. If you find an
+  # order dependency and want to debug it, you can fix the order by providing
+  # the seed, which is printed after each run.
+  #     --seed 1234
+  config.order = 'random'
 end
