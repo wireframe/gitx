@@ -269,7 +269,7 @@ describe Thegarage::Gitx::CLI do
         expect(output[0]).to eq "Skipping creation of tag for pull request: #{ENV['TRAVIS_PULL_REQUEST']}\n"
       end
     end
-    context 'when the travis branch is NOT master and is not a pull request' do
+    context 'when the travis branch is NOT master and is not a pull request', focus: true do
       before do
         ENV['TRAVIS_BRANCH'] = 'random-branch'
         ENV['TRAVIS_PULL_REQUEST'] = 'false'
@@ -277,7 +277,7 @@ describe Thegarage::Gitx::CLI do
       end
       it 'tells us that the branch is not supported' do
         output = capture_with_status(:stdout) { Thegarage::Gitx::CLI.start ['create_tag'] }
-        expect(output[0]).to eq "Cannot create build tag for branch: #{ENV['TRAVIS_BRANCH']}. Only #{@taggable_branches} are supported.\n"
+        expect(output[0]).to include "Cannot create build tag for branch: #{ENV['TRAVIS_BRANCH']}."
       end
     end
     context 'when the travis branch is master and not a pull request' do
