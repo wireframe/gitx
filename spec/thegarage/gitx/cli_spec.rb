@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'timecop'
 
 describe Thegarage::Gitx::CLI do
   # stub methods on cli
@@ -18,7 +19,7 @@ describe Thegarage::Gitx::CLI do
     end
     # stub current user to always be known
     def current_user
-      'wireframe'
+      'quaunaut'
     end
   end
 
@@ -241,6 +242,58 @@ describe Thegarage::Gitx::CLI do
           "git pull origin master",
           "git push origin HEAD"
         ]
+      end
+    end
+  end
+
+  describe '#create_tag' do
+    before do
+      ENV['TRAVIS_BRANCH'] = nil
+      ENV['TRAVIS_PULL_REQUEST'] = nil
+      ENV['TRAVIS_BUILD_NUMBER'] = nil
+    end
+    context 'when ENV[\'TRAVIS_BRANCH\'] is nil' do
+      it 'should raise Unknown Branch error' do
+        lambda {
+          Thegarage::Gitx::CLI.start ['create_tag']
+        }.should raise_error "Unknown branch. ENV['TRAVIS_BRANCH'] is required."
+      end
+    end
+    context 'when the travis branch is master and the travis build is a pull request' do
+      before do
+        ENV['TRAVIS_BRANCH'] = 'master'
+        ENV['TRAVIS_PULL_REQUEST'] = 'This is a pull request'
+      end
+      it 'tells us that it is skipping the creation of the tag' do
+        output = capture_with_status(:stdout) { Thegarage::Gitx::CLI.start ['create_tag'] }
+        expect(output[0]).to eq "Skipping creation of tag for pull request: #{ENV['TRAVIS_PULL_REQUEST']}\n"
+      end
+    end
+    context 'when the travis branch is NOT master and is not a pull request' do
+      before do
+        ENV['TRAVIS_BRANCH'] = 'random-branch'
+        ENV['TRAVIS_PULL_REQUEST'] = 'false'
+        @taggable_branches = Thegarage::Gitx::CLI::TAGGABLE_BRANCHES
+      end
+      it 'tells us that the branch is not supported' do
+        output = capture_with_status(:stdout) { Thegarage::Gitx::CLI.start ['create_tag'] }
+        expect(output[0]).to eq "Cannot create build tag for branch: #{ENV['TRAVIS_BRANCH']}. Only #{@taggable_branches} are supported.\n"
+      end
+    end
+    context 'when the travis branch is master and not a pull request' do
+      before do
+        ENV['TRAVIS_BRANCH'] = 'master'
+        ENV['TRAVIS_PULL_REQUEST'] = 'false'
+        ENV['TRAVIS_BUILD_NUMBER'] = '24'
+      end
+      it 'should create a tag for the branch and push it to github' do
+        Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
+          Thegarage::Gitx::CLI.start ['create_tag']
+          Thegarage::Gitx::CLI.stubbed_executed_commands == [
+            "git tag build-master-2013-10-30-10-21-28 -a -m 'Generated tag from TravisCI build 24'",
+            "git push origin build-master-2013-10-30-10-21-28"
+          ]
+        end
       end
     end
   end
