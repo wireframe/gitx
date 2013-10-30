@@ -30,6 +30,7 @@ create a pull request on github for peer review of the current branch.
 ## git release
 
 release the current feature branch to master.  This operation will perform the following:
+
 * pull in latest code from remote branch
 * merge in latest code from master branch
 * prompt user to confirm they actually want to perform the release
@@ -45,6 +46,10 @@ delete released branches after they have been merged into master.
 ## git nuke <aggregate_branch_name>
 
 reset an aggregate branch (ex: prototype, staging) back to a known good state.
+
+## git createtag
+
+create a tag for the current Travis-CI build and push it back to origin
 
 
 ## Note on Patches/Pull Requests
