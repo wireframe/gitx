@@ -18,6 +18,7 @@ module Thegarage
         # Link to ticket describing feature/bug (plantain, JIRA, bugzilla). Format is [title](url).
         # Brief description of the change, and how it accomplishes the task they set out to do.
       EOS
+      TAGGABLE_BRANCHES = %w(master staging)
 
       method_option :trace, :type => :boolean, :aliases => '-v'
       def initialize(*args)
@@ -140,6 +141,24 @@ module Thegarage
         cleanup
       end
 
+      desc 'buildtag', 'create a tag for the current Travis-CI build and push it back to origin'
+      def buildtag
+        travis_branch = ENV['TRAVIS_BRANCH']
+        pull_request = ENV['TRAVIS_PULL_REQUEST']
+        
+        raise "Unknown branch. ENV['TRAVIS_BRANCH'] is required." unless travis_branch
+                
+        if pull_request != 'false'
+          say "Skipping creation of tag for pull request: #{pull_request}"
+        elsif !TAGGABLE_BRANCHES.include?(travis_branch)
+          say "Cannot create build tag for branch: #{travis_branch}. Only #{TAGGABLE_BRANCHES} are supported."
+        else
+          timestamp = Time.now.utc.strftime '%Y-%m-%d-%H-%M-%S'
+          git_tag = "build-#{travis_branch}-#{timestamp}"
+          run_cmd "git tag #{git_tag} -a -m 'Generated tag from TravisCI build #{ENV['TRAVIS_BUILD_NUMBER']}'"
+          run_cmd "git push origin #{git_tag}"
+        end
+      end
 
       private
 
