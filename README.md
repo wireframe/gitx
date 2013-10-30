@@ -47,9 +47,9 @@ delete released branches after they have been merged into master.
 
 reset an aggregate branch (ex: prototype, staging) back to a known good state.
 
-## git createtag
+## git buildtag
 
-create a tag for the current Travis-CI build and push it back to origin
+create a build tag for the current Travis-CI build and push it back to origin
 
 
 ## Note on Patches/Pull Requests
