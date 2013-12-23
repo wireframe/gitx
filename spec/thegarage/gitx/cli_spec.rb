@@ -276,6 +276,53 @@ describe Thegarage::Gitx::CLI do
   end
 
   describe '#reviewrequest' do
+    context 'when github.user is not configured' do
+      it 'raises error' do
+        expect do
+          cli.reviewrequest
+        end.to raise_error /Github user not configured/
+      end
+    end
+    context 'when authorization_token is nil' do
+      let(:options) { {description: 'testing'} }
+      let(:current_user) { 'ryan@codecrate.com' }
+      let(:github_password) { 'secretz' }
+      let(:authorization_token) { 'auth_token' }
+      let(:expected_auth_body) do
+        JSON.dump({
+         scopes: ["repo"],
+         note: "The Garage Git eXtensions",
+         note_url: "https://github.com/thegarage/thegarage-gitx"
+        })
+      end
+      before do
+        stub_request(:post, "https://#{current_user}:#{github_password}@api.github.com/authorizations").
+          with(:body => expected_auth_body).
+          to_return(:status => 200, :body => JSON.dump(token: authorization_token), :headers => {})
+
+        stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
+          to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
+
+        allow(cli).to receive(:current_user).and_return(current_user)
+        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password)
+        expect(cli).to receive(:github_auth_token=).with(authorization_token)
+
+        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
+        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
+        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+
+        cli.reviewrequest
+      end
+      it 'creates authorization_token' do
+        should meet_expectations
+      end
+      it 'should create github pull request' do
+        should meet_expectations
+      end
+      it 'should run expected commands' do
+        should meet_expectations
+      end
+    end
     context 'when description != null and there is an existing authorization_token' do
       let(:options) { {description: 'testing'} }
       let(:authorization_token) { '123981239123' }

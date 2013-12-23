@@ -19,9 +19,8 @@ module Thegarage
         auth_token = github_auth_token
         return auth_token unless auth_token.to_s.blank?
 
-        username = current_user
-        raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" if username.empty?
-        password = ask("Github password for #{username}: ", :echo => false)
+        raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless current_user
+        password = ask("Github password for #{current_user}: ", :echo => false)
 
         payload = {
           :scopes => ['repo'],
@@ -31,7 +30,7 @@ module Thegarage
         response = RestClient::Request.new({
           :url => "https://api.github.com/authorizations",
           :method => "POST",
-          :user => username,
+          :user => current_user,
           :password => password,
           :payload => payload,
           :headers => {
