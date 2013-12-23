@@ -25,7 +25,7 @@ module Thegarage
       # ex: git@github.com:socialcast/thegarage/gitx.git OR https://github.com/socialcast/thegarage/gitx.git
       def current_remote_repo
         repo = current_repo.config['remote.origin.url']
-        repo.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
+        repo.to_s.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
       end
 
       # @returns [String] github username (ex: 'wireframe') of the current github.user
