@@ -278,6 +278,10 @@ describe Thegarage::Gitx::CLI do
   describe '#reviewrequest' do
     context 'when github.user is not configured' do
       it 'raises error' do
+        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
+        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
+        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+
         expect do
           cli.reviewrequest
         end.to raise_error /Github user not configured/
