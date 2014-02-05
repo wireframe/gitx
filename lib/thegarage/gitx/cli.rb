@@ -12,13 +12,14 @@ module Thegarage
       include Thegarage::Gitx::Git
       include Thegarage::Gitx::Github
 
-      PULL_REQUEST_DESCRIPTION = "\n\n" + <<-EOS.dedent
-        # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
-        # Links to screencasts or screenshots with a desciption of what this is showcasing. For architectual changes please include diagrams that will make it easier for the reviewer to understand the change. Format is ![title](url).
-        # Link to ticket describing feature/bug (plantain, JIRA, bugzilla). Format is [title](url).
-        # Brief description of the change, and how it accomplishes the task they set out to do.
-      EOS
       TAGGABLE_BRANCHES = %w(master staging)
+      PULL_REQUEST_FOOTER = <<-EOS.dedent
+        # Pull Request Protips
+        # Include description of how this change accomplishes the task at hand.
+        # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
+        # Review CONTRIBUTING.md for recommendations of artifacts, links, images, screencasts, etc.
+        # NOTE: this footer will automatically be stripped from the pull request.
+      EOS
 
       method_option :trace, :type => :boolean, :aliases => '-v'
       def initialize(*args)
@@ -34,11 +35,20 @@ module Thegarage
         update
 
         token = authorization_token
-        description = options[:description] || editor_input(PULL_REQUEST_DESCRIPTION)
+        changelog = run_cmd "git log #{BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'%ci - %s%n%b'"
+        description_template = []
+        description_template << options[:description]
+        description_template << "\n"
+        description_template << '### Changelog'
+        description_template << changelog
+        description_template << "\n"
+        description_template << PULL_REQUEST_FOOTER
+
+        description = editor_input(description_template.join("\n"))
         branch = current_branch
         repo = current_remote_repo
         url = create_pull_request token, branch, repo, description
-        say "Pull request created: #{url}"
+        say "Pull request created: #{url}", :green
       end
 
       # TODO: use --no-edit to skip merge messages
@@ -117,9 +127,7 @@ module Thegarage
         good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{bad_branch})")
         good_branch = bad_branch if good_branch.length == 0
 
-        run_cmd "git fetch --tags"
-        good_tags = run_cmd("git tag -l 'build-#{good_branch}-*'").split
-        last_known_good_tag = good_tags.sort.last
+        last_known_good_tag = build_tags_for_branch(good_branch).last
         raise "No known good tag found for branch: #{good_branch}.  Verify tag exists via `git tag -l 'build-#{good_branch}-*'`" unless last_known_good_tag
         return unless yes?("Reset #{bad_branch} to #{last_known_good_tag}? (y/n)", :green)
 
@@ -143,20 +151,18 @@ module Thegarage
 
       desc 'buildtag', 'create a tag for the current Travis-CI build and push it back to origin'
       def buildtag
-        travis_branch = ENV['TRAVIS_BRANCH']
+        branch = ENV['TRAVIS_BRANCH']
         pull_request = ENV['TRAVIS_PULL_REQUEST']
-        
-        raise "Unknown branch. ENV['TRAVIS_BRANCH'] is required." unless travis_branch
-                
+
+        raise "Unknown branch. ENV['TRAVIS_BRANCH'] is required." unless branch
+
         if pull_request != 'false'
           say "Skipping creation of tag for pull request: #{pull_request}"
-        elsif !TAGGABLE_BRANCHES.include?(travis_branch)
-          say "Cannot create build tag for branch: #{travis_branch}. Only #{TAGGABLE_BRANCHES} are supported."
+        elsif !TAGGABLE_BRANCHES.include?(branch)
+          say "Cannot create build tag for branch: #{branch}. Only #{TAGGABLE_BRANCHES} are supported."
         else
-          timestamp = Time.now.utc.strftime '%Y-%m-%d-%H-%M-%S'
-          git_tag = "build-#{travis_branch}-#{timestamp}"
-          run_cmd "git tag #{git_tag} -a -m 'Generated tag from TravisCI build #{ENV['TRAVIS_BUILD_NUMBER']}'"
-          run_cmd "git push origin #{git_tag}"
+          label = "Generated tag from TravisCI build #{ENV['TRAVIS_BUILD_NUMBER']}"
+          create_build_tag(branch, label)
         end
       end
 

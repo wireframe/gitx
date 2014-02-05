@@ -16,7 +16,6 @@ describe Thegarage::Gitx::CLI do
     allow(cli).to receive(:current_branch).and_return('feature-branch')
   end
 
-
   describe '#update' do
     before do
       expect(cli).to receive(:run).with('git pull origin feature-branch', capture: true).ordered
@@ -277,7 +276,9 @@ describe Thegarage::Gitx::CLI do
 
   describe '#reviewrequest' do
     context 'when github.user is not configured' do
+      let(:current_user) { nil }
       it 'raises error' do
+        allow(cli).to receive(:current_user).and_return(current_user)
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
@@ -311,9 +312,11 @@ describe Thegarage::Gitx::CLI do
         expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password)
         expect(cli).to receive(:github_auth_token=).with(authorization_token)
 
+        expect(cli).to receive(:editor_input).and_return('scrubbed text')
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%ci - %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
 
         cli.reviewrequest
       end
@@ -336,9 +339,11 @@ describe Thegarage::Gitx::CLI do
 
         expect(cli).to receive(:authorization_token).and_return(authorization_token)
 
+        expect(cli).to receive(:editor_input).and_return('scrubbed text')
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%ci - %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
 
         cli.reviewrequest
       end

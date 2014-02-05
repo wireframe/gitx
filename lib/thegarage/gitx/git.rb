@@ -60,19 +60,31 @@ module Thegarage
       end
 
       # reset the specified aggregate branch to the same set of commits as the destination branch
-      def nuke_branch(branch, head_branch)
-        return if branch == head_branch
-        raise "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(branch)
+      def nuke_branch(outdated_branch, head_branch)
+        return if outdated_branch == head_branch
+        fail "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(outdated_branch)
         say "Resetting "
-        say "#{branch} ", :green
+        say "#{outdated_branch} ", :green
         say "branch to "
         say head_branch, :green
 
+        if File.exists?('db/migrate')
+          outdated_migrations = run_cmd("git diff #{head_branch}...#{outdated_branch} --name-only db/migrate").split
+          if outdated_migrations.any?
+            say "#{outdated_branch} contains migrations that may need to be reverted.  Consider running the following before nuking:", :red
+            outdated_migrations.each do |migration|
+              version = File.basename(migration).split('_').first
+              say "rake db:migrate:down VERSION=#{version}"
+            end
+            return unless yes?("Are you sure you want to nuke #{outdated_branch}? (y/n) ", :green)
+          end
+        end
+
         run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        run_cmd "git branch -D #{branch}", :allow_failure => true
-        run_cmd "git push origin --delete #{branch}", :allow_failure => true
-        run_cmd "git checkout -b #{branch} #{head_branch}"
-        share_branch branch
+        run_cmd "git branch -D #{outdated_branch}", :allow_failure => true
+        run_cmd "git push origin --delete #{outdated_branch}", :allow_failure => true
+        run_cmd "git checkout -b #{outdated_branch} #{head_branch}"
+        share_branch outdated_branch
         run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
       end
 
@@ -132,9 +144,22 @@ module Thegarage
           pid = fork { exec "#{editor} #{flags} #{f.path}" }
           Process.waitpid(pid)
           description = File.read(f.path)
-          description.gsub(/^\#.*/, '').chomp.strip
+          description.gsub(CLI::PULL_REQUEST_FOOTER, '').chomp.strip
         end
       end
+    end
+
+    def create_build_tag(branch, label)
+      timestamp = Time.now.utc.strftime '%Y-%m-%d-%H-%M-%S'
+      git_tag = "build-#{branch}-#{timestamp}"
+      run_cmd "git tag #{git_tag} -a -m '#{label}'"
+      run_cmd "git push origin #{git_tag}"
+    end
+
+    def build_tags_for_branch(branch)
+      run_cmd "git fetch --tags"
+      build_tags = run_cmd("git tag -l 'build-#{branch}-*'").split
+      build_tags.sort
     end
   end
 end

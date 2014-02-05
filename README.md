@@ -1,6 +1,6 @@
 # thegarage-gitx
 
-[![Build Status](https://travis-ci.org/thegarage/thegarage-gitx.png?branch=fix-rspec-mocks)](https://travis-ci.org/thegarage/thegarage-gitx)
+[![Build Status](https://travis-ci.org/thegarage/thegarage-gitx.png?branch=master)](https://travis-ci.org/thegarage/thegarage-gitx)
 
 Useful Git eXtensions for Development workflow at The Garage.
 
