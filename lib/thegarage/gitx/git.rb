@@ -63,22 +63,12 @@ module Thegarage
       def nuke_branch(outdated_branch, head_branch)
         return if outdated_branch == head_branch
         fail "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(outdated_branch)
+        return if migrations_need_to_be_reverted?
+
         say "Resetting "
         say "#{outdated_branch} ", :green
         say "branch to "
         say head_branch, :green
-
-        if File.exists?('db/migrate')
-          outdated_migrations = run_cmd("git diff #{head_branch}...#{outdated_branch} --name-only db/migrate").split
-          if outdated_migrations.any?
-            say "#{outdated_branch} contains migrations that may need to be reverted.  Consider running the following before nuking:", :red
-            outdated_migrations.each do |migration|
-              version = File.basename(migration).split('_').first
-              say "rake db:migrate:down VERSION=#{version}"
-            end
-            return unless yes?("Are you sure you want to nuke #{outdated_branch}? (y/n) ", :green)
-          end
-        end
 
         run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
         run_cmd "git branch -D #{outdated_branch}", :allow_failure => true
@@ -160,6 +150,20 @@ module Thegarage
       run_cmd "git fetch --tags"
       build_tags = run_cmd("git tag -l 'build-#{branch}-*'").split
       build_tags.sort
+    end
+
+    def migrations_need_to_be_reverted?
+      return false unless File.exists?('db/migrate')
+      outdated_migrations = run_cmd("git diff #{head_branch}...#{outdated_branch} --name-only db/migrate").split
+      return false if outdated_migrations.empty?
+
+      say "#{outdated_branch} contains migrations that may need to be reverted.  Ensure any reversable migrations are reverted on affected databases before nuking.", :red
+      say 'Example commands to revert outdated migrations:'
+      outdated_migrations.reverse.each do |migration|
+        version = File.basename(migration).split('_').first
+        say "rake db:migrate:down VERSION=#{version}"
+      end
+      !yes?("Are you sure you want to nuke #{outdated_branch}? (y/n) ", :green)
     end
   end
 end
