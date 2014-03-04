@@ -279,9 +279,6 @@ describe Thegarage::Gitx::CLI do
       let(:current_user) { nil }
       it 'raises error' do
         allow(cli).to receive(:current_user).and_return(current_user)
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
 
         expect do
           cli.reviewrequest
@@ -309,14 +306,14 @@ describe Thegarage::Gitx::CLI do
           to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
 
         allow(cli).to receive(:current_user).and_return(current_user)
-        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password)
-        expect(cli).to receive(:github_auth_token=).with(authorization_token)
+        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password).any_number_of_times
+        allow(cli).to receive(:github_auth_token=).with(authorization_token)
 
         expect(cli).to receive(:editor_input).and_return('scrubbed text')
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
-        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%ci - %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
+        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%s%n%b%n'", capture: true).and_return("2013-01-01 did some stuff").ordered
 
         cli.reviewrequest
       end
@@ -337,13 +334,13 @@ describe Thegarage::Gitx::CLI do
         stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
           to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
 
-        expect(cli).to receive(:authorization_token).and_return(authorization_token)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(cli).to receive(:editor_input).and_return('scrubbed text')
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
-        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%ci - %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
+        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%s%n%b%n'", capture: true).and_return("2013-01-01 did some stuff").ordered
 
         cli.reviewrequest
       end

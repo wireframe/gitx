@@ -12,7 +12,7 @@ module Thegarage
       private
       # request github authorization token
       # User-Agent is required
-      # store the token in ~/.socialcast/credentials.yml for future reuse
+      # store the token in local git config
       # @see http://developer.github.com/v3/oauth/#scopes
       # @see http://developer.github.com/v3/#user-agent-required
       def authorization_token
@@ -50,16 +50,23 @@ module Thegarage
 
       # returns the url of the created pull request
       # @see http://developer.github.com/v3/pulls/
-      def create_pull_request(token, branch, repo, body)
-        payload = {:title => branch, :base => Thegarage::Gitx::BASE_BRANCH, :head => branch, :body => body}.to_json
+      def create_pull_request(body, assignee = nil)
+        branch = current_branch
+        repo = current_remote_repo
+
         say "Creating pull request for "
         say "#{branch} ", :green
         say "against "
         say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
         say "in "
         say repo, :green
-        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => {:accept => :json, :content_type => :json, 'Authorization' => "token #{token}"}).execute
+
+        payload = {:title => branch, :base => Thegarage::Gitx::BASE_BRANCH, :head => branch, :body => body}.to_json
+        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => github_request_headers).execute
         data = JSON.parse response.body
+
+        assign_pull_request(branch, assignee, data) if assignee
+
         url = data['html_url']
         url
       rescue RestClient::Exception => e
@@ -67,9 +74,24 @@ module Thegarage
         throw e
       end
 
+      def assign_pull_request(branch, assignee, data)
+        issue_payload = { :title => branch, :assignee => assignee }.to_json
+        RestClient::Request.new(:url => data['issue_url'], :method => "PATCH", :payload => issue_payload, :headers => github_request_headers).execute
+      rescue RestClient::Exception => e
+        process_error e
+      end
+
       def process_error(e)
         data = JSON.parse e.http_body
-        say "Failed to create pull request: #{data['message']}", :red
+        say "Github request failed: #{data['message']}", :red
+      end
+
+      def github_request_headers
+        {
+          :accept => :json,
+          :content_type => :json,
+          'Authorization' => "token #{authorization_token}"
+        }
       end
     end
   end

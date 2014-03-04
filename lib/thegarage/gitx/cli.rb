@@ -30,12 +30,13 @@ module Thegarage
 
       desc "reviewrequest", "Create a pull request on github"
       method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
+      method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
       # @see http://developer.github.com/v3/pulls/
       def reviewrequest
+        fail 'Github authorization token not found' unless authorization_token
         update
 
-        token = authorization_token
-        changelog = run_cmd "git log #{BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'%ci - %s%n%b'"
+        changelog = run_cmd "git log #{BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'%s%n%b%n'"
         description_template = []
         description_template << options[:description]
         description_template << "\n"
@@ -45,10 +46,9 @@ module Thegarage
         description_template << PULL_REQUEST_FOOTER
 
         description = editor_input(description_template.join("\n"))
-        branch = current_branch
-        repo = current_remote_repo
-        url = create_pull_request token, branch, repo, description
-        say "Pull request created: #{url}", :green
+        url = create_pull_request description, options[:assignee]
+        say 'Pull request created: '
+        say url, :green
       end
 
       # TODO: use --no-edit to skip merge messages
