@@ -36,13 +36,12 @@ module Thegarage
         fail 'Github authorization token not found' unless authorization_token
         update
 
-        changelog = run_cmd "git log #{BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'%s%n%b%n'"
+        changelog = run_cmd "git log #{BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
         description_template = []
         description_template << options[:description]
         description_template << "\n"
         description_template << '### Changelog'
         description_template << changelog
-        description_template << "\n"
         description_template << PULL_REQUEST_FOOTER
 
         description = editor_input(description_template.join("\n"))

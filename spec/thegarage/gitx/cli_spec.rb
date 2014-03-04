@@ -313,7 +313,7 @@ describe Thegarage::Gitx::CLI do
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
-        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%s%n%b%n'", capture: true).and_return("2013-01-01 did some stuff").ordered
+        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
 
         cli.reviewrequest
       end
@@ -340,7 +340,7 @@ describe Thegarage::Gitx::CLI do
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
-        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'%s%n%b%n'", capture: true).and_return("2013-01-01 did some stuff").ordered
+        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
 
         cli.reviewrequest
       end
