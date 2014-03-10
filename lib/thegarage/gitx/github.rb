@@ -1,5 +1,6 @@
 require 'rest_client'
 require 'json'
+require 'tempfile'
 
 module Thegarage
   module Gitx
@@ -142,12 +143,11 @@ module Thegarage
 
       # launch configured editor to retreive message/string
       def input_from_editor(initial_text = '')
-        require 'tempfile'
         Tempfile.open('reviewrequest.md') do |f|
           f << initial_text
           f.flush
 
-          editor = ENV['EDITOR'] || 'vi'
+          editor = repo.config['core.editor'] || ENV['EDITOR'] || 'vi'
           flags = case editor
           when 'mate', 'emacs', 'subl'
             '-w'
