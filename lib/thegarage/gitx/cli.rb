@@ -73,7 +73,7 @@ module Thegarage
       desc 'start', 'start a new git branch with latest changes from master'
       def start(branch_name = nil)
         unless branch_name
-          example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sort_by { rand }.first
+          example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.shuffle.first
           repo = Grit::Repo.new(Dir.pwd)
           remote_branches = repo.remotes.collect {|b| b.name.split('/').last }
           until branch_name = ask("What would you like to name your branch? (ex: #{example_branch})") {|q|
