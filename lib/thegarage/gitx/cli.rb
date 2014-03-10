@@ -1,6 +1,7 @@
 require "thor"
 require 'rest_client'
 require 'thegarage/gitx'
+require 'thegarage/gitx/github'
 
 module Thegarage
   module Gitx
@@ -10,7 +11,6 @@ module Thegarage
 
       include Thegarage::Gitx
       include Thegarage::Gitx::Git
-      include Thegarage::Gitx::Github
 
       TAGGABLE_BRANCHES = %w(master staging)
       PULL_REQUEST_FOOTER = <<-EOS.dedent
@@ -21,11 +21,14 @@ module Thegarage
         # NOTE: this footer will automatically be stripped from the pull request.
       EOS
 
+      attr_reader :github
+
       method_option :trace, :type => :boolean, :aliases => '-v'
       def initialize(*args)
         super(*args)
         RestClient.proxy = ENV['HTTPS_PROXY'] if ENV.has_key?('HTTPS_PROXY')
         RestClient.log = Logger.new(STDOUT) if options[:trace]
+        @github = Thegarage::Gitx::Github.new(current_repo, self)
       end
 
       desc "reviewrequest", "Create a pull request on github"
@@ -33,7 +36,7 @@ module Thegarage
       method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
       # @see http://developer.github.com/v3/pulls/
       def reviewrequest
-        fail 'Github authorization token not found' unless authorization_token
+        fail 'Github authorization token not found' unless github.authorization_token
         update
 
         changelog = run_cmd "git log #{BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
@@ -45,7 +48,8 @@ module Thegarage
         description_template << PULL_REQUEST_FOOTER
 
         description = editor_input(description_template.join("\n"))
-        url = create_pull_request description, options[:assignee]
+
+        url = github.create_pull_request current_branch, description, options[:assignee]
         say 'Pull request created: '
         say url, :green
       end

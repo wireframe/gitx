@@ -21,29 +21,6 @@ module Thegarage
         @repo ||= Grit::Repo.new(Dir.pwd)
       end
 
-      # lookup the current repository of the PWD
-      # ex: git@github.com:socialcast/thegarage/gitx.git OR https://github.com/socialcast/thegarage/gitx.git
-      def current_remote_repo
-        repo = current_repo.config['remote.origin.url']
-        repo.to_s.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
-      end
-
-      # @returns [String] github username (ex: 'wireframe') of the current github.user
-      # @returns empty [String] when no github.user is set on the system
-      def current_user
-        current_repo.config['github.user']
-      end
-
-      # @returns [String] auth token stored in git (current repo, user config or installed global settings)
-      def github_auth_token
-        current_repo.config['thegarage.gitx.githubauthtoken']
-      end
-
-      # store new auth token in the local project git config
-      def github_auth_token=(new_token)
-        current_repo.config['thegarage.gitx.githubauthtoken'] = new_token
-      end
-
       # retrieve a list of branches
       def branches(options = {})
         branches = []
