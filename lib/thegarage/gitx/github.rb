@@ -6,6 +6,14 @@ module Thegarage
     class Github
       CLIENT_NAME = 'The Garage Git eXtensions'
       CLIENT_URL = 'https://github.com/thegarage/thegarage-gitx'
+      PULL_REQUEST_FOOTER = <<-EOS.dedent
+        # Pull Request Protips(tm):
+        # * Include description of how this change accomplishes the task at hand.
+        # * Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
+        # * Review CONTRIBUTING.md for recommendations of artifacts, links, images, screencasts, etc.
+        #
+        # This footer will automatically be stripped from the pull request description
+      EOS
 
       attr_reader :repo, :shell
 
@@ -13,6 +21,40 @@ module Thegarage
         @repo = repo
         @shell = shell
       end
+
+      # returns the url of the created pull request
+      # @see http://developer.github.com/v3/pulls/
+      def create_pull_request(branch, changelog, options = {})
+        fail 'Github authorization token not found' unless authorization_token
+        remote = remote_origin_name
+        body = pull_request_body(changelog, options[:description])
+
+        shell.say "Creating pull request for "
+        shell.say "#{branch} ", :green
+        shell.say "against "
+        shell.say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
+        shell.say "in "
+        shell.say remote, :green
+
+        payload = {
+          :title => branch,
+          :base => Thegarage::Gitx::BASE_BRANCH,
+          :head => branch,
+          :body => body
+        }.to_json
+        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{remote}/pulls", :method => "POST", :payload => payload, :headers => request_headers).execute
+        data = JSON.parse response.body
+
+        assign_pull_request(branch, options[:assignee], data) if options[:assignee]
+
+        url = data['html_url']
+        url
+      rescue RestClient::Exception => e
+        process_error e
+        throw e
+      end
+
+      private
 
       # request github authorization token
       # User-Agent is required
@@ -26,13 +68,6 @@ module Thegarage
 
         fail "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
         password = shell.ask("Github password for #{username}: ", :echo => false)
-
-        shell.say "Creating pull request for "
-        shell.say "#{branch} ", :green
-        shell.say "against "
-        shell.say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
-        shell.say "in "
-        shell.say repo, :green
 
         payload = {
           :scopes => ['repo'],
@@ -59,25 +94,6 @@ module Thegarage
         process_error e
         throw e
       end
-
-      # returns the url of the created pull request
-      # @see http://developer.github.com/v3/pulls/
-      def create_pull_request(branch, body, assignee = nil)
-        repo = remote_origin_name
-        payload = {:title => branch, :base => Thegarage::Gitx::BASE_BRANCH, :head => branch, :body => body}.to_json
-        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{repo}/pulls", :method => "POST", :payload => payload, :headers => request_headers).execute
-        data = JSON.parse response.body
-
-        assign_pull_request(branch, assignee, data) if assignee
-
-        url = data['html_url']
-        url
-      rescue RestClient::Exception => e
-        process_error e
-        throw e
-      end
-
-      private
 
       def assign_pull_request(branch, assignee, data)
         issue_payload = { :title => branch, :assignee => assignee }.to_json
@@ -108,8 +124,43 @@ module Thegarage
       # lookup the current repository of the PWD
       # ex: git@github.com:socialcast/thegarage/gitx.git OR https://github.com/socialcast/thegarage/gitx.git
       def remote_origin_name
-        repo = repo.config['remote.origin.url']
-        repo.to_s.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
+        remote = repo.config['remote.origin.url']
+        remote.to_s.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
+      end
+
+      def pull_request_body(changelog, description = nil)
+        description_template = []
+        description_template << description if description
+        description_template << "\n"
+        description_template << '### Changelog'
+        description_template << changelog
+        description_template << PULL_REQUEST_FOOTER
+
+        body = input_from_editor(description_template.join("\n"))
+        body.gsub(PULL_REQUEST_FOOTER, '').chomp.strip
+      end
+
+      # launch configured editor to retreive message/string
+      def input_from_editor(initial_text = '')
+        require 'tempfile'
+        Tempfile.open('reviewrequest.md') do |f|
+          f << initial_text
+          f.flush
+
+          editor = ENV['EDITOR'] || 'vi'
+          flags = case editor
+          when 'mate', 'emacs', 'subl'
+            '-w'
+          when 'mvim'
+            '-f'
+          else
+            ''
+          end
+          pid = fork { exec([editor, flags, f.path].join(' ')) }
+          Process.waitpid(pid)
+          contents = File.read(f.path)
+          contents.chomp.strip
+        end
       end
     end
   end

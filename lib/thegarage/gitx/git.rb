@@ -92,55 +92,32 @@ module Thegarage
         AGGREGATE_BRANCHES.include?(branch)
       end
 
-      # launch configured editor to retreive message/string
-      def editor_input(initial_text = '')
-        require 'tempfile'
-        Tempfile.open('reviewrequest.md') do |f|
-          f << initial_text
-          f.flush
+      def create_build_tag(branch, label)
+        timestamp = Time.now.utc.strftime '%Y-%m-%d-%H-%M-%S'
+        git_tag = "build-#{branch}-#{timestamp}"
+        run_cmd "git tag #{git_tag} -a -m '#{label}'"
+        run_cmd "git push origin #{git_tag}"
+      end
 
-          editor = ENV['EDITOR'] || 'vi'
-          flags = case editor
-          when 'mate', 'emacs', 'subl'
-            '-w'
-          when 'mvim'
-            '-f'
-          else
-            ''
-          end
-          pid = fork { exec "#{editor} #{flags} #{f.path}" }
-          Process.waitpid(pid)
-          description = File.read(f.path)
-          description.gsub(CLI::PULL_REQUEST_FOOTER, '').chomp.strip
+      def build_tags_for_branch(branch)
+        run_cmd "git fetch --tags"
+        build_tags = run_cmd("git tag -l 'build-#{branch}-*'").split
+        build_tags.sort
+      end
+
+      def migrations_need_to_be_reverted?
+        return false unless File.exists?('db/migrate')
+        outdated_migrations = run_cmd("git diff #{head_branch}...#{outdated_branch} --name-only db/migrate").split
+        return false if outdated_migrations.empty?
+
+        say "#{outdated_branch} contains migrations that may need to be reverted.  Ensure any reversable migrations are reverted on affected databases before nuking.", :red
+        say 'Example commands to revert outdated migrations:'
+        outdated_migrations.reverse.each do |migration|
+          version = File.basename(migration).split('_').first
+          say "rake db:migrate:down VERSION=#{version}"
         end
+        !yes?("Are you sure you want to nuke #{outdated_branch}? (y/n) ", :green)
       end
-    end
-
-    def create_build_tag(branch, label)
-      timestamp = Time.now.utc.strftime '%Y-%m-%d-%H-%M-%S'
-      git_tag = "build-#{branch}-#{timestamp}"
-      run_cmd "git tag #{git_tag} -a -m '#{label}'"
-      run_cmd "git push origin #{git_tag}"
-    end
-
-    def build_tags_for_branch(branch)
-      run_cmd "git fetch --tags"
-      build_tags = run_cmd("git tag -l 'build-#{branch}-*'").split
-      build_tags.sort
-    end
-
-    def migrations_need_to_be_reverted?
-      return false unless File.exists?('db/migrate')
-      outdated_migrations = run_cmd("git diff #{head_branch}...#{outdated_branch} --name-only db/migrate").split
-      return false if outdated_migrations.empty?
-
-      say "#{outdated_branch} contains migrations that may need to be reverted.  Ensure any reversable migrations are reverted on affected databases before nuking.", :red
-      say 'Example commands to revert outdated migrations:'
-      outdated_migrations.reverse.each do |migration|
-        version = File.basename(migration).split('_').first
-        say "rake db:migrate:down VERSION=#{version}"
-      end
-      !yes?("Are you sure you want to nuke #{outdated_branch}? (y/n) ", :green)
     end
   end
 end

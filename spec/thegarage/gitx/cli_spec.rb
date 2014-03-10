@@ -275,68 +275,12 @@ describe Thegarage::Gitx::CLI do
   end
 
   describe '#reviewrequest' do
-    context 'when github.user is not configured' do
-      let(:current_user) { nil }
-      it 'raises error' do
-        allow(cli).to receive(:current_user).and_return(current_user)
-
-        expect do
-          cli.reviewrequest
-        end.to raise_error /Github user not configured/
-      end
-    end
-    context 'when authorization_token is nil' do
-      let(:options) { {description: 'testing'} }
-      let(:current_user) { 'ryan@codecrate.com' }
-      let(:github_password) { 'secretz' }
-      let(:authorization_token) { 'auth_token' }
-      let(:expected_auth_body) do
-        JSON.dump({
-         scopes: ["repo"],
-         note: "The Garage Git eXtensions",
-         note_url: "https://github.com/thegarage/thegarage-gitx"
-        })
-      end
+    context 'when github configured correctly' do
+      let(:github) { double('fake github') }
       before do
-        stub_request(:post, "https://#{current_user}:#{github_password}@api.github.com/authorizations").
-          with(:body => expected_auth_body).
-          to_return(:status => 200, :body => JSON.dump(token: authorization_token), :headers => {})
+        expect(cli).to receive(:github).and_return(github)
+        expect(github).to receive(:create_pull_request).and_return('https://path/to/new/pull/request')
 
-        stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
-          to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
-
-        allow(cli).to receive(:current_user).and_return(current_user)
-        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password).any_number_of_times
-        allow(cli).to receive(:github_auth_token=).with(authorization_token)
-
-        expect(cli).to receive(:editor_input).and_return('scrubbed text')
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
-        expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
-
-        cli.reviewrequest
-      end
-      it 'creates authorization_token' do
-        should meet_expectations
-      end
-      it 'should create github pull request' do
-        should meet_expectations
-      end
-      it 'should run expected commands' do
-        should meet_expectations
-      end
-    end
-    context 'when description != null and there is an existing authorization_token' do
-      let(:options) { {description: 'testing'} }
-      let(:authorization_token) { '123981239123' }
-      before do
-        stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
-          to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
-
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
-
-        expect(cli).to receive(:editor_input).and_return('scrubbed text')
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered

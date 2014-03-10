@@ -9,26 +9,15 @@ module Thegarage
       include Thor::Actions
       add_runtime_options!
 
-      include Thegarage::Gitx
       include Thegarage::Gitx::Git
 
       TAGGABLE_BRANCHES = %w(master staging)
-      PULL_REQUEST_FOOTER = <<-EOS.dedent
-        # Pull Request Protips
-        # Include description of how this change accomplishes the task at hand.
-        # Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
-        # Review CONTRIBUTING.md for recommendations of artifacts, links, images, screencasts, etc.
-        # NOTE: this footer will automatically be stripped from the pull request.
-      EOS
-
-      attr_reader :github
 
       method_option :trace, :type => :boolean, :aliases => '-v'
       def initialize(*args)
         super(*args)
         RestClient.proxy = ENV['HTTPS_PROXY'] if ENV.has_key?('HTTPS_PROXY')
         RestClient.log = Logger.new(STDOUT) if options[:trace]
-        @github = Thegarage::Gitx::Github.new(current_repo, self)
       end
 
       desc "reviewrequest", "Create a pull request on github"
@@ -36,20 +25,10 @@ module Thegarage
       method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
       # @see http://developer.github.com/v3/pulls/
       def reviewrequest
-        fail 'Github authorization token not found' unless github.authorization_token
         update
 
-        changelog = run_cmd "git log #{BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
-        description_template = []
-        description_template << options[:description]
-        description_template << "\n"
-        description_template << '### Changelog'
-        description_template << changelog
-        description_template << PULL_REQUEST_FOOTER
-
-        description = editor_input(description_template.join("\n"))
-
-        url = github.create_pull_request current_branch, description, options[:assignee]
+        changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
+        url = github.create_pull_request(current_branch, changelog, options)
         say 'Pull request created: '
         say url, :green
       end
@@ -183,6 +162,10 @@ module Thegarage
       # check if --pretend or -p flag passed to CLI
       def pretend?
         options[:pretend]
+      end
+
+      def github
+        @github ||= Thegarage::Gitx::Github.new(current_repo, self)
       end
     end
   end
