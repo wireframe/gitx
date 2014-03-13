@@ -23,40 +23,7 @@ module Thegarage
         @shell = shell
       end
 
-      # returns the url of the created pull request
-      # @see http://developer.github.com/v3/pulls/
-      def create_pull_request(branch, changelog, options = {})
-        fail 'Github authorization token not found' unless authorization_token
-        remote = remote_origin_name
-        body = pull_request_body(changelog, options[:description])
-
-        shell.say "Creating pull request for "
-        shell.say "#{branch} ", :green
-        shell.say "against "
-        shell.say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
-        shell.say "in "
-        shell.say remote, :green
-
-        payload = {
-          :title => branch,
-          :base => Thegarage::Gitx::BASE_BRANCH,
-          :head => branch,
-          :body => body
-        }.to_json
-        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{remote}/pulls", :method => "POST", :payload => payload, :headers => request_headers).execute
-        data = JSON.parse response.body
-
-        assign_pull_request(branch, options[:assignee], data) if options[:assignee]
-
-        url = data['html_url']
-        url
-      rescue RestClient::Exception => e
-        process_error e
-        throw e
-      end
-
-      private
-
+      # returns [Hash] data structure of created pull request
       # request github authorization token
       # User-Agent is required
       # store the token in local git config
@@ -93,19 +60,64 @@ module Thegarage
         token
       rescue RestClient::Exception => e
         process_error e
-        throw e
       end
 
-      def assign_pull_request(branch, assignee, data)
-        issue_payload = { :title => branch, :assignee => assignee }.to_json
-        RestClient::Request.new(:url => data['issue_url'], :method => "PATCH", :payload => issue_payload, :headers => request_headers).execute
+      # @see http://developer.github.com/v3/pulls/
+      def create_pull_request(branch, changelog, options = {})
+        remote = remote_origin_name
+        body = pull_request_body(changelog, options[:description])
+
+        shell.say "Creating pull request for "
+        shell.say "#{branch} ", :green
+        shell.say "against "
+        shell.say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
+        shell.say "in "
+        shell.say remote, :green
+
+        payload = {
+          :title => branch,
+          :base => Thegarage::Gitx::BASE_BRANCH,
+          :head => branch,
+          :body => body
+        }.to_json
+        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{remote}/pulls", :method => "POST", :payload => payload, :headers => request_headers).execute
+        pull_request = JSON.parse response.body
+
+        pull_request
       rescue RestClient::Exception => e
         process_error e
       end
 
+      def assign_pull_request(pull_request, assignee)
+        branch = pull_request['head']['ref']
+        payload = {
+          :title => branch,
+          :assignee => assignee
+        }.to_json
+        RestClient::Request.new(:url => pull_request['issue_url'], :method => "PATCH", :payload => payload, :headers => request_headers).execute
+      rescue RestClient::Exception => e
+        process_error e
+      end
+
+      # @returns [Hash] data structure of pull request info if found
+      # @returns nil if no pull request found
+      def find_pull_request(branch)
+        payload = {
+          course: branch
+        }.to_json
+        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{remote}/pulls", :method => "GET", :payload => payload, :headers => request_headers).execute
+        data = JSON.parse(response.body)
+        data.first
+      rescue RestClient::Exception => e
+        process_error e
+      end
+
+      private
+
       def process_error(e)
         data = JSON.parse e.http_body
         shell.say "Github request failed: #{data['message']}", :red
+        throw e
       end
 
       def request_headers

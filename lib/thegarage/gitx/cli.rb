@@ -20,17 +20,25 @@ module Thegarage
         RestClient.log = Logger.new(STDOUT) if options[:trace]
       end
 
-      desc "reviewrequest", "Create a pull request on github"
+      desc "reviewrequest", "Create or update a pull request on github"
       method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
       method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
+      method_option :open, :type => :boolean, :aliases => '-o', :desc => 'open the pull request in a web browser'
       # @see http://developer.github.com/v3/pulls/
       def reviewrequest
         update
+        fail 'Github authorization token not found' unless github.authorization_token
 
-        changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
-        url = github.create_pull_request(current_branch, changelog, options)
-        say 'Pull request created: '
-        say url, :green
+        pull_request = github.find_pull_request(current_branch)
+        if pull_request.nil?
+          changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
+          pull_request = github.create_pull_request(current_branch, changelog, options)
+          say 'Pull request created: '
+          say pull_request['html_url'], :green
+        end
+        github.assign_pull_request(pull_request, options[:assignee]) if options[:assignee]
+
+        run_cmd "open #{pull_request['html_url']}" if options[:open]
       end
 
       # TODO: use --no-edit to skip merge messages

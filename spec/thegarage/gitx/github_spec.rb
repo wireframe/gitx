@@ -10,12 +10,12 @@ describe Thegarage::Gitx::Github do
   let(:shell) { double('fake shell', say: nil, ask: nil) }
   subject { Thegarage::Gitx::Github.new(repo, shell) }
 
-  describe '#create_pull_request' do
+  describe '#authorization_token' do
     context 'when github.user is not configured' do
       it 'raises error' do
         expect do
-          subject.create_pull_request 'example-branch', 'changelog'
-        end.to raise_error /Github user not configured/
+          subject.authorization_token
+        end.to raise_error(/Github user not configured/)
       end
     end
     context 'when config.authorization_token is nil' do
@@ -39,24 +39,31 @@ describe Thegarage::Gitx::Github do
           with(:body => expected_auth_body).
           to_return(:status => 200, :body => JSON.dump(token: authorization_token), :headers => {})
 
-        stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
-          to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
+        expect(shell).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password)
 
-        expect(shell).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password).any_number_of_times
-
-        expect(subject).to receive(:input_from_editor).and_return('scrubbed text')
-        subject.create_pull_request 'example-branch', 'changelog'
+        @auth_token = subject.authorization_token
       end
-      it 'creates authorization_token' do
+      it 'stores authorization_token in git config' do
         expect(repo_config).to include('thegarage.gitx.githubauthtoken' => authorization_token)
       end
-      it 'should create github pull request' do
-        should meet_expectations
-      end
-      it 'should run expected commands' do
-        should meet_expectations
-      end
+      it { expect(@auth_token).to eq authorization_token }
     end
+    context 'when there is an existing authorization_token' do
+      let(:authorization_token) { '123981239123' }
+      let(:repo_config) do
+        {
+          'remote.origin.url' => 'https://github.com/thegarage/thegarage-gitx',
+          'github.user' => 'ryan@codecrate.com',
+          'thegarage.gitx.githubauthtoken' => authorization_token
+        }
+      end
+      before do
+        @auth_token = subject.authorization_token
+      end
+      it { expect(@auth_token).to eq authorization_token }
+    end
+  end
+  describe '#create_pull_request' do
     context 'when there is an existing authorization_token' do
       let(:authorization_token) { '123981239123' }
       let(:repo_config) do

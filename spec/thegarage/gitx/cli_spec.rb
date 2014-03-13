@@ -24,7 +24,7 @@ describe Thegarage::Gitx::CLI do
 
       cli.update
     end
-    it 'should run expected commands' do
+    it 'runs expected commands' do
       should meet_expectations
     end
   end
@@ -45,7 +45,7 @@ describe Thegarage::Gitx::CLI do
 
         cli.integrate
       end
-      it 'should default to staging' do
+      it 'defaults to staging branch' do
         should meet_expectations
       end
     end
@@ -64,12 +64,12 @@ describe Thegarage::Gitx::CLI do
 
         cli.integrate 'prototype'
       end
-      it 'should run expected commands' do
+      it 'runs expected commands' do
         should meet_expectations
       end
     end
     context 'when target branch != staging || prototype' do
-      it 'should raise an error' do
+      it 'raises an error' do
         expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
@@ -92,7 +92,7 @@ describe Thegarage::Gitx::CLI do
 
         cli.release
       end
-      it 'should only run update commands' do
+      it 'only runs update commands' do
         should meet_expectations
       end
     end
@@ -122,7 +122,7 @@ describe Thegarage::Gitx::CLI do
 
         cli.release
       end
-      it 'should run expected commands' do
+      it 'runs expected commands' do
         should meet_expectations
       end
     end
@@ -153,7 +153,7 @@ describe Thegarage::Gitx::CLI do
 
         cli.nuke 'prototype'
       end
-      it 'should run expected commands' do
+      it 'runs expected commands' do
         should meet_expectations
       end
     end
@@ -181,7 +181,7 @@ describe Thegarage::Gitx::CLI do
 
         cli.nuke 'staging'
       end
-      it 'should run expected commands' do
+      it 'runs expected commands' do
         should meet_expectations
       end
     end
@@ -229,17 +229,17 @@ describe Thegarage::Gitx::CLI do
 
         cli.nuke 'prototype'
       end
-      it 'should run expected commands' do
+      it 'runs expected commands' do
         should meet_expectations
       end
     end
     context 'when target branch != staging || prototype' do
-      it 'should raise error' do
+      it 'raises error' do
         lambda {
           expect(cli).to receive(:ask).and_return('master')
           expect(cli).to receive(:yes?).and_return(true)
           cli.nuke 'not-an-integration-branch'
-        }.should raise_error /Only aggregate branches are allowed to be reset/
+        }.should raise_error(/Only aggregate branches are allowed to be reset/)
       end
     end
     context 'when user does not confirm nuking the target branch' do
@@ -255,7 +255,7 @@ describe Thegarage::Gitx::CLI do
 
         cli.nuke 'prototype'
       end
-      it 'should run expected commands' do
+      it 'runs expected commands' do
         should meet_expectations
       end
     end
@@ -269,29 +269,99 @@ describe Thegarage::Gitx::CLI do
         expect(cli).to receive(:run).with("git fetch --tags", capture: true).ordered
         expect(cli).to receive(:run).with("git tag -l 'build-master-*'", capture: true).and_return(buildtags).ordered
 
-        expect { cli.nuke('prototype') }.to raise_error /No known good tag found for branch/
+        expect { cli.nuke('prototype') }.to raise_error(/No known good tag found for branch/)
       end
     end
   end
 
   describe '#reviewrequest' do
-    context 'when github configured correctly' do
-      let(:github) { double('fake github') }
-      before do
-        expect(cli).to receive(:github).and_return(github)
-        expect(github).to receive(:create_pull_request).and_return('https://path/to/new/pull/request')
+    let(:github) { double('fake github') }
+    let(:pull_request) do
+      {
+        'html_url' => 'https://path/to/new/pull/request',
+        'head' => {
+          'ref' => 'branch_name'
+        }
+      }
+    end
+    before do
+      allow(cli).to receive(:github).and_return(github)
 
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+      expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
+      expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
+      expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+    end
+    context 'when pull request does not exist' do
+      let(:authorization_token) { '123123' }
+      let(:changelog) { '* made some fixes' }
+      before do
+        expect(github).to receive(:authorization_token).and_return(authorization_token)
+        expect(github).to receive(:find_pull_request).and_return(nil)
+        expect(github).to receive(:create_pull_request).and_return(pull_request)
+
         expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
+        cli.reviewrequest
+      end
+      it 'creates github pull request' do
+        should meet_expectations
+      end
+      it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
+    context 'when authorization_token is missing' do
+      let(:authorization_token) { nil }
+      it do
+        expect(github).to receive(:authorization_token).and_return(authorization_token)
+        expect { cli.reviewrequest }.to raise_error(/token not found/)
+      end
+    end
+    context 'when pull request already exists' do
+      let(:authorization_token) { '123123' }
+      before do
+        expect(github).to receive(:authorization_token).and_return(authorization_token)
+        expect(github).to receive(:find_pull_request).and_return(pull_request)
+        expect(github).to_not receive(:create_pull_request)
 
         cli.reviewrequest
       end
-      it 'should create github pull request' do
+      it 'does not create new pull request' do
         should meet_expectations
       end
-      it 'should run expected commands' do
+    end
+    context 'when --assignee option passed' do
+      let(:options) do
+        {
+          assignee: 'johndoe'
+        }
+      end
+      let(:authorization_token) { '123123' }
+      before do
+        expect(github).to receive(:authorization_token).and_return(authorization_token)
+        expect(github).to receive(:find_pull_request).and_return(pull_request)
+        expect(github).to receive(:assign_pull_request)
+
+        cli.reviewrequest
+      end
+      it 'calls assign_pull_request method' do
+        should meet_expectations
+      end
+    end
+    context 'when --open flag passed' do
+      let(:options) do
+        {
+          open: true
+        }
+      end
+      let(:authorization_token) { '123123' }
+      before do
+        expect(github).to receive(:authorization_token).and_return(authorization_token)
+        expect(github).to receive(:find_pull_request).and_return(pull_request)
+
+        expect(cli).to receive(:run).with("open #{pull_request['html_url']}", capture: true).ordered
+        cli.reviewrequest
+      end
+      it 'runs open command with pull request url' do
         should meet_expectations
       end
     end
@@ -307,7 +377,7 @@ describe Thegarage::Gitx::CLI do
       ENV['TRAVIS_BUILD_NUMBER'] = env_travis_build_number
     end
     context 'when ENV[\'TRAVIS_BRANCH\'] is nil' do
-      it 'should raise Unknown Branch error' do
+      it 'raises Unknown Branch error' do
         expect { cli.buildtag }.to raise_error "Unknown branch. ENV['TRAVIS_BRANCH'] is required."
       end
     end
@@ -344,7 +414,7 @@ describe Thegarage::Gitx::CLI do
           cli.buildtag
         end
       end
-      it 'should create a tag for the branch and push it to github' do
+      it 'creates a tag for the branch and push it to github' do
         should meet_expectations
       end
     end
