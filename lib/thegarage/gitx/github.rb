@@ -64,7 +64,6 @@ module Thegarage
 
       # @see http://developer.github.com/v3/pulls/
       def create_pull_request(branch, changelog, options = {})
-        remote = remote_origin_name
         body = pull_request_body(changelog, options[:description])
 
         shell.say "Creating pull request for "
@@ -72,7 +71,7 @@ module Thegarage
         shell.say "against "
         shell.say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
         shell.say "in "
-        shell.say remote, :green
+        shell.say remote_origin_name, :green
 
         payload = {
           :title => branch,
@@ -80,7 +79,7 @@ module Thegarage
           :head => branch,
           :body => body
         }.to_json
-        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{remote}/pulls", :method => "POST", :payload => payload, :headers => request_headers).execute
+        response = RestClient::Request.new(:url => pull_request_url, :method => "POST", :payload => payload, :headers => request_headers).execute
         pull_request = JSON.parse response.body
 
         pull_request
@@ -105,7 +104,7 @@ module Thegarage
         payload = {
           course: branch
         }.to_json
-        response = RestClient::Request.new(:url => "https://api.github.com/repos/#{remote}/pulls", :method => "GET", :payload => payload, :headers => request_headers).execute
+        response = RestClient::Request.new(:url => remote_origin_name, :method => "GET", :payload => payload, :headers => request_headers).execute
         data = JSON.parse(response.body)
         data.first
       rescue RestClient::Exception => e
@@ -118,6 +117,10 @@ module Thegarage
         data = JSON.parse e.http_body
         shell.say "Github request failed: #{data['message']}", :red
         throw e
+      end
+
+      def pull_request_url
+        "https://api.github.com/repos/#{remote_origin_name}/pulls"
       end
 
       def request_headers
