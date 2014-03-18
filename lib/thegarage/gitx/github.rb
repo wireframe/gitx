@@ -106,7 +106,7 @@ module Thegarage
           head: head_reference,
           state: 'open'
         }
-        response = RestClient::Request.new(:url => pull_request_url, :method => "GET", :payload => payload, :headers => request_headers.merge(params: params)).execute
+        response = RestClient::Request.new(:url => pull_request_url, :method => "GET", :headers => request_headers.merge(params: params)).execute
         data = JSON.parse(response.body)
         data.first
       rescue RestClient::Exception => e
