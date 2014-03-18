@@ -101,8 +101,10 @@ module Thegarage
       # @returns [Hash] data structure of pull request info if found
       # @returns nil if no pull request found
       def find_pull_request(branch)
+        head_reference = [remote_origin_name.split('/').first, branch].join(':')
         payload = {
-          course: branch
+          head: head_reference,
+          state: open
         }.to_json
         response = RestClient::Request.new(:url => pull_request_url, :method => "GET", :payload => payload, :headers => request_headers).execute
         data = JSON.parse(response.body)
