@@ -104,7 +104,7 @@ module Thegarage
         payload = {
           course: branch
         }.to_json
-        response = RestClient::Request.new(:url => remote_origin_name, :method => "GET", :payload => payload, :headers => request_headers).execute
+        response = RestClient::Request.new(:url => pull_request_url, :method => "GET", :payload => payload, :headers => request_headers).execute
         data = JSON.parse(response.body)
         data.first
       rescue RestClient::Exception => e
