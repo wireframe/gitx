@@ -286,10 +286,6 @@ describe Thegarage::Gitx::CLI do
     end
     before do
       allow(cli).to receive(:github).and_return(github)
-
-      expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-      expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-      expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
     end
     context 'when pull request does not exist' do
       let(:authorization_token) { '123123' }
@@ -299,6 +295,9 @@ describe Thegarage::Gitx::CLI do
         expect(github).to receive(:find_pull_request).and_return(nil)
         expect(github).to receive(:create_pull_request).and_return(pull_request)
 
+        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
+        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
+        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
         expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
         cli.reviewrequest
       end

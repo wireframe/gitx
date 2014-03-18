@@ -26,11 +26,11 @@ module Thegarage
       method_option :open, :type => :boolean, :aliases => '-o', :desc => 'open the pull request in a web browser'
       # @see http://developer.github.com/v3/pulls/
       def reviewrequest
-        update
         fail 'Github authorization token not found' unless github.authorization_token
 
         pull_request = github.find_pull_request(current_branch)
         if pull_request.nil?
+          update
           changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
           pull_request = github.create_pull_request(current_branch, changelog, options)
           say 'Pull request created: '

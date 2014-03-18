@@ -102,11 +102,11 @@ module Thegarage
       # @returns nil if no pull request found
       def find_pull_request(branch)
         head_reference = [remote_origin_name.split('/').first, branch].join(':')
-        payload = {
+        params = {
           head: head_reference,
-          state: open
-        }.to_json
-        response = RestClient::Request.new(:url => pull_request_url, :method => "GET", :payload => payload, :headers => request_headers).execute
+          state: 'open'
+        }
+        response = RestClient::Request.new(:url => pull_request_url, :method => "GET", :payload => payload, :headers => request_headers.merge(params: params)).execute
         data = JSON.parse(response.body)
         data.first
       rescue RestClient::Exception => e
@@ -148,8 +148,7 @@ module Thegarage
 
       def pull_request_body(changelog, description = nil)
         description_template = []
-        description_template << description if description
-        description_template << "\n"
+        description_template << "#{description}\n" if description
         description_template << '### Changelog'
         description_template << changelog
         description_template << PULL_REQUEST_FOOTER
@@ -175,8 +174,7 @@ module Thegarage
           end
           pid = fork { exec([editor, flags, f.path].join(' ')) }
           Process.waitpid(pid)
-          contents = File.read(f.path)
-          contents.chomp.strip
+          File.read(f.path)
         end
       end
     end
