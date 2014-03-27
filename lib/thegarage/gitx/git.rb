@@ -30,6 +30,17 @@ module Thegarage
         runner.run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
         runner.run_cmd 'git push origin HEAD'
       end
+
+      def track
+        branch = current_branch
+        runner.run_cmd "git branch --set-upstream-to origin/#{branch}"
+      end
+
+      def share
+        branch = current_branch
+        runner.run_cmd "git push origin #{branch}"
+        track
+      end
     end
 
     module Git

@@ -67,7 +67,7 @@ module Thegarage
 
       desc 'track', 'set the current branch to track the remote branch with the same name'
       def track
-        track_branch current_branch
+        git.track
       end
 
       desc 'start', 'start a new git branch with latest changes from master'
@@ -91,7 +91,7 @@ module Thegarage
 
       desc 'share', 'Share the current branch in the remote repository'
       def share
-        share_branch current_branch
+        git.share
       end
 
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches'

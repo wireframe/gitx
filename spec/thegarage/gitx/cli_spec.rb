@@ -370,6 +370,29 @@ describe Thegarage::Gitx::CLI do
     end
   end
 
+  describe '#track' do
+    let(:git) { double('fake git') }
+    before do
+      allow(cli).to receive(:git).and_return(git)
+    end
+    it 'calls git.track' do
+      expect(git).to receive(:track)
+      cli.track
+    end
+  end
+
+  describe '#share' do
+    let(:git) { double('fake git') }
+    before do
+      allow(cli).to receive(:git).and_return(git)
+    end
+    it 'calls git.share' do
+      expect(git).to receive(:share)
+      cli.share
+    end
+  end
+
+
   describe '#buildtag' do
     let(:env_travis_branch) { nil }
     let(:env_travis_pull_request) { nil }
