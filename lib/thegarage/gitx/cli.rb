@@ -72,21 +72,12 @@ module Thegarage
 
       desc 'start', 'start a new git branch with latest changes from master'
       def start(branch_name = nil)
-        unless branch_name
-          example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.shuffle.first
-          repo = Grit::Repo.new(Dir.pwd)
-          remote_branches = repo.remotes.collect {|b| b.name.split('/').last }
-          until branch_name = ask("What would you like to name your branch? (ex: #{example_branch})") {|q|
-              q.validate = Proc.new { |branch|
-                branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)
-              }
-            }
-          end
+        until git.valid_new_branch_name?(branch_name)
+          example_branch = %w{ api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link }.sample
+          branch_name = ask("What would you like to name your branch? (ex: #{example_branch})")
         end
 
-        run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        run_cmd 'git pull'
-        run_cmd "git checkout -b #{branch_name}"
+        git.start branch_name
       end
 
       desc 'share', 'Share the current branch in the remote repository'

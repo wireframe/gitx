@@ -392,6 +392,20 @@ describe Thegarage::Gitx::CLI do
     end
   end
 
+  describe '#start' do
+    let(:git) { double('fake git') }
+    context 'when user inputs branch that is valid' do
+      before do
+        allow(cli).to receive(:git).and_return(git)
+      end
+      it 'calls git.start' do
+        expect(git).to receive(:valid_new_branch_name?).with('new-branch').and_return(true)
+        expect(git).to receive(:start).with('new-branch')
+
+        cli.start 'new-branch'
+      end
+    end
+  end
 
   describe '#buildtag' do
     let(:env_travis_branch) { nil }
