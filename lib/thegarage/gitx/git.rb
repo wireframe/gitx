@@ -3,6 +3,35 @@ require 'pathname'
 
 module Thegarage
   module Gitx
+    class Worker
+      attr_accessor :shell, :runner
+      def initialize(shell, runner)
+        @shell = shell
+        @runner = runner
+      end
+
+      def current_repo
+        @repo ||= Grit::Repo.new(Dir.pwd)
+      end
+
+      # lookup the current branch of the PWD
+      def current_branch
+        Grit::Head.current(current_repo).name
+      end
+
+      def update
+        branch = current_branch
+        shell.say 'Updating '
+        shell.say "#{branch} ", :green
+        shell.say "with latest changes from "
+        shell.say Thegarage::Gitx::BASE_BRANCH, :green
+
+        runner.run_cmd "git pull origin #{branch}", :allow_failure => true
+        runner.run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
+        runner.run_cmd 'git push origin HEAD'
+      end
+    end
+
     module Git
       AGGREGATE_BRANCHES = %w{ staging prototype }
       RESERVED_BRANCHES = %w{ HEAD master next_release } + AGGREGATE_BRANCHES

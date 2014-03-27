@@ -1,7 +1,10 @@
+require 'English'
 require "thor"
 require 'rest_client'
 require 'thegarage/gitx'
+require 'thegarage/gitx/git'
 require 'thegarage/gitx/github'
+require 'thegarage/gitx/runner'
 
 module Thegarage
   module Gitx
@@ -30,7 +33,7 @@ module Thegarage
 
         pull_request = github.find_pull_request(current_branch)
         if pull_request.nil?
-          update
+          git.update
           changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
           pull_request = github.create_pull_request(current_branch, changelog, options)
           say 'Pull request created: '
@@ -41,20 +44,9 @@ module Thegarage
         run_cmd "open #{pull_request['html_url']}" if options[:open]
       end
 
-      # TODO: use --no-edit to skip merge messages
-      # TODO: use pull --rebase to skip merge commit
       desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
       def update
-        branch = current_branch
-
-        say 'updating '
-        say "#{branch} ", :green
-        say "to have most recent changes from "
-        say Thegarage::Gitx::BASE_BRANCH, :green
-
-        run_cmd "git pull origin #{branch}", :allow_failure => true
-        run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
-        run_cmd 'git push origin HEAD'
+        git.update
       end
 
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
@@ -106,7 +98,7 @@ module Thegarage
       def integrate(target_branch = 'staging')
         branch = current_branch
 
-        update
+        git.update
         integrate_branch(branch, target_branch)
         run_cmd "git checkout #{branch}"
       end
@@ -128,7 +120,7 @@ module Thegarage
       def release
         branch = current_branch
         assert_not_protected_branch!(branch, 'release')
-        update
+        git.update
 
         return unless yes?("Release #{branch} to production? (y/n)", :green)
         run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
@@ -174,6 +166,10 @@ module Thegarage
 
       def github
         @github ||= Thegarage::Gitx::Github.new(current_repo, self)
+      end
+
+      def git
+        @git ||= Thegarage::Gitx::Worker.new(shell, Thegarage::Gitx::Runner.new(shell, options))
       end
     end
   end

@@ -1,0 +1,28 @@
+require 'spec_helper'
+require 'timecop'
+
+describe Thegarage::Gitx::Git do
+  let(:runner) { double('fake runner') }
+  let(:shell) { double('fake shell') }
+  subject { Thegarage::Gitx::Worker.new(shell, runner) }
+
+  # default current branch to: feature-branch
+  before do
+    allow(subject).to receive(:current_branch).and_return('feature-branch')
+  end
+
+  describe '#update' do
+    before do
+      allow(shell).to receive(:say)
+
+      expect(runner).to receive(:run_cmd).with('git pull origin feature-branch', allow_failure: true).ordered
+      expect(runner).to receive(:run_cmd).with('git pull origin master').ordered
+      expect(runner).to receive(:run_cmd).with('git push origin HEAD').ordered
+
+      subject.update
+    end
+    it 'runs expected commands' do
+      should meet_expectations
+    end
+  end
+end

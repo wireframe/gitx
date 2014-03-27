@@ -17,10 +17,13 @@ describe Thegarage::Gitx::CLI do
   end
 
   describe '#update' do
+    let(:git) { double('fake git') }
     before do
-      expect(cli).to receive(:run).with('git pull origin feature-branch', capture: true).ordered
-      expect(cli).to receive(:run).with('git pull origin master', capture: true).ordered
-      expect(cli).to receive(:run).with('git push origin HEAD', capture: true).ordered
+      allow(cli).to receive(:git).and_return(git)
+    end
+
+    before do
+      expect(git).to receive(:update)
 
       cli.update
     end
@@ -30,11 +33,14 @@ describe Thegarage::Gitx::CLI do
   end
 
   describe '#integrate' do
+    let(:git) { double('fake git') }
+    before do
+      allow(cli).to receive(:git).and_return(git)
+    end
     context 'when target branch is ommitted' do
       before do
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(git).to receive(:update)
+
         expect(cli).to receive(:run).with("git branch -D staging", capture: true).ordered
         expect(cli).to receive(:run).with("git fetch origin", capture: true).ordered
         expect(cli).to receive(:run).with("git checkout staging", capture: true).ordered
@@ -51,9 +57,8 @@ describe Thegarage::Gitx::CLI do
     end
     context 'when target branch == prototype' do
       before do
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(git).to receive(:update)
+
         expect(cli).to receive(:run).with("git branch -D prototype", capture: true).ordered
         expect(cli).to receive(:run).with("git fetch origin", capture: true).ordered
         expect(cli).to receive(:run).with("git checkout prototype", capture: true).ordered
@@ -70,9 +75,7 @@ describe Thegarage::Gitx::CLI do
     end
     context 'when target branch != staging || prototype' do
       it 'raises an error' do
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(git).to receive(:update)
 
         lambda {
           cli.integrate 'some-other-branch'
@@ -82,13 +85,15 @@ describe Thegarage::Gitx::CLI do
   end
 
   describe '#release' do
+    let(:git) { double('fake git') }
+    before do
+      allow(cli).to receive(:git).and_return(git)
+    end
     context 'when user rejects release' do
       before do
         expect(cli).to receive(:yes?).and_return(false)
 
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(git).to receive(:update)
 
         cli.release
       end
@@ -101,9 +106,8 @@ describe Thegarage::Gitx::CLI do
         expect(cli).to receive(:yes?).and_return(true)
         expect(cli).to receive(:branches).and_return(%w( old-merged-feature )).twice
 
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(git).to receive(:update)
+
         expect(cli).to receive(:run).with("git checkout master", capture: true).ordered
         expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
         expect(cli).to receive(:run).with("git pull . feature-branch", capture: true).ordered
@@ -276,6 +280,7 @@ describe Thegarage::Gitx::CLI do
 
   describe '#reviewrequest' do
     let(:github) { double('fake github') }
+    let(:git) { double('fake git') }
     let(:pull_request) do
       {
         'html_url' => 'https://path/to/new/pull/request',
@@ -286,6 +291,7 @@ describe Thegarage::Gitx::CLI do
     end
     before do
       allow(cli).to receive(:github).and_return(github)
+      allow(cli).to receive(:git).and_return(git)
     end
     context 'when pull request does not exist' do
       let(:authorization_token) { '123123' }
@@ -295,9 +301,7 @@ describe Thegarage::Gitx::CLI do
         expect(github).to receive(:find_pull_request).and_return(nil)
         expect(github).to receive(:create_pull_request).and_return(pull_request)
 
-        expect(cli).to receive(:run).with("git pull origin feature-branch", capture: true).ordered
-        expect(cli).to receive(:run).with("git pull origin master", capture: true).ordered
-        expect(cli).to receive(:run).with("git push origin HEAD", capture: true).ordered
+        expect(git).to receive(:update)
         expect(cli).to receive(:run).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'", capture: true).and_return("2013-01-01 did some stuff").ordered
         cli.reviewrequest
       end
