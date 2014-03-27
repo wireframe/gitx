@@ -88,6 +88,9 @@ module Thegarage
       end
 
       def assign_pull_request(pull_request, assignee)
+        shell.say "Assigning pull request to "
+        shell.say assignee, :green
+
         branch = pull_request['head']['ref']
         payload = {
           :title => branch,
