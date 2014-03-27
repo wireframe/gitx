@@ -1,45 +1,44 @@
 require 'grit'
 require 'pathname'
+require 'rugged'
 
 module Thegarage
   module Gitx
     class Worker
-      attr_accessor :shell, :runner
-      def initialize(shell, runner)
+      attr_accessor :shell, :runner, :repo
+
+      def initialize(shell, runner, path = Dir.pwd)
         @shell = shell
         @runner = runner
-      end
-
-      def current_repo
-        @repo ||= Grit::Repo.new(Dir.pwd)
-      end
-
-      # lookup the current branch of the PWD
-      def current_branch
-        Grit::Head.current(current_repo).name
+        root_path = Rugged::Repository.discover(path)
+        @repo ||= Rugged::Repository.new(root_path)
       end
 
       def update
-        branch = current_branch
         shell.say 'Updating '
-        shell.say "#{branch} ", :green
+        shell.say "#{current_branch.name} ", :green
         shell.say "with latest changes from "
         shell.say Thegarage::Gitx::BASE_BRANCH, :green
 
-        runner.run_cmd "git pull origin #{branch}", :allow_failure => true
+        runner.run_cmd "git pull origin #{current_branch.name}", :allow_failure => true
         runner.run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
         runner.run_cmd 'git push origin HEAD'
       end
 
       def track
-        branch = current_branch
-        runner.run_cmd "git branch --set-upstream-to origin/#{branch}"
+        runner.run_cmd "git branch --set-upstream-to origin/#{current_branch.name}"
       end
 
       def share
-        branch = current_branch
-        runner.run_cmd "git push origin #{branch}"
+        runner.run_cmd "git push origin #{current_branch.name}"
         track
+      end
+
+      private
+
+      # lookup the current branch of the repo
+      def current_branch
+        repo.branches.find(&:head?)
       end
     end
 

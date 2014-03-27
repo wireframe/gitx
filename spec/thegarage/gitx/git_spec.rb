@@ -4,11 +4,12 @@ require 'timecop'
 describe Thegarage::Gitx::Git do
   let(:runner) { double('fake runner') }
   let(:shell) { double('fake shell') }
+  let(:current_branch) { double('fake git branch', name: 'feature-branch') }
   subject { Thegarage::Gitx::Worker.new(shell, runner) }
 
   # default current branch to: feature-branch
   before do
-    allow(subject).to receive(:current_branch).and_return('feature-branch')
+    allow(subject).to receive(:current_branch).and_return(current_branch)
   end
 
   describe '#update' do
