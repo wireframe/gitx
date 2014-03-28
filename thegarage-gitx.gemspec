@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "timecop", "~> 0.6.3"
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-rspec"
+  spec.add_development_dependency "coveralls"
 end
