@@ -1,10 +1,13 @@
-require 'grit'
 require 'pathname'
 require 'rugged'
 
 module Thegarage
   module Gitx
-    class Worker
+    class Git
+      AGGREGATE_BRANCHES = %w( staging prototype )
+      RESERVED_BRANCHES = %w( HEAD master next_release ) + AGGREGATE_BRANCHES
+      TAGGABLE_BRANCHES = %w( master staging )
+
       attr_accessor :shell, :runner, :repo
 
       def initialize(shell, runner, path = Dir.pwd)
@@ -45,30 +48,93 @@ module Thegarage
         runner.run_cmd "git checkout -b #{branch_name}"
       end
 
-      private
+      def cleanup
+        runner.run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
+        runner.run_cmd "git pull"
+        runner.run_cmd 'git remote prune origin'
+
+        shell.say "Deleting branches that have been merged into "
+        shell.say Thegarage::Gitx::BASE_BRANCH, :green
+        branches(:merged => true, :remote => true).each do |branch|
+          runner.run_cmd "git push origin --delete #{branch}" unless aggregate_branch?(branch)
+        end
+        branches(:merged => true).each do |branch|
+          runner.run_cmd "git branch -d #{branch}" unless aggregate_branch?(branch)
+        end
+      end
+
+      def integrate(target_branch = 'staging')
+        update
+
+        branch = current_branch.name
+        integrate_branch(branch, target_branch)
+        runner.run_cmd "git checkout #{branch}"
+      end
+
+      def current_build_tag(branch)
+        last_build_tag = build_tags_for_branch(branch).last
+        raise "No known good tag found for branch: #{branch}.  Verify tag exists via `git tag -l 'build-#{branch}-*'`" unless last_build_tag
+        last_build_tag
+      end
+
+      # reset the specified aggregate branch to the same set of commits as the destination branch
+      def nuke(outdated_branch, target_reference)
+        return if outdated_branch == target_reference
+        fail "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(outdated_branch)
+        return if migrations_need_to_be_reverted?
+
+        shell.say "Resetting "
+        shell.say "#{outdated_branch} ", :green
+        shell.say "branch to "
+        shell.say target_reference, :green
+
+        runner.run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
+        runner.run_cmd "git branch -D #{outdated_branch}", :allow_failure => true
+        runner.run_cmd "git push origin --delete #{outdated_branch}", :allow_failure => true
+        runner.run_cmd "git checkout -b #{outdated_branch} #{target_reference}"
+        runner.run_cmd "git push origin #{outdated_branch}"
+        runner.run_cmd "git branch --set-upstream-to origin/#{outdated_branch}"
+        runner.run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
+      end
 
       # lookup the current branch of the repo
       def current_branch
         repo.branches.find(&:head?)
       end
-    end
 
-    module Git
-      AGGREGATE_BRANCHES = %w{ staging prototype }
-      RESERVED_BRANCHES = %w{ HEAD master next_release } + AGGREGATE_BRANCHES
+      def release
+        branch = current_branch.name
+        assert_not_protected_branch!(branch, 'release')
+        update
+
+        runner.run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
+        runner.run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
+        runner.run_cmd "git pull . #{branch}"
+        runner.run_cmd "git push origin HEAD"
+        integrate('staging')
+        cleanup
+      end
+
+      def buildtag
+        branch = ENV['TRAVIS_BRANCH']
+        pull_request = ENV['TRAVIS_PULL_REQUEST']
+
+        raise "Unknown branch. ENV['TRAVIS_BRANCH'] is required." unless branch
+
+        if pull_request != 'false'
+          shell.say "Skipping creation of tag for pull request: #{pull_request}"
+        elsif !TAGGABLE_BRANCHES.include?(branch)
+          shell.say "Cannot create build tag for branch: #{branch}. Only #{TAGGABLE_BRANCHES} are supported."
+        else
+          label = "Generated tag from TravisCI build #{ENV['TRAVIS_BUILD_NUMBER']}"
+          create_build_tag(branch, label)
+        end
+      end
 
       private
+
       def assert_not_protected_branch!(branch, action)
         raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
-      end
-
-      # lookup the current branch of the PWD
-      def current_branch
-        Grit::Head.current(current_repo).name
-      end
-
-      def current_repo
-        @repo ||= Grit::Repo.new(Dir.pwd)
       end
 
       # retrieve a list of branches
@@ -86,56 +152,27 @@ module Thegarage
         branches.uniq
       end
 
-      # reset the specified aggregate branch to the same set of commits as the destination branch
-      def nuke_branch(outdated_branch, head_branch)
-        return if outdated_branch == head_branch
-        fail "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(outdated_branch)
-        return if migrations_need_to_be_reverted?
-
-        say "Resetting "
-        say "#{outdated_branch} ", :green
-        say "branch to "
-        say head_branch, :green
-
-        run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        run_cmd "git branch -D #{outdated_branch}", :allow_failure => true
-        run_cmd "git push origin --delete #{outdated_branch}", :allow_failure => true
-        run_cmd "git checkout -b #{outdated_branch} #{head_branch}"
-        share_branch outdated_branch
-        run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-      end
-
-      # share the local branch in the remote repo
-      def share_branch(branch)
-        run_cmd "git push origin #{branch}"
-        track_branch branch
-      end
-
-      def track_branch(branch)
-        run_cmd "git branch --set-upstream-to origin/#{branch}"
-      end
-
       # integrate a branch into a destination aggregate branch
       # blow away the local aggregate branch to ensure pulling into most recent "clean" branch
       def integrate_branch(branch, destination_branch)
         assert_not_protected_branch!(branch, 'integrate') unless aggregate_branch?(destination_branch)
         raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch) || destination_branch == Thegarage::Gitx::BASE_BRANCH
-        say "Integrating "
-        say "#{branch} ", :green
-        say "into "
-        say destination_branch, :green
+        shell.say "Integrating "
+        shell.say "#{branch} ", :green
+        shell.say "into "
+        shell.say destination_branch, :green
 
         refresh_branch_from_remote destination_branch
-        run_cmd "git pull . #{branch}"
-        run_cmd "git push origin HEAD"
-        run_cmd "git checkout #{branch}"
+        runner.run_cmd "git pull . #{branch}"
+        runner.run_cmd "git push origin HEAD"
+        runner.run_cmd "git checkout #{branch}"
       end
 
       # nuke local branch and pull fresh version from remote repo
       def refresh_branch_from_remote(destination_branch)
-        run_cmd "git branch -D #{destination_branch}", :allow_failure => true
-        run_cmd "git fetch origin"
-        run_cmd "git checkout #{destination_branch}"
+        runner.run_cmd "git branch -D #{destination_branch}", :allow_failure => true
+        runner.run_cmd "git fetch origin"
+        runner.run_cmd "git checkout #{destination_branch}"
       end
 
       def aggregate_branch?(branch)
@@ -145,26 +182,26 @@ module Thegarage
       def create_build_tag(branch, label)
         timestamp = Time.now.utc.strftime '%Y-%m-%d-%H-%M-%S'
         git_tag = "build-#{branch}-#{timestamp}"
-        run_cmd "git tag #{git_tag} -a -m '#{label}'"
-        run_cmd "git push origin #{git_tag}"
+        runner.run_cmd "git tag #{git_tag} -a -m '#{label}'"
+        runner.run_cmd "git push origin #{git_tag}"
       end
 
       def build_tags_for_branch(branch)
-        run_cmd "git fetch --tags"
-        build_tags = run_cmd("git tag -l 'build-#{branch}-*'").split
+        runner.run_cmd "git fetch --tags"
+        build_tags = runner.run_cmd("git tag -l 'build-#{branch}-*'").split
         build_tags.sort
       end
 
       def migrations_need_to_be_reverted?
         return false unless File.exists?('db/migrate')
-        outdated_migrations = run_cmd("git diff #{head_branch}...#{outdated_branch} --name-only db/migrate").split
+        outdated_migrations = runner.run_cmd("git diff #{head_branch}...#{outdated_branch} --name-only db/migrate").split
         return false if outdated_migrations.empty?
 
-        say "#{outdated_branch} contains migrations that may need to be reverted.  Ensure any reversable migrations are reverted on affected databases before nuking.", :red
-        say 'Example commands to revert outdated migrations:'
+        shell.say "#{outdated_branch} contains migrations that may need to be reverted.  Ensure any reversable migrations are reverted on affected databases before nuking.", :red
+        shell.say 'Example commands to revert outdated migrations:'
         outdated_migrations.reverse.each do |migration|
           version = File.basename(migration).split('_').first
-          say "rake db:migrate:down VERSION=#{version}"
+          shell.say "rake db:migrate:down VERSION=#{version}"
         end
         !yes?("Are you sure you want to nuke #{outdated_branch}? (y/n) ", :green)
       end

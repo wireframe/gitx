@@ -12,10 +12,6 @@ module Thegarage
       include Thor::Actions
       add_runtime_options!
 
-      include Thegarage::Gitx::Git
-
-      TAGGABLE_BRANCHES = %w(master staging)
-
       method_option :trace, :type => :boolean, :aliases => '-v'
       def initialize(*args)
         super(*args)
@@ -31,17 +27,18 @@ module Thegarage
       def reviewrequest
         fail 'Github authorization token not found' unless github.authorization_token
 
-        pull_request = github.find_pull_request(current_branch)
+        branch = git.current_branch.name
+        pull_request = github.find_pull_request(branch)
         if pull_request.nil?
           git.update
-          changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{current_branch} --no-merges --pretty=format:'* %s%n%b'"
-          pull_request = github.create_pull_request(current_branch, changelog, options)
+          changelog = runner.run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --no-merges --pretty=format:'* %s%n%b'"
+          pull_request = github.create_pull_request(branch, changelog, options)
           say 'Pull request created: '
           say pull_request['html_url'], :green
         end
         github.assign_pull_request(pull_request, options[:assignee]) if options[:assignee]
 
-        run_cmd "open #{pull_request['html_url']}" if options[:open]
+        runner.run_cmd "open #{pull_request['html_url']}" if options[:open]
       end
 
       desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
@@ -51,18 +48,7 @@ module Thegarage
 
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
       def cleanup
-        run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        run_cmd "git pull"
-        run_cmd 'git remote prune origin'
-
-        say "Deleting branches that have been merged into "
-        say Thegarage::Gitx::BASE_BRANCH, :green
-        branches(:merged => true, :remote => true).each do |branch|
-          run_cmd "git push origin --delete #{branch}" unless aggregate_branch?(branch)
-        end
-        branches(:merged => true).each do |branch|
-          run_cmd "git branch -d #{branch}" unless aggregate_branch?(branch)
-        end
+        git.cleanup
       end
 
       desc 'track', 'set the current branch to track the remote branch with the same name'
@@ -87,11 +73,7 @@ module Thegarage
 
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches'
       def integrate(target_branch = 'staging')
-        branch = current_branch
-
-        git.update
-        integrate_branch(branch, target_branch)
-        run_cmd "git checkout #{branch}"
+        git.integrate target_branch
       end
 
       desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
@@ -100,67 +82,35 @@ module Thegarage
         good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{bad_branch})")
         good_branch = bad_branch if good_branch.length == 0
 
-        last_known_good_tag = build_tags_for_branch(good_branch).last
-        raise "No known good tag found for branch: #{good_branch}.  Verify tag exists via `git tag -l 'build-#{good_branch}-*'`" unless last_known_good_tag
+        last_known_good_tag = git.current_build_tag(good_branch)
         return unless yes?("Reset #{bad_branch} to #{last_known_good_tag}? (y/n)", :green)
 
-        nuke_branch(bad_branch, last_known_good_tag)
+        git.nuke bad_branch, last_known_good_tag
       end
 
       desc 'release', 'release the current branch to production'
       def release
-        branch = current_branch
-        assert_not_protected_branch!(branch, 'release')
-        git.update
-
-        return unless yes?("Release #{branch} to production? (y/n)", :green)
-        run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
-        run_cmd "git pull . #{branch}"
-        run_cmd "git push origin HEAD"
-        integrate_branch('master', 'staging')
-        cleanup
+        return unless yes?("Release #{git.current_branch.name} to production? (y/n)", :green)
+        git.release
       end
 
       desc 'buildtag', 'create a tag for the current Travis-CI build and push it back to origin'
       def buildtag
-        branch = ENV['TRAVIS_BRANCH']
-        pull_request = ENV['TRAVIS_PULL_REQUEST']
-
-        raise "Unknown branch. ENV['TRAVIS_BRANCH'] is required." unless branch
-
-        if pull_request != 'false'
-          say "Skipping creation of tag for pull request: #{pull_request}"
-        elsif !TAGGABLE_BRANCHES.include?(branch)
-          say "Cannot create build tag for branch: #{branch}. Only #{TAGGABLE_BRANCHES} are supported."
-        else
-          label = "Generated tag from TravisCI build #{ENV['TRAVIS_BUILD_NUMBER']}"
-          create_build_tag(branch, label)
-        end
+        git.buildtag
       end
 
       private
 
-      # execute a shell command and raise an error if non-zero exit code is returned
-      # return the string output from the command
-      def run_cmd(cmd, options = {})
-        output = run(cmd, capture: true)
-        success = $CHILD_STATUS.to_i == 0
-        fail "#{cmd} failed" unless success || options[:allow_failure]
-        output
-      end
-
-      # check if --pretend or -p flag passed to CLI
-      def pretend?
-        options[:pretend]
-      end
-
       def github
-        @github ||= Thegarage::Gitx::Github.new(current_repo, self)
+        @github ||= Thegarage::Gitx::Github.new(git.repo, shell)
       end
 
       def git
-        @git ||= Thegarage::Gitx::Worker.new(shell, Thegarage::Gitx::Runner.new(shell, options))
+        @git ||= Thegarage::Gitx::Git.new(shell, runner)
+      end
+
+      def runner
+        @runner ||= Thegarage::Gitx::Runner.new(shell, options)
       end
     end
   end
