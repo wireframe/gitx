@@ -1,6 +1,7 @@
 # thegarage-gitx
 
 [![Build Status](https://travis-ci.org/thegarage/thegarage-gitx.png?branch=master)](https://travis-ci.org/thegarage/thegarage-gitx)
+[![Code Quality](https://codeclimate.com/github/thegarage/thegarage-gitx/badges)](https://codeclimate.com/github/thegarage/thegarage-gitx)
 
 Useful Git eXtensions for Development workflow at The Garage.
 
