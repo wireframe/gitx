@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'timecop'
 
 describe Thegarage::Gitx::CLI do
   let(:args) { [] }
@@ -11,14 +10,12 @@ describe Thegarage::Gitx::CLI do
   end
   let(:cli) { Thegarage::Gitx::CLI.new(args, options, config) }
   let(:git) { double('fake git') }
-  let(:github) { double('fake github') }
   let(:runner) { double('fake runner') }
   let(:branch) { double('fake branch', name: 'feature-branch') }
 
   before do
     allow(cli).to receive(:git).and_return(git)
     allow(cli).to receive(:runner).and_return(runner)
-    allow(cli).to receive(:github).and_return(github)
     allow(git).to receive(:current_branch).and_return(branch)
   end
 
@@ -132,92 +129,6 @@ describe Thegarage::Gitx::CLI do
         cli.nuke 'prototype'
       end
       it 'runs expected commands' do
-        should meet_expectations
-      end
-    end
-  end
-
-  describe '#reviewrequest' do
-    let(:pull_request) do
-      {
-        'html_url' => 'https://path/to/new/pull/request',
-        'head' => {
-          'ref' => 'branch_name'
-        }
-      }
-    end
-    context 'when pull request does not exist' do
-      let(:authorization_token) { '123123' }
-      let(:changelog) { '* made some fixes' }
-      before do
-        expect(github).to receive(:authorization_token).and_return(authorization_token)
-        expect(github).to receive(:find_pull_request).and_return(nil)
-        expect(github).to receive(:create_pull_request).and_return(pull_request)
-
-        expect(git).to receive(:update)
-        expect(runner).to receive(:run_cmd).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
-        cli.reviewrequest
-      end
-      it 'creates github pull request' do
-        should meet_expectations
-      end
-      it 'runs expected commands' do
-        should meet_expectations
-      end
-    end
-    context 'when authorization_token is missing' do
-      let(:authorization_token) { nil }
-      it do
-        expect(github).to receive(:authorization_token).and_return(authorization_token)
-        expect { cli.reviewrequest }.to raise_error(/token not found/)
-      end
-    end
-    context 'when pull request already exists' do
-      let(:authorization_token) { '123123' }
-      before do
-        expect(github).to receive(:authorization_token).and_return(authorization_token)
-        expect(github).to receive(:find_pull_request).and_return(pull_request)
-        expect(github).to_not receive(:create_pull_request)
-
-        cli.reviewrequest
-      end
-      it 'does not create new pull request' do
-        should meet_expectations
-      end
-    end
-    context 'when --assignee option passed' do
-      let(:options) do
-        {
-          assignee: 'johndoe'
-        }
-      end
-      let(:authorization_token) { '123123' }
-      before do
-        expect(github).to receive(:authorization_token).and_return(authorization_token)
-        expect(github).to receive(:find_pull_request).and_return(pull_request)
-        expect(github).to receive(:assign_pull_request)
-
-        cli.reviewrequest
-      end
-      it 'calls assign_pull_request method' do
-        should meet_expectations
-      end
-    end
-    context 'when --open flag passed' do
-      let(:options) do
-        {
-          open: true
-        }
-      end
-      let(:authorization_token) { '123123' }
-      before do
-        expect(github).to receive(:authorization_token).and_return(authorization_token)
-        expect(github).to receive(:find_pull_request).and_return(pull_request)
-
-        expect(runner).to receive(:run_cmd).with("open #{pull_request['html_url']}").ordered
-        cli.reviewrequest
-      end
-      it 'runs open command with pull request url' do
         should meet_expectations
       end
     end

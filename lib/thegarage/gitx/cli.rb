@@ -3,7 +3,6 @@ require "thor"
 require 'rest_client'
 require 'thegarage/gitx'
 require 'thegarage/gitx/git'
-require 'thegarage/gitx/github'
 require 'thegarage/gitx/runner'
 
 module Thegarage
@@ -17,28 +16,6 @@ module Thegarage
         super(*args)
         RestClient.proxy = ENV['HTTPS_PROXY'] if ENV.has_key?('HTTPS_PROXY')
         RestClient.log = Logger.new(STDOUT) if options[:trace]
-      end
-
-      desc "reviewrequest", "Create or update a pull request on github"
-      method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
-      method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
-      method_option :open, :type => :boolean, :aliases => '-o', :desc => 'open the pull request in a web browser'
-      # @see http://developer.github.com/v3/pulls/
-      def reviewrequest
-        fail 'Github authorization token not found' unless github.authorization_token
-
-        branch = git.current_branch.name
-        pull_request = github.find_pull_request(branch)
-        if pull_request.nil?
-          git.update
-          changelog = runner.run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --no-merges --pretty=format:'* %s%n%b'"
-          pull_request = github.create_pull_request(branch, changelog, options)
-          say 'Pull request created: '
-          say pull_request['html_url'], :green
-        end
-        github.assign_pull_request(pull_request, options[:assignee]) if options[:assignee]
-
-        runner.run_cmd "open #{pull_request['html_url']}" if options[:open]
       end
 
       desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
