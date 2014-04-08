@@ -28,11 +28,6 @@ module Thegarage
         git.start branch_name
       end
 
-      desc 'share', 'Share the current branch in the remote repository'
-      def share
-        git.share
-      end
-
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches'
       def integrate(target_branch = 'staging')
         git.integrate target_branch

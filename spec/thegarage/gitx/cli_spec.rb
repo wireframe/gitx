@@ -123,20 +123,6 @@ describe Thegarage::Gitx::CLI do
     end
   end
 
-  describe '#track' do
-    it 'calls git.track' do
-      expect(git).to receive(:track)
-      cli.track
-    end
-  end
-
-  describe '#share' do
-    it 'calls git.share' do
-      expect(git).to receive(:share)
-      cli.share
-    end
-  end
-
   describe '#start' do
     context 'when user inputs branch that is valid' do
       it 'calls git.start' do

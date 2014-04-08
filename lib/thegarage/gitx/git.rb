@@ -17,15 +17,6 @@ module Thegarage
         @repo = Rugged::Repository.new(root_path)
       end
 
-      def track
-        runner.run_cmd "git branch --set-upstream-to origin/#{current_branch.name}"
-      end
-
-      def share
-        runner.run_cmd "git push origin #{current_branch.name}"
-        track
-      end
-
       def valid_new_branch_name?(branch)
         remote_branches = Rugged::Branch.each_name(repo, :remote).to_a.map { |branch| branch.split('/').last }
         branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)

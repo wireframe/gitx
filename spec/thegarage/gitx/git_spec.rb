@@ -12,29 +12,6 @@ describe Thegarage::Gitx::Git do
     allow(subject).to receive(:current_branch).and_return(branch)
   end
 
-  describe '#track' do
-    before do
-      expect(runner).to receive(:run_cmd).with('git branch --set-upstream-to origin/feature-branch').ordered
-
-      subject.track
-    end
-    it 'runs expected commands' do
-      should meet_expectations
-    end
-  end
-
-  describe '#share' do
-    before do
-      expect(runner).to receive(:run_cmd).with('git push origin feature-branch').ordered
-      expect(runner).to receive(:run_cmd).with('git branch --set-upstream-to origin/feature-branch').ordered
-
-      subject.share
-    end
-    it 'runs expected commands' do
-      should meet_expectations
-    end
-  end
-
   describe '#integrate' do
     context 'when target branch is ommitted' do
       before do
