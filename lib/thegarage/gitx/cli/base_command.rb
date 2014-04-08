@@ -11,6 +11,7 @@ module Thegarage
         include Thor::Actions
 
         AGGREGATE_BRANCHES = %w( staging prototype )
+        RESERVED_BRANCHES = %w( HEAD master next_release ) + AGGREGATE_BRANCHES
         add_runtime_options!
 
         method_option :trace, :type => :boolean, :aliases => '-v'
@@ -47,6 +48,10 @@ module Thegarage
 
         def aggregate_branch?(branch)
           AGGREGATE_BRANCHES.include?(branch)
+        end
+
+        def assert_not_protected_branch!(branch, action)
+          raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
         end
       end
     end

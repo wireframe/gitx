@@ -19,29 +19,6 @@ describe Thegarage::Gitx::CLI do
     allow(git).to receive(:current_branch).and_return(branch)
   end
 
-  describe '#integrate' do
-    context 'when target branch is ommitted' do
-      before do
-        expect(git).to receive(:integrate).with('staging')
-
-        cli.integrate
-      end
-      it 'defaults to staging branch' do
-        should meet_expectations
-      end
-    end
-    context 'when target branch == prototype' do
-      before do
-        expect(git).to receive(:integrate).with('prototype')
-
-        cli.integrate 'prototype'
-      end
-      it 'runs expected commands' do
-        should meet_expectations
-      end
-    end
-  end
-
   describe '#release' do
     context 'when user rejects release' do
       before do

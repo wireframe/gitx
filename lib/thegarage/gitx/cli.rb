@@ -18,11 +18,6 @@ module Thegarage
         RestClient.log = Logger.new(STDOUT) if options[:trace]
       end
 
-      desc 'integrate', 'integrate the current branch into one of the aggregate development branches'
-      def integrate(target_branch = 'staging')
-        git.integrate target_branch
-      end
-
       desc 'nuke', 'nuke the specified aggregate branch and reset it to a known good state'
       method_option :destination, :type => :string, :aliases => '-d', :desc => 'destination branch to reset to'
       def nuke(bad_branch)

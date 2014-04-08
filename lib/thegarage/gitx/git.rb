@@ -16,14 +16,6 @@ module Thegarage
         @repo = Rugged::Repository.new(root_path)
       end
 
-      def integrate(target_branch = 'staging')
-        update
-
-        branch = current_branch.name
-        integrate_branch(branch, target_branch)
-        runner.run_cmd "git checkout #{branch}"
-      end
-
       def current_build_tag(branch)
         last_build_tag = build_tags_for_branch(branch).last
         raise "No known good tag found for branch: #{branch}.  Verify tag exists via `git tag -l 'build-#{branch}-*'`" unless last_build_tag
@@ -87,29 +79,6 @@ module Thegarage
           branches << branch unless RESERVED_BRANCHES.include?(branch)
         end
         branches.uniq
-      end
-
-      # integrate a branch into a destination aggregate branch
-      # blow away the local aggregate branch to ensure pulling into most recent "clean" branch
-      def integrate_branch(branch, destination_branch)
-        assert_not_protected_branch!(branch, 'integrate') unless aggregate_branch?(destination_branch)
-        raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(destination_branch) || destination_branch == Thegarage::Gitx::BASE_BRANCH
-        shell.say "Integrating "
-        shell.say "#{branch} ", :green
-        shell.say "into "
-        shell.say destination_branch, :green
-
-        refresh_branch_from_remote destination_branch
-        runner.run_cmd "git pull . #{branch}"
-        runner.run_cmd "git push origin HEAD"
-        runner.run_cmd "git checkout #{branch}"
-      end
-
-      # nuke local branch and pull fresh version from remote repo
-      def refresh_branch_from_remote(destination_branch)
-        runner.run_cmd "git branch -D #{destination_branch}", :allow_failure => true
-        runner.run_cmd "git fetch origin"
-        runner.run_cmd "git checkout #{destination_branch}"
       end
 
       def aggregate_branch?(branch)

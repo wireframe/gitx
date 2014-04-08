@@ -12,52 +12,6 @@ describe Thegarage::Gitx::Git do
     allow(subject).to receive(:current_branch).and_return(branch)
   end
 
-  describe '#integrate' do
-    context 'when target branch is ommitted' do
-      before do
-        expect(subject).to receive(:update)
-
-        expect(runner).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
-        expect(runner).to receive(:run_cmd).with("git fetch origin").ordered
-        expect(runner).to receive(:run_cmd).with("git checkout staging").ordered
-        expect(runner).to receive(:run_cmd).with("git pull . feature-branch").ordered
-        expect(runner).to receive(:run_cmd).with("git push origin HEAD").ordered
-        expect(runner).to receive(:run_cmd).with("git checkout feature-branch").ordered
-        expect(runner).to receive(:run_cmd).with("git checkout feature-branch").ordered
-
-        subject.integrate
-      end
-      it 'defaults to staging branch' do
-        should meet_expectations
-      end
-    end
-    context 'when target branch == prototype' do
-      before do
-        expect(subject).to receive(:update)
-
-        expect(runner).to receive(:run_cmd).with("git branch -D prototype", allow_failure: true).ordered
-        expect(runner).to receive(:run_cmd).with("git fetch origin").ordered
-        expect(runner).to receive(:run_cmd).with("git checkout prototype").ordered
-        expect(runner).to receive(:run_cmd).with("git pull . feature-branch").ordered
-        expect(runner).to receive(:run_cmd).with("git push origin HEAD").ordered
-        expect(runner).to receive(:run_cmd).with("git checkout feature-branch").ordered
-        expect(runner).to receive(:run_cmd).with("git checkout feature-branch").ordered
-
-        subject.integrate 'prototype'
-      end
-      it 'runs expected commands' do
-        should meet_expectations
-      end
-    end
-    context 'when target branch != staging || prototype' do
-      it 'raises an error' do
-        expect(subject).to receive(:update)
-
-        expect { subject.integrate('some-other-branch') }.to raise_error(/Only aggregate branches are allowed for integration/)
-      end
-    end
-  end
-
   describe '#release' do
     it 'merges feature branch into master' do
       expect(subject).to receive(:update)
