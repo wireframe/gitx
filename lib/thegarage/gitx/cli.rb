@@ -18,11 +18,6 @@ module Thegarage
         RestClient.log = Logger.new(STDOUT) if options[:trace]
       end
 
-      desc 'track', 'set the current branch to track the remote branch with the same name'
-      def track
-        git.track
-      end
-
       desc 'start', 'start a new git branch with latest changes from master'
       def start(branch_name = nil)
         until git.valid_new_branch_name?(branch_name)
