@@ -4,7 +4,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'pry'
 require 'webmock/rspec'
-require 'thegarage/gitx/cli'
+require 'timecop'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
