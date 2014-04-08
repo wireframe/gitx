@@ -18,11 +18,6 @@ module Thegarage
         RestClient.log = Logger.new(STDOUT) if options[:trace]
       end
 
-      desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
-      def cleanup
-        git.cleanup
-      end
-
       desc 'track', 'set the current branch to track the remote branch with the same name'
       def track
         git.track

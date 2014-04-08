@@ -9,6 +9,8 @@ module Thegarage
     module Cli
       class BaseCommand < Thor
         include Thor::Actions
+
+        AGGREGATE_BRANCHES = %w( staging prototype )
         add_runtime_options!
 
         method_option :trace, :type => :boolean, :aliases => '-v'
@@ -53,6 +55,10 @@ module Thegarage
           success = $CHILD_STATUS.to_i == 0
           fail "#{cmd} failed" unless success || options[:allow_failure]
           output
+        end
+
+        def aggregate_branch?(branch)
+          AGGREGATE_BRANCHES.include?(branch)
         end
       end
     end

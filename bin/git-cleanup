@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx', 'cli.rb')
-Thegarage::Gitx::CLI.start (['cleanup'] + ARGV)
+require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx/cli', 'cleanup_command.rb')
+args = ARGV.dup.unshift('cleanup')
+Thegarage::Gitx::Cli::CleanupCommand.start(args)
+

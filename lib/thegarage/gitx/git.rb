@@ -37,21 +37,6 @@ module Thegarage
         runner.run_cmd "git checkout -b #{branch_name}"
       end
 
-      def cleanup
-        runner.run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        runner.run_cmd "git pull"
-        runner.run_cmd 'git remote prune origin'
-
-        shell.say "Deleting branches that have been merged into "
-        shell.say Thegarage::Gitx::BASE_BRANCH, :green
-        branches(:merged => true, :remote => true).each do |branch|
-          runner.run_cmd "git push origin --delete #{branch}" unless aggregate_branch?(branch)
-        end
-        branches(:merged => true).each do |branch|
-          runner.run_cmd "git branch -d #{branch}" unless aggregate_branch?(branch)
-        end
-      end
-
       def integrate(target_branch = 'staging')
         update
 
