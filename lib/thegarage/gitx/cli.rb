@@ -41,11 +41,6 @@ module Thegarage
         git.release
       end
 
-      desc 'buildtag', 'create a tag for the current Travis-CI build and push it back to origin'
-      def buildtag
-        git.buildtag
-      end
-
       private
 
       def github

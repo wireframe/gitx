@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx', 'cli.rb')
-Thegarage::Gitx::CLI.start (['buildtag'] + ARGV)
+require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx/cli', 'buildtag_command.rb')
+args = ARGV.dup.unshift('buildtag')
+Thegarage::Gitx::Cli::BuildtagCommand.start(args)

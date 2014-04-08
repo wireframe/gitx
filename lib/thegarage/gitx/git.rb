@@ -6,7 +6,6 @@ module Thegarage
     class Git
       AGGREGATE_BRANCHES = %w( staging prototype )
       RESERVED_BRANCHES = %w( HEAD master next_release ) + AGGREGATE_BRANCHES
-      TAGGABLE_BRANCHES = %w( master staging )
 
       attr_accessor :shell, :runner, :repo
 
@@ -69,22 +68,6 @@ module Thegarage
         cleanup
       end
 
-      def buildtag
-        branch = ENV['TRAVIS_BRANCH']
-        pull_request = ENV['TRAVIS_PULL_REQUEST']
-
-        raise "Unknown branch. ENV['TRAVIS_BRANCH'] is required." unless branch
-
-        if pull_request != 'false'
-          shell.say "Skipping creation of tag for pull request: #{pull_request}"
-        elsif !TAGGABLE_BRANCHES.include?(branch)
-          shell.say "Cannot create build tag for branch: #{branch}. Only #{TAGGABLE_BRANCHES} are supported."
-        else
-          label = "Generated tag from TravisCI build #{ENV['TRAVIS_BUILD_NUMBER']}"
-          create_build_tag(branch, label)
-        end
-      end
-
       private
 
       def assert_not_protected_branch!(branch, action)
@@ -131,13 +114,6 @@ module Thegarage
 
       def aggregate_branch?(branch)
         AGGREGATE_BRANCHES.include?(branch)
-      end
-
-      def create_build_tag(branch, label)
-        timestamp = Time.now.utc.strftime '%Y-%m-%d-%H-%M-%S'
-        git_tag = "build-#{branch}-#{timestamp}"
-        runner.run_cmd "git tag #{git_tag} -a -m '#{label}'"
-        runner.run_cmd "git push origin #{git_tag}"
       end
 
       def build_tags_for_branch(branch)

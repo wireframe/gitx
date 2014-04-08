@@ -122,11 +122,4 @@ describe Thegarage::Gitx::CLI do
       end
     end
   end
-
-  describe '#buildtag' do
-    it 'calls git.buildtag' do
-      expect(git).to receive(:buildtag)
-      cli.buildtag
-    end
-  end
 end
