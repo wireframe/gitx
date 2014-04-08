@@ -17,17 +17,6 @@ module Thegarage
         @repo = Rugged::Repository.new(root_path)
       end
 
-      def valid_new_branch_name?(branch)
-        remote_branches = Rugged::Branch.each_name(repo, :remote).to_a.map { |branch| branch.split('/').last }
-        branch =~ /^[A-Za-z0-9\-_]+$/ && !remote_branches.include?(branch)
-      end
-
-      def start(branch_name)
-        runner.run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        runner.run_cmd 'git pull'
-        runner.run_cmd "git checkout -b #{branch_name}"
-      end
-
       def integrate(target_branch = 'staging')
         update
 

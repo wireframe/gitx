@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx', 'cli.rb')
-Thegarage::Gitx::CLI.start (['start'] + ARGV)
+require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx/cli', 'start_command.rb')
+args = ARGV.dup.unshift('start')
+Thegarage::Gitx::Cli::StartCommand.start(args)

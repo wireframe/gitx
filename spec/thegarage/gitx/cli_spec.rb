@@ -123,17 +123,6 @@ describe Thegarage::Gitx::CLI do
     end
   end
 
-  describe '#start' do
-    context 'when user inputs branch that is valid' do
-      it 'calls git.start' do
-        expect(git).to receive(:valid_new_branch_name?).with('new-branch').and_return(true)
-        expect(git).to receive(:start).with('new-branch')
-
-        cli.start 'new-branch'
-      end
-    end
-  end
-
   describe '#buildtag' do
     it 'calls git.buildtag' do
       expect(git).to receive(:buildtag)
