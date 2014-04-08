@@ -18,11 +18,6 @@ module Thegarage
         RestClient.log = Logger.new(STDOUT) if options[:trace]
       end
 
-      desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
-      def update
-        git.update
-      end
-
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
       def cleanup
         git.cleanup

@@ -17,17 +17,6 @@ module Thegarage
         @repo = Rugged::Repository.new(root_path)
       end
 
-      def update
-        shell.say 'Updating '
-        shell.say "#{current_branch.name} ", :green
-        shell.say "with latest changes from "
-        shell.say Thegarage::Gitx::BASE_BRANCH, :green
-
-        runner.run_cmd "git pull origin #{current_branch.name}", :allow_failure => true
-        runner.run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
-        runner.run_cmd 'git push origin HEAD'
-      end
-
       def track
         runner.run_cmd "git branch --set-upstream-to origin/#{current_branch.name}"
       end

@@ -19,17 +19,6 @@ describe Thegarage::Gitx::CLI do
     allow(git).to receive(:current_branch).and_return(branch)
   end
 
-  describe '#update' do
-    before do
-      expect(git).to receive(:update)
-
-      cli.update
-    end
-    it 'runs expected commands' do
-      should meet_expectations
-    end
-  end
-
   describe '#integrate' do
     context 'when target branch is ommitted' do
       before do
