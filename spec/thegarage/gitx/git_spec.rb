@@ -12,22 +12,6 @@ describe Thegarage::Gitx::Git do
     allow(subject).to receive(:current_branch).and_return(branch)
   end
 
-  describe '#release' do
-    it 'merges feature branch into master' do
-      expect(subject).to receive(:update)
-
-      expect(runner).to receive(:run_cmd).with("git checkout master").ordered
-      expect(runner).to receive(:run_cmd).with("git pull origin master").ordered
-      expect(runner).to receive(:run_cmd).with("git pull . feature-branch").ordered
-      expect(runner).to receive(:run_cmd).with("git push origin HEAD").ordered
-
-      expect(subject).to receive(:integrate).with('staging')
-      expect(subject).to receive(:cleanup)
-
-      subject.release
-    end
-  end
-
   describe '#nuke' do
     context 'when target branch == prototype and head is a valid buildtag' do
       let(:buildtag) { 'build-master-2013-10-01-01' }

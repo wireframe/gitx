@@ -19,31 +19,6 @@ describe Thegarage::Gitx::CLI do
     allow(git).to receive(:current_branch).and_return(branch)
   end
 
-  describe '#release' do
-    context 'when user rejects release' do
-      before do
-        expect(cli).to receive(:yes?).and_return(false)
-
-        expect(git).to_not receive(:release)
-
-        cli.release
-      end
-      it 'only runs update commands' do
-        should meet_expectations
-      end
-    end
-    context 'when user confirms release' do
-      before do
-        expect(cli).to receive(:yes?).and_return(true)
-        expect(git).to receive(:release)
-        cli.release
-      end
-      it 'runs expected commands' do
-        should meet_expectations
-      end
-    end
-  end
-
   describe '#nuke' do
     context 'when target branch == prototype and --destination == master' do
       let(:options) do

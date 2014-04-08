@@ -47,19 +47,6 @@ module Thegarage
         repo.branches.find(&:head?)
       end
 
-      def release
-        branch = current_branch.name
-        assert_not_protected_branch!(branch, 'release')
-        update
-
-        runner.run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
-        runner.run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
-        runner.run_cmd "git pull . #{branch}"
-        runner.run_cmd "git push origin HEAD"
-        integrate('staging')
-        cleanup
-      end
-
       private
 
       def assert_not_protected_branch!(branch, action)

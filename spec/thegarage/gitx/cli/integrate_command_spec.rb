@@ -17,11 +17,13 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
   end
 
   describe '#integrate' do
+    let(:fake_update_command) { double('fake update command') }
+    before do
+      allow(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
+    end
     context 'when target branch is ommitted' do
       before do
-        expect(cli).to receive(:run_cmd).with("git pull origin feature-branch", allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with("git pull origin master").ordered
-        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
+        expect(fake_update_command).to receive(:update)
 
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
@@ -38,9 +40,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
     end
     context 'when target branch == prototype' do
       before do
-        expect(cli).to receive(:run_cmd).with("git pull origin feature-branch", allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with("git pull origin master").ordered
-        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
+        expect(fake_update_command).to receive(:update)
 
         expect(cli).to receive(:run_cmd).with("git branch -D prototype", allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered

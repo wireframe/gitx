@@ -30,12 +30,6 @@ module Thegarage
         git.nuke bad_branch, last_known_good_tag
       end
 
-      desc 'release', 'release the current branch to production'
-      def release
-        return unless yes?("Release #{git.current_branch.name} to production? (y/n)", :green)
-        git.release
-      end
-
       private
 
       def github
