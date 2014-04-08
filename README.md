@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/thegarage/thegarage-gitx.png?branch=master)](https://travis-ci.org/thegarage/thegarage-gitx)
 [![Code Coverage](https://coveralls.io/repos/thegarage/thegarage-gitx/badge.png)](https://coveralls.io/r/thegarage/thegarage-gitx)
-[![Code Quality](https://codeclimate.com/github/thegarage/thegarage-gitx/badges)](https://codeclimate.com/github/thegarage/thegarage-gitx)
+[![Code Climate](https://codeclimate.com/github/thegarage/thegarage-gitx.png)](https://codeclimate.com/github/thegarage/thegarage-gitx)
 
 Useful Git eXtensions for Development workflow at The Garage.
 
