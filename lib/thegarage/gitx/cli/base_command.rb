@@ -53,6 +53,21 @@ module Thegarage
         def assert_not_protected_branch!(branch, action)
           raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
         end
+
+        # retrieve a list of branches
+        def branches(options = {})
+          branches = []
+          args = []
+          args << '-r' if options[:remote]
+          args << "--merged #{options[:merged].is_a?(String) ? options[:merged] : ''}" if options[:merged]
+          output = `git branch #{args.join(' ')}`.split("\n")
+          output.each do |branch|
+            branch = branch.gsub(/\*/, '').strip.split(' ').first
+            branch = branch.split('/').last if options[:remote]
+            branches << branch unless RESERVED_BRANCHES.include?(branch)
+          end
+          branches.uniq
+        end
       end
     end
   end
