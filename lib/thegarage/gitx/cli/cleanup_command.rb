@@ -21,15 +21,16 @@ module Thegarage
             run_cmd "git branch -d #{branch}"
           end
         end
-      end
 
-      private
-      def merged_local_branches
-        branches(:merged => true).reject { |b| aggregate_branch?(b) }
-      end
+        private
 
-      def merged_remote_branches
-        branches(:merged => true, :remote => true).reject { |b| aggregate_branch?(b) }
+        def merged_local_branches
+          branches(:merged => true).reject { |b| aggregate_branch?(b) }
+        end
+
+        def merged_remote_branches
+          branches(:merged => true, :remote => true).reject { |b| aggregate_branch?(b) }
+        end
       end
     end
   end
