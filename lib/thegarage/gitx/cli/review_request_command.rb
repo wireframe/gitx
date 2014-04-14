@@ -2,6 +2,7 @@ require 'thor'
 require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
 require 'json'
+require 'rest_client'
 
 module Thegarage
   module Gitx
