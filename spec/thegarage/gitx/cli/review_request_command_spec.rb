@@ -35,11 +35,13 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
     context 'when pull request does not exist' do
       let(:authorization_token) { '123123' }
       let(:changelog) { '* made some fixes' }
+      let(:fake_update_command) { double('fake update command', update: nil) }
       before do
+        expect(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
+
         expect(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:find_pull_request).and_return(nil)
         expect(cli).to receive(:create_pull_request).and_return(pull_request)
-        expect(cli).to receive(:update)
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
         cli.reviewrequest
       end

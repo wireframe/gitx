@@ -1,6 +1,7 @@
 require 'thor'
 require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
+require 'thegarage/gitx/cli/update_command'
 require 'json'
 require 'rest_client'
 
@@ -29,7 +30,7 @@ module Thegarage
           branch = current_branch.name
           pull_request = find_pull_request(branch)
           if pull_request.nil?
-            update
+            UpdateCommand.new.update
             changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --no-merges --pretty=format:'* %s%n%b'"
             pull_request = create_pull_request(branch, changelog, options)
             say 'Pull request created: '
