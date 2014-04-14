@@ -2,4 +2,4 @@
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx/cli', 'review_request_command.rb')
 args = ARGV.dup.unshift('reviewrequest')
-Thegarage::Gitx::Cli::ReviewReqeustCommand.start(args)
+Thegarage::Gitx::Cli::ReviewRequestCommand.start(args)
