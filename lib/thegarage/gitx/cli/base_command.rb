@@ -31,6 +31,10 @@ module Thegarage
           end
         end
 
+        def checkout_branch(branch_name)
+          repo.head = "refs/heads/#{branch_name}"
+        end
+
         # lookup the current branch of the repo
         def current_branch
           repo.branches.find(&:head?)
