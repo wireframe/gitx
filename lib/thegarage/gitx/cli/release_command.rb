@@ -17,7 +17,7 @@ module Thegarage
           assert_not_protected_branch!(branch, 'release')
           UpdateCommand.new.update
 
-          run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
+          checkout_branch Thegarage::Gitx::BASE_BRANCH
           run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
           run_cmd "git pull . #{branch}"
           run_cmd "git push origin HEAD"

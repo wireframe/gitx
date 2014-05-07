@@ -8,7 +8,7 @@ module Thegarage
       class CleanupCommand < BaseCommand
         desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
         def cleanup
-          run_cmd "git checkout #{Thegarage::Gitx::BASE_BRANCH}"
+          checkout_branch Thegarage::Gitx::BASE_BRANCH
           run_cmd "git pull"
           run_cmd 'git remote prune origin'
 

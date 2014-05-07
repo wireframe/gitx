@@ -23,7 +23,7 @@ module Thegarage
           refresh_branch_from_remote target_branch
           run_cmd "git pull . #{branch}"
           run_cmd "git push origin HEAD"
-          run_cmd "git checkout #{branch}"
+          checkout_branch branch
         end
 
         private
@@ -32,7 +32,7 @@ module Thegarage
         def refresh_branch_from_remote(target_branch)
           run_cmd "git branch -D #{target_branch}", :allow_failure => true
           run_cmd "git fetch origin"
-          run_cmd "git checkout #{target_branch}"
+          checkout_branch target_branch
         end
       end
     end

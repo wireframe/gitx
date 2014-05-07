@@ -32,7 +32,7 @@ module Thegarage
         end
 
         def checkout_branch(branch_name)
-          repo.head = "refs/heads/#{branch_name}"
+          run_cmd "git checkout #{branch_name}"
         end
 
         # lookup the current branch of the repo
