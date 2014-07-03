@@ -19,7 +19,7 @@ module Thegarage
 
           checkout_branch Thegarage::Gitx::BASE_BRANCH
           run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
-          run_cmd "git pull . #{branch}"
+          run_cmd "git merge --no-ff #{branch}"
           run_cmd "git push origin HEAD"
 
           IntegrateCommand.new.integrate('staging')

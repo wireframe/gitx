@@ -43,7 +43,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
 
         expect(cli).to receive(:run_cmd).with("git checkout master").ordered
         expect(cli).to receive(:run_cmd).with("git pull origin master").ordered
-        expect(cli).to receive(:run_cmd).with("git pull . feature-branch").ordered
+        expect(cli).to receive(:run_cmd).with("git merge --no-ff feature-branch").ordered
         expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
 
         cli.release
