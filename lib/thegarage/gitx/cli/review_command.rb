@@ -8,7 +8,7 @@ require 'rest_client'
 module Thegarage
   module Gitx
     module Cli
-      class ReviewRequestCommand < BaseCommand
+      class ReviewCommand < BaseCommand
         CLIENT_URL = 'https://github.com/thegarage/thegarage-gitx'
         PULL_REQUEST_FOOTER = <<-EOS.dedent
           # Pull Request Protips(tm):
@@ -19,12 +19,12 @@ module Thegarage
           # This footer will automatically be stripped from the pull request description
         EOS
 
-        desc "reviewrequest", "Create or update a pull request on github"
+        desc "review", "Create or update a pull request on github"
         method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
         method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
         method_option :open, :type => :boolean, :aliases => '-o', :desc => 'open the pull request in a web browser'
         # @see http://developer.github.com/v3/pulls/
-        def reviewrequest
+        def review
           fail 'Github authorization token not found' unless authorization_token
 
           branch = current_branch.name

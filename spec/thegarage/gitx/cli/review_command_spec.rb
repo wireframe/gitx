@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'thegarage/gitx/cli/review_request_command'
+require 'thegarage/gitx/cli/review_command'
 
-describe Thegarage::Gitx::Cli::ReviewRequestCommand do
+describe Thegarage::Gitx::Cli::ReviewCommand do
   let(:args) { [] }
   let(:options) { {} }
   let(:config) do
@@ -9,7 +9,7 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
       pretend: true
     }
   end
-  let(:cli) { Thegarage::Gitx::Cli::ReviewRequestCommand.new(args, options, config) }
+  let(:cli) { Thegarage::Gitx::Cli::ReviewCommand.new(args, options, config) }
   let(:repo) { double('fake repo', config: repo_config) }
   let(:repo_config) do
     {
@@ -23,7 +23,7 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
     allow(cli).to receive(:current_branch).and_return(branch)
   end
 
-  describe '#reviewrequest' do
+  describe '#review' do
     let(:pull_request) do
       {
         'html_url' => 'https://path/to/new/pull/request',
@@ -43,7 +43,7 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
         expect(cli).to receive(:find_pull_request).and_return(nil)
         expect(cli).to receive(:create_pull_request).and_return(pull_request)
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
-        cli.reviewrequest
+        cli.review
       end
       it 'creates github pull request' do
         should meet_expectations
@@ -56,7 +56,7 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
       let(:authorization_token) { nil }
       it do
         expect(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect { cli.reviewrequest }.to raise_error(/token not found/)
+        expect { cli.review }.to raise_error(/token not found/)
       end
     end
     context 'when pull request already exists' do
@@ -66,7 +66,7 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
         expect(cli).to receive(:find_pull_request).and_return(pull_request)
         expect(cli).to_not receive(:create_pull_request)
 
-        cli.reviewrequest
+        cli.review
       end
       it 'does not create new pull request' do
         should meet_expectations
@@ -84,7 +84,7 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
         expect(cli).to receive(:find_pull_request).and_return(pull_request)
         expect(cli).to receive(:assign_pull_request)
 
-        cli.reviewrequest
+        cli.review
       end
       it 'calls assign_pull_request method' do
         should meet_expectations
@@ -101,7 +101,7 @@ describe Thegarage::Gitx::Cli::ReviewRequestCommand do
         expect(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:find_pull_request).and_return(pull_request)
         expect(cli).to receive(:run_cmd).with("open #{pull_request['html_url']}").ordered
-        cli.reviewrequest
+        cli.review
       end
       it 'runs open command with pull request url' do
         should meet_expectations

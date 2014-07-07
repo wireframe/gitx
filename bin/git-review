@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-puts 'WARNING: git reviewrequest has been deprecated.  use `git review` instead'
-
 require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx/cli', 'review_command.rb')
 args = ARGV.dup.unshift('review')
 Thegarage::Gitx::Cli::ReviewCommand.start(args)
