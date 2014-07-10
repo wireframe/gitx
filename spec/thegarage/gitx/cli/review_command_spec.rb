@@ -27,6 +27,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
     let(:pull_request) do
       {
         'html_url' => 'https://path/to/new/pull/request',
+        'issue_url' => 'https://api/path/to/new/pull/request',
         'head' => {
           'ref' => 'branch_name'
         }
@@ -80,14 +81,17 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       let(:authorization_token) { '123123' }
       before do
-        expect(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(cli).to receive(:authorization_token).and_return(authorization_token).at_least(:once)
         expect(cli).to receive(:find_pull_request).and_return(pull_request)
-        expect(cli).to receive(:assign_pull_request)
+
+        stub_request(:patch, 'https://api/path/to/new/pull/request').to_return(:status => 200)
 
         cli.review
       end
-      it 'calls assign_pull_request method' do
-        should meet_expectations
+      it 'updates github pull request' do
+        expect(WebMock).to have_requested(:patch, "https://api/path/to/new/pull/request").
+          with(:body => {title: 'branch_name', assignee: 'johndoe'}.to_json,
+               :headers => {'Accept'=>'application/json', 'Authorization'=>'token 123123', 'Content-Type'=>'application/json'})
       end
     end
     context 'when --open flag passed' do
