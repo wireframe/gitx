@@ -4,6 +4,7 @@ require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
 require 'json'
 require 'rest_client'
+require 'octokit'
 
 module Thegarage
   module Gitx
@@ -56,31 +57,22 @@ module Thegarage
 
           fail "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
           password = ask("Github password for #{username}: ", :echo => false)
+          say ''
+          two_factor_auth_token = ask("Github two factor authorization token (if enabled): ", :echo => false)
 
-          client_name = "The Garage Git eXtensions - #{remote_origin_name}"
-          payload = {
+          timestamp = Time.now.utc.strftime('%Y-%m-%dT%H:%M:%S%z')
+          client_name = "The Garage Git eXtensions - #{remote_origin_name} #{timestamp}"
+          options = {
             :scopes => ['repo'],
             :note => client_name,
             :note_url => CLIENT_URL
-          }.to_json
-          response = RestClient::Request.new({
-            :url => "https://api.github.com/authorizations",
-            :method => "POST",
-            :user => username,
-            :password => password,
-            :payload => payload,
-            :headers => {
-              :accept => :json,
-              :content_type => :json,
-              :user_agent => 'thegarage/gitx'
-            }
-          }).execute
-          data = JSON.parse response.body
-          token = data['token']
+          }
+          options[:headers] = {'X-GitHub-OTP' => two_factor_auth_token} if two_factor_auth_token
+          client = Octokit::Client.new(login: username, password: password)
+          response = client.create_authorization(options)
+          token = response.token
           repo.config['thegarage.gitx.githubauthtoken'] = token
           token
-        rescue RestClient::Exception => e
-          process_error e
         end
 
         # @see http://developer.github.com/v3/pulls/
