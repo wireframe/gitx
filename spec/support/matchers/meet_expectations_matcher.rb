@@ -2,6 +2,6 @@
 RSpec::Matchers.define :meet_expectations do |expected|
   match do |actual|
     # do nothing
-    expect(true).to be_true
+    expect(true).to be true
   end
 end
