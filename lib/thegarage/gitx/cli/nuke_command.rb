@@ -34,7 +34,7 @@ module Thegarage
         private
 
         def migrations_need_to_be_reverted?(bad_branch, last_known_good_tag)
-          return false unless File.exists?('db/migrate')
+          return false unless File.exist?('db/migrate')
           outdated_migrations = run_cmd("git diff #{last_known_good_tag}...#{bad_branch} --name-only db/migrate").split
           return false if outdated_migrations.empty?
 
