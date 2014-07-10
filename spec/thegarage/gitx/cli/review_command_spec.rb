@@ -130,19 +130,12 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       let(:github_password) { 'secretz' }
       let(:authorization_token) { '123981239123' }
-      let(:expected_auth_body) do
-        JSON.dump({
-         scopes: ["repo"],
-         note: "The Garage Git eXtensions - thegarage/thegarage-gitx",
-         note_url: "https://github.com/thegarage/thegarage-gitx"
-        })
-      end
       before do
         stub_request(:post, "https://ryan@codecrate.com:secretz@api.github.com/authorizations").
-          with(:body => expected_auth_body).
-          to_return(:status => 200, :body => JSON.dump(token: authorization_token), :headers => {})
+          to_return(:status => 200, :body => JSON.dump(token: authorization_token), :headers => {'Content-Type' => 'application/json'})
 
         expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password)
+        expect(cli).to receive(:ask).with('Github two factor authorization token (if enabled): ', {:echo => false}).and_return(nil)
 
         @auth_token = cli.send(:authorization_token)
       end
@@ -162,6 +155,31 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       before do
         @auth_token = cli.send(:authorization_token)
+      end
+      it { expect(@auth_token).to eq authorization_token }
+    end
+    context 'when two factor authorization token given' do
+      let(:repo_config) do
+        {
+          'remote.origin.url' => 'https://github.com/thegarage/thegarage-gitx',
+          'github.user' => 'ryan@codecrate.com'
+        }
+      end
+      let(:github_password) { 'secretz' }
+      let(:authorization_token) { '123981239123' }
+      let(:two_factor_auth_token) { '456456' }
+      before do
+        stub_request(:post, "https://ryan@codecrate.com:secretz@api.github.com/authorizations").
+          with(headers: {'X-GitHub-OTP' => two_factor_auth_token}).
+          to_return(:status => 200, :body => JSON.dump(token: authorization_token), :headers => {'Content-Type' => 'application/json'})
+
+        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password)
+        expect(cli).to receive(:ask).with('Github two factor authorization token (if enabled): ', {:echo => false}).and_return(two_factor_auth_token)
+
+        @auth_token = cli.send(:authorization_token)
+      end
+      it 'stores authorization_token in git config' do
+        expect(repo_config).to include('thegarage.gitx.githubauthtoken' => authorization_token)
       end
       it { expect(@auth_token).to eq authorization_token }
     end
