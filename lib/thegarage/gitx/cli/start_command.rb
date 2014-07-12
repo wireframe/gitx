@@ -29,7 +29,7 @@ module Thegarage
         end
 
         def remote_branches
-          @remote_branches ||= Rugged::Branch.each_name(repo, :remote).to_a.map { |branch| branch.split('/').last }
+          @remote_branches ||= repo.branches.each_name(:remote).to_a.map { |branch| branch.split('/').last }
         end
       end
     end

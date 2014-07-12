@@ -26,8 +26,7 @@ module Thegarage
         def repo
           @repo ||= begin
             path = Dir.pwd
-            root_path = Rugged::Repository.discover(path)
-            Rugged::Repository.new(root_path)
+            Rugged::Repository.discover(path)
           end
         end
 
