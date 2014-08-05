@@ -2,8 +2,6 @@ require 'thor'
 require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
-require 'json'
-require 'rest_client'
 require 'octokit'
 
 module Thegarage
@@ -29,37 +27,48 @@ module Thegarage
           fail 'Github authorization token not found' unless authorization_token
 
           branch = current_branch.name
-          pull_request = find_pull_request(branch)
-          if pull_request.nil?
-            UpdateCommand.new.update
-            changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --no-merges --pretty=format:'* %s%n%b'"
-            pull_request = create_pull_request(branch, changelog, options)
-            say 'Pull request created: '
-            say pull_request['html_url'], :green
-          end
-          assign_pull_request(pull_request, options[:assignee]) if options[:assignee]
+          pull_request = find_or_create_pull_request(branch)
+          assign_pull_request(pull_request) if options[:assignee]
 
-          run_cmd "open #{pull_request['html_url']}" if options[:open]
+          run_cmd "open #{pull_request.html_url}" if options[:open]
         end
 
         private
 
-        # returns [Hash] data structure of created pull request
-        # request github authorization token
-        # User-Agent is required
-        # store the token in local git config
-        # @returns [String] auth token stored in git (current repo, user config or installed global settings)
+        def find_or_create_pull_request(branch)
+          pull_request = find_pull_request(branch)
+          return pull_request if pull_request
+
+          UpdateCommand.new.update
+          pull_request = create_pull_request(branch)
+          say 'Pull request created: '
+          say pull_request.html_url, :green
+
+          pull_request
+        end
+
+        # token is cached in local git config for future use
+        # @return [String] auth token stored in git (current repo, user config or installed global settings)
         # @see http://developer.github.com/v3/oauth/#scopes
         # @see http://developer.github.com/v3/#user-agent-required
         def authorization_token
           auth_token = repo.config['thegarage.gitx.githubauthtoken']
           return auth_token unless auth_token.to_s.blank?
 
-          fail "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
+          auth_token = create_authorization
+          repo.config['thegarage.gitx.githubauthtoken'] = auth_token
+          auth_token
+        end
+
+        def create_authorization
           password = ask("Github password for #{username}: ", :echo => false)
           say ''
-          two_factor_auth_token = ask("Github two factor authorization token (if enabled): ", :echo => false)
+          client = Octokit::Client.new(login: username, password: password)
+          response = client.create_authorization(authorization_request_options)
+          response.token
+        end
 
+        def authorization_request_options
           timestamp = Time.now.utc.strftime('%Y-%m-%dT%H:%M:%S%z')
           client_name = "The Garage Git eXtensions - #{remote_origin_name} #{timestamp}"
           options = {
@@ -67,18 +76,14 @@ module Thegarage
             :note => client_name,
             :note_url => CLIENT_URL
           }
+          two_factor_auth_token = ask("Github two factor authorization token (if enabled): ", :echo => false)
+          say ''
           options[:headers] = {'X-GitHub-OTP' => two_factor_auth_token} if two_factor_auth_token
-          client = Octokit::Client.new(login: username, password: password)
-          response = client.create_authorization(options)
-          token = response.token
-          repo.config['thegarage.gitx.githubauthtoken'] = token
-          token
+          options
         end
 
         # @see http://developer.github.com/v3/pulls/
-        def create_pull_request(branch, changelog, options = {})
-          body = pull_request_body(changelog, options[:description])
-
+        def create_pull_request(branch)
           say "Creating pull request for "
           say "#{branch} ", :green
           say "against "
@@ -86,71 +91,45 @@ module Thegarage
           say "in "
           say remote_origin_name, :green
 
-          payload = {
-            :title => branch,
-            :base => Thegarage::Gitx::BASE_BRANCH,
-            :head => branch,
-            :body => body
-          }.to_json
-          response = RestClient::Request.new(:url => pull_request_url, :method => "POST", :payload => payload, :headers => request_headers).execute
-          pull_request = JSON.parse response.body
-
-          pull_request
-        rescue RestClient::Exception => e
-          process_error e
+          client = Octokit::Client.new(:access_token => authorization_token)
+          title = branch
+          body = pull_request_body(branch)
+          client.create_pull_request(remote_origin_name, Thegarage::Gitx::BASE_BRANCH, branch, title, body)
         end
 
-        def assign_pull_request(pull_request, assignee)
+        def assign_pull_request(pull_request)
+          assignee = options[:assignee]
           say "Assigning pull request to "
           say assignee, :green
 
-          branch = pull_request['head']['ref']
-          payload = {
-            :title => branch,
-            :assignee => assignee
-          }.to_json
-          RestClient::Request.new(:url => pull_request['issue_url'], :method => "PATCH", :payload => payload, :headers => request_headers).execute
-        rescue RestClient::Exception => e
-          process_error e
+          client = Octokit::Client.new(:access_token => authorization_token)
+          title = pull_request.title
+          body = pull_request.body
+          options = {
+            assignee: assignee
+          }
+          client.update_issue(remote_origin_name, pull_request.number, title, body, options)
         end
 
-        # @returns [Hash] data structure of pull request info if found
-        # @returns nil if no pull request found
+        # @return [Sawyer::Resource] data structure of pull request info if found
+        # @return nil if no pull request found
         def find_pull_request(branch)
-          head_reference = [remote_origin_name.split('/').first, branch].join(':')
+          head_reference = "#{repo_organization_name}:#{branch}"
           params = {
             head: head_reference,
             state: 'open'
           }
-          response = RestClient::Request.new(:url => pull_request_url, :method => "GET", :headers => request_headers.merge(params: params)).execute
-          data = JSON.parse(response.body)
-          data.first
-        rescue RestClient::Exception => e
-          process_error e
+          client = Octokit::Client.new(:access_token => authorization_token)
+          pull_requests = client.pull_requests(remote_origin_name, params)
+          pull_requests.first
         end
 
-        def process_error(e)
-          data = JSON.parse e.http_body
-          say "Github request failed: #{data['message']}", :red
-          throw e
-        end
-
-        def pull_request_url
-          "https://api.github.com/repos/#{remote_origin_name}/pulls"
-        end
-
-        def request_headers
-          {
-            :accept => :json,
-            :content_type => :json,
-            'Authorization' => "token #{authorization_token}"
-          }
-        end
-
-        # @returns [String] github username (ex: 'wireframe') of the current github.user
-        # @returns empty [String] when no github.user is set on the system
+        # @return [String] github username (ex: 'wireframe') of the current github.user
+        # @raise error if github.user is not configured
         def username
-          repo.config['github.user']
+          username = repo.config['github.user']
+          fail "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
+          username
         end
 
         # lookup the current repository of the PWD
@@ -160,36 +139,22 @@ module Thegarage
           remote.to_s.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
         end
 
-        def pull_request_body(changelog, description = nil)
+        def repo_organization_name
+          remote_origin_name.split('/').first
+        end
+
+        def pull_request_body(branch)
+          changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --no-merges --pretty=format:'* %s%n%b'"
+          description = options[:description]
+
           description_template = []
           description_template << "#{description}\n" if description
           description_template << '### Changelog'
           description_template << changelog
           description_template << PULL_REQUEST_FOOTER
 
-          body = input_from_editor(description_template.join("\n"))
+          body = ask_editor(description_template.join("\n"))
           body.gsub(PULL_REQUEST_FOOTER, '').chomp.strip
-        end
-
-        # launch configured editor to retreive message/string
-        def input_from_editor(initial_text = '')
-          Tempfile.open('reviewrequest.md') do |f|
-            f << initial_text
-            f.flush
-
-            editor = repo.config['core.editor'] || ENV['EDITOR'] || 'vi'
-            flags = case editor
-            when 'mate', 'emacs', 'subl'
-              '-w'
-            when 'mvim'
-              '-f'
-            else
-              ''
-            end
-            pid = fork { exec([editor, flags, f.path].join(' ')) }
-            Process.waitpid(pid)
-            File.read(f.path)
-          end
         end
       end
     end

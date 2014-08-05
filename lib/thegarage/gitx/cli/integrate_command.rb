@@ -21,7 +21,7 @@ module Thegarage
           say target_branch, :green
 
           refresh_branch_from_remote target_branch
-          run_cmd "git pull . #{branch}"
+          run_cmd "git merge #{branch}"
           run_cmd "git push origin HEAD"
           checkout_branch branch
         end

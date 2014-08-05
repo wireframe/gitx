@@ -28,7 +28,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git checkout staging").ordered
-        expect(cli).to receive(:run_cmd).with("git pull . feature-branch").ordered
+        expect(cli).to receive(:run_cmd).with("git merge feature-branch").ordered
         expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
         expect(cli).to receive(:run_cmd).with("git checkout feature-branch").ordered
 
@@ -45,7 +45,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with("git branch -D prototype", allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git checkout prototype").ordered
-        expect(cli).to receive(:run_cmd).with("git pull . feature-branch").ordered
+        expect(cli).to receive(:run_cmd).with("git merge feature-branch").ordered
         expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
         expect(cli).to receive(:run_cmd).with("git checkout feature-branch").ordered
 
