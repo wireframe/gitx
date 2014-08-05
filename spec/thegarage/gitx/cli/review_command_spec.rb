@@ -21,7 +21,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
   before do
     allow(cli).to receive(:repo).and_return(repo)
     allow(cli).to receive(:current_branch).and_return(branch)
-    allow(cli).to receive(:input_from_editor).and_return('description')
+    allow(cli).to receive(:ask_editor).and_return('description')
   end
 
   describe '#review' do

@@ -153,29 +153,8 @@ module Thegarage
           description_template << changelog
           description_template << PULL_REQUEST_FOOTER
 
-          body = input_from_editor(description_template.join("\n"))
+          body = ask_editor(description_template.join("\n"))
           body.gsub(PULL_REQUEST_FOOTER, '').chomp.strip
-        end
-
-        # launch configured editor to retreive message/string
-        def input_from_editor(initial_text = '')
-          Tempfile.open('reviewrequest.md') do |f|
-            f << initial_text
-            f.flush
-
-            editor = repo.config['core.editor'] || ENV['EDITOR'] || 'vi'
-            flags = case editor
-            when 'mate', 'emacs', 'subl'
-              '-w'
-            when 'mvim'
-              '-f'
-            else
-              ''
-            end
-            pid = fork { exec([editor, flags, f.path].join(' ')) }
-            Process.waitpid(pid)
-            File.read(f.path)
-          end
         end
       end
     end
