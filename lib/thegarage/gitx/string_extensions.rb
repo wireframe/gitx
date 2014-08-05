@@ -5,10 +5,6 @@ class String
   end
   alias :dedent :undent
 
-  def starts_with?(characters)
-    !!self.match(/^#{characters}/)
-  end
-
   def blank?
     self.to_s == ''
   end
