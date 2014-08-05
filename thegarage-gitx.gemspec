@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "rugged", '~> 0.21.0'
   spec.add_runtime_dependency "thor"
-  spec.add_runtime_dependency "rest-client", ">= 1.4.0"
   spec.add_runtime_dependency "octokit"
 
   spec.add_development_dependency "bundler", "~> 1.3"
@@ -29,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry", '>= 0'
   spec.add_development_dependency "webmock", '>= 0'
   spec.add_development_dependency "timecop", "~> 0.7.0"
+  spec.add_development_dependency "vcr"
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "coveralls"

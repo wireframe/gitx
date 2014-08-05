@@ -17,8 +17,6 @@ module Thegarage
         method_option :trace, :type => :boolean, :aliases => '-v'
         def initialize(*args)
           super(*args)
-          RestClient.proxy = ENV['HTTPS_PROXY'] if ENV.has_key?('HTTPS_PROXY')
-          RestClient.log = Logger.new(STDOUT) if options[:trace]
         end
 
         private

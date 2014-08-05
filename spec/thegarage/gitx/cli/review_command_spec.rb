@@ -21,30 +21,34 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
   before do
     allow(cli).to receive(:repo).and_return(repo)
     allow(cli).to receive(:current_branch).and_return(branch)
+    allow(cli).to receive(:input_from_editor).and_return('description')
   end
 
   describe '#review' do
-    let(:pull_request) do
-      {
-        'html_url' => 'https://path/to/new/pull/request',
-        'issue_url' => 'https://api/path/to/new/pull/request',
-        'head' => {
-          'ref' => 'branch_name'
-        }
-      }
-    end
     context 'when pull request does not exist' do
       let(:authorization_token) { '123123' }
       let(:changelog) { '* made some fixes' }
       let(:fake_update_command) { double('fake update command', update: nil) }
+      let(:new_pull_request) do
+        {
+          html_url: "https://path/to/html/pull/request",
+          issue_url: "https://api/path/to/issue/url",
+          number: 10,
+          head: {
+            ref: "branch_name"
+          }
+        }
+      end
       before do
         expect(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
 
-        expect(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:find_pull_request).and_return(nil)
-        expect(cli).to receive(:create_pull_request).and_return(pull_request)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
-        cli.review
+
+        stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
+        VCR.use_cassette('pull_request_does_not_exist') do
+          cli.review
+        end
       end
       it 'creates github pull request' do
         should meet_expectations
@@ -56,18 +60,19 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
     context 'when authorization_token is missing' do
       let(:authorization_token) { nil }
       it do
-        expect(cli).to receive(:authorization_token).and_return(authorization_token)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect { cli.review }.to raise_error(/token not found/)
       end
     end
     context 'when pull request already exists' do
       let(:authorization_token) { '123123' }
       before do
-        expect(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:find_pull_request).and_return(pull_request)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to_not receive(:create_pull_request)
 
-        cli.review
+        VCR.use_cassette('pull_request_does_exist') do
+          cli.review
+        end
       end
       it 'does not create new pull request' do
         should meet_expectations
@@ -81,17 +86,16 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       let(:authorization_token) { '123123' }
       before do
-        expect(cli).to receive(:authorization_token).and_return(authorization_token).at_least(:once)
-        expect(cli).to receive(:find_pull_request).and_return(pull_request)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        stub_request(:patch, 'https://api/path/to/new/pull/request').to_return(:status => 200)
+        stub_request(:patch, 'https://api.github.com/repos/thegarage/thegarage-gitx/issues/10').to_return(:status => 200)
 
-        cli.review
+        VCR.use_cassette('pull_request_does_exist') do
+          cli.review
+        end
       end
       it 'updates github pull request' do
-        expect(WebMock).to have_requested(:patch, "https://api/path/to/new/pull/request").
-          with(:body => {title: 'branch_name', assignee: 'johndoe'}.to_json,
-               :headers => {'Accept'=>'application/json', 'Authorization'=>'token 123123', 'Content-Type'=>'application/json'})
+        expect(WebMock).to have_requested(:patch, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10")
       end
     end
     context 'when --open flag passed' do
@@ -102,10 +106,11 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       let(:authorization_token) { '123123' }
       before do
-        expect(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:find_pull_request).and_return(pull_request)
-        expect(cli).to receive(:run_cmd).with("open #{pull_request['html_url']}").ordered
-        cli.review
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(cli).to receive(:run_cmd).with("open https://path/to/html/pull/request").ordered
+        VCR.use_cassette('pull_request_does_exist') do
+          cli.review
+        end
       end
       it 'runs open command with pull request url' do
         should meet_expectations
@@ -182,31 +187,6 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         expect(repo_config).to include('thegarage.gitx.githubauthtoken' => authorization_token)
       end
       it { expect(@auth_token).to eq authorization_token }
-    end
-  end
-  describe '#create_pull_request' do
-    context 'when there is an existing authorization_token' do
-      let(:authorization_token) { '123981239123' }
-      let(:repo_config) do
-        {
-          'remote.origin.url' => 'https://github.com/thegarage/thegarage-gitx',
-          'github.user' => 'ryan@codecrate.com',
-          'thegarage.gitx.githubauthtoken' => authorization_token
-        }
-      end
-      before do
-        stub_request(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls").
-          to_return(:status => 200, :body => %q({"html_url": "http://github.com/repo/project/pulls/1"}), :headers => {})
-
-        expect(cli).to receive(:input_from_editor).and_return('scrubbed text')
-        cli.send(:create_pull_request, 'example-branch', 'changelog')
-      end
-      it 'should create github pull request' do
-        should meet_expectations
-      end
-      it 'should run expected commands' do
-        should meet_expectations
-      end
     end
   end
 end
