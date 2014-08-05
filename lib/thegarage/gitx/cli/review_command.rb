@@ -27,19 +27,25 @@ module Thegarage
           fail 'Github authorization token not found' unless authorization_token
 
           branch = current_branch.name
-          pull_request = find_pull_request(branch)
-          if pull_request.nil?
-            UpdateCommand.new.update
-            pull_request = create_pull_request(branch)
-            say 'Pull request created: '
-            say pull_request.html_url, :green
-          end
-          assign_pull_request(pull_request, options[:assignee]) if options[:assignee]
+          pull_request = find_or_create_pull_request(branch)
+          assign_pull_request(pull_request) if options[:assignee]
 
           run_cmd "open #{pull_request.html_url}" if options[:open]
         end
 
         private
+
+        def find_or_create_pull_request(branch)
+          pull_request = find_pull_request(branch)
+          return pull_request if pull_request
+
+          UpdateCommand.new.update
+          pull_request = create_pull_request(branch)
+          say 'Pull request created: '
+          say pull_request.html_url, :green
+
+          pull_request
+        end
 
         # token is cached in local git config for future use
         # @return [String] auth token stored in git (current repo, user config or installed global settings)
@@ -49,10 +55,20 @@ module Thegarage
           auth_token = repo.config['thegarage.gitx.githubauthtoken']
           return auth_token unless auth_token.to_s.blank?
 
+          auth_token = create_authorization
+          repo.config['thegarage.gitx.githubauthtoken'] = auth_token
+          auth_token
+        end
+
+        def create_authorization
           password = ask("Github password for #{username}: ", :echo => false)
           say ''
-          two_factor_auth_token = ask("Github two factor authorization token (if enabled): ", :echo => false)
+          client = Octokit::Client.new(login: username, password: password)
+          response = client.create_authorization(authorization_request_options)
+          response.token
+        end
 
+        def authorization_request_options
           timestamp = Time.now.utc.strftime('%Y-%m-%dT%H:%M:%S%z')
           client_name = "The Garage Git eXtensions - #{remote_origin_name} #{timestamp}"
           options = {
@@ -60,12 +76,10 @@ module Thegarage
             :note => client_name,
             :note_url => CLIENT_URL
           }
+          two_factor_auth_token = ask("Github two factor authorization token (if enabled): ", :echo => false)
+          say ''
           options[:headers] = {'X-GitHub-OTP' => two_factor_auth_token} if two_factor_auth_token
-          client = Octokit::Client.new(login: username, password: password)
-          response = client.create_authorization(options)
-          token = response.token
-          repo.config['thegarage.gitx.githubauthtoken'] = token
-          token
+          options
         end
 
         # @see http://developer.github.com/v3/pulls/
@@ -83,7 +97,8 @@ module Thegarage
           client.create_pull_request(remote_origin_name, Thegarage::Gitx::BASE_BRANCH, branch, title, body)
         end
 
-        def assign_pull_request(pull_request, assignee)
+        def assign_pull_request(pull_request)
+          assignee = options[:assignee]
           say "Assigning pull request to "
           say assignee, :green
 
