@@ -88,7 +88,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        stub_request(:patch, 'https://api.github.com/repos/thegarage/thegarage-gitx/issues/10').to_return(:status => 200)
+        stub_request(:patch, /.*api.github.com.*/).to_return(:status => 200)
 
         VCR.use_cassette('pull_request_does_exist') do
           cli.review
@@ -114,6 +114,26 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       it 'runs open command with pull request url' do
         should meet_expectations
+      end
+    end
+    context 'when --bump flag is passed' do
+      let(:options) do
+        {
+          bump: true
+        }
+      end
+      let(:authorization_token) { '123123' }
+      before do
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(cli).to receive(:ask_editor).and_return('comment description')
+        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+
+        VCR.use_cassette('pull_request_does_exist') do
+          cli.review
+        end
+      end
+      it 'posts comment to github' do
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments")
       end
     end
   end

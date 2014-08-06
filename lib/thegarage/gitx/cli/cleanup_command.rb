@@ -14,22 +14,32 @@ module Thegarage
 
           say "Deleting local and remote branches that have been merged into "
           say Thegarage::Gitx::BASE_BRANCH, :green
-          merged_remote_branches.each do |branch|
+          merged_branches(remote: true).each do |branch|
             run_cmd "git push origin --delete #{branch}"
           end
-          merged_local_branches.each do |branch|
+          merged_branches(remote: false).each do |branch|
             run_cmd "git branch -d #{branch}"
           end
         end
 
         private
 
-        def merged_local_branches
-          branches(:merged => true).reject { |b| aggregate_branch?(b) }
-        end
+        # @return list of branches that have been merged
+        def merged_branches(options = {})
+          args = []
+          args << '-r' if options[:remote]
+          args << "--merged"
+          output = run_cmd("git branch #{args.join(' ')}").split("\n")
+          branches = output.map do |branch|
+            branch = branch.gsub(/\*/, '').strip.split(' ').first
+            branch = branch.split('/').last if options[:remote]
+            branch
+          end
+          branches.uniq!
+          branches -= RESERVED_BRANCHES
+          branches.reject! { |b| aggregate_branch?(b) }
 
-        def merged_remote_branches
-          branches(:merged => true, :remote => true).reject { |b| aggregate_branch?(b) }
+          branches
         end
       end
     end
