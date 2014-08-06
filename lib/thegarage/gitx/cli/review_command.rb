@@ -22,6 +22,7 @@ module Thegarage
         method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
         method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
         method_option :open, :type => :boolean, :aliases => '-o', :desc => 'open the pull request in a web browser'
+        method_option :bump, :type => :boolean, :aliases => '-b', :desc => 'bump an existing review with a github comment to re-request review'
         # @see http://developer.github.com/v3/pulls/
         def review
           fail 'Github authorization token not found' unless authorization_token
@@ -37,14 +38,17 @@ module Thegarage
 
         def find_or_create_pull_request(branch)
           pull_request = find_pull_request(branch)
-          return pull_request if pull_request
+          if pull_request
+            create_bump_comment(pull_request) if options[:bump]
+            pull_request
+          else
+            UpdateCommand.new.update
+            pull_request = create_pull_request(branch)
+            say 'Pull request created: '
+            say pull_request.html_url, :green
 
-          UpdateCommand.new.update
-          pull_request = create_pull_request(branch)
-          say 'Pull request created: '
-          say pull_request.html_url, :green
-
-          pull_request
+            pull_request
+          end
         end
 
         # token is cached in local git config for future use
@@ -70,7 +74,7 @@ module Thegarage
 
         def authorization_request_options
           timestamp = Time.now.utc.strftime('%Y-%m-%dT%H:%M:%S%z')
-          client_name = "The Garage Git eXtensions - #{remote_origin_name} #{timestamp}"
+          client_name = "The Garage Git eXtensions - #{github_slug} #{timestamp}"
           options = {
             :scopes => ['repo'],
             :note => client_name,
@@ -89,12 +93,11 @@ module Thegarage
           say "against "
           say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
           say "in "
-          say remote_origin_name, :green
+          say github_slug, :green
 
-          client = Octokit::Client.new(:access_token => authorization_token)
           title = branch
           body = pull_request_body(branch)
-          client.create_pull_request(remote_origin_name, Thegarage::Gitx::BASE_BRANCH, branch, title, body)
+          github_client.create_pull_request(github_slug, Thegarage::Gitx::BASE_BRANCH, branch, title, body)
         end
 
         def assign_pull_request(pull_request)
@@ -102,26 +105,39 @@ module Thegarage
           say "Assigning pull request to "
           say assignee, :green
 
-          client = Octokit::Client.new(:access_token => authorization_token)
           title = pull_request.title
           body = pull_request.body
           options = {
             assignee: assignee
           }
-          client.update_issue(remote_origin_name, pull_request.number, title, body, options)
+          github_client.update_issue(github_slug, pull_request.number, title, body, options)
         end
 
         # @return [Sawyer::Resource] data structure of pull request info if found
         # @return nil if no pull request found
         def find_pull_request(branch)
-          head_reference = "#{repo_organization_name}:#{branch}"
+          head_reference = "#{github_organization}:#{branch}"
           params = {
             head: head_reference,
             state: 'open'
           }
-          client = Octokit::Client.new(:access_token => authorization_token)
-          pull_requests = client.pull_requests(remote_origin_name, params)
+          pull_requests = github_client.pull_requests(github_slug, params)
           pull_requests.first
+        end
+
+        def create_bump_comment(pull_request)
+          comment_template = []
+          comment_template << '[gitx] review bump :tada:'
+          comment_template << ''
+          comment_template << '### Summary of Changes'
+
+          comment = ask_editor(comment_template.join("\n"), repo.config['core.editor'])
+          comment = comment.chomp.strip
+          github_client.add_comment(github_slug, pull_request.number, comment)
+        end
+
+        def github_client
+          @client ||= Octokit::Client.new(:access_token => authorization_token)
         end
 
         # @return [String] github username (ex: 'wireframe') of the current github.user
@@ -132,15 +148,18 @@ module Thegarage
           username
         end
 
-        # lookup the current repository of the PWD
-        # ex: git@github.com:socialcast/thegarage/gitx.git OR https://github.com/socialcast/thegarage/gitx.git
-        def remote_origin_name
+        # @return the github slug for the current repository's remote origin url.
+        # @example
+        #   git@github.com:socialcast/thegarage/gitx.git #=> thegarage/gitx
+        # @example
+        #   https://github.com/socialcast/thegarage/gitx.git #=> thegarage/gitx
+        def github_slug
           remote = repo.config['remote.origin.url']
           remote.to_s.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
         end
 
-        def repo_organization_name
-          remote_origin_name.split('/').first
+        def github_organization
+          github_slug.split('/').first
         end
 
         def pull_request_body(branch)
