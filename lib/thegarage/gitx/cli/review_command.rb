@@ -22,7 +22,7 @@ module Thegarage
         method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'
         method_option :assignee, :type => :string, :aliases => '-a', :desc => 'pull request assignee'
         method_option :open, :type => :boolean, :aliases => '-o', :desc => 'open the pull request in a web browser'
-        method_option :bump, :type => :boolean, :aliases => '-b', :desc => 'bump an existing review with a github comment to re-request review'
+        method_option :bump, :type => :boolean, :aliases => '-b', :desc => 'bump an existing pull request by posting a comment to re-review new changes'
         # @see http://developer.github.com/v3/pulls/
         def review
           fail 'Github authorization token not found' unless authorization_token

@@ -34,6 +34,7 @@ in order to re-assign pull requests.
 options:
 * `--assign` or `-a` = assign pull request to github user
 * `--open` or `-o` = open pull request in default web browser.
+* `--bump` or `-b` = bump an existing pull request by posting a comment to re-review new changes
 
 
 ## git release
