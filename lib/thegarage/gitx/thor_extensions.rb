@@ -4,12 +4,12 @@ class Thor
     # see http://osdir.com/ml/ruby-talk/2010-06/msg01424.html
     # see https://gist.github.com/rkumar/456809
     # see http://rdoc.info/github/visionmedia/commander/master/Commander/UI.ask_editor
-    def ask_editor(initial_text = '')
+    def ask_editor(initial_text = '', editor = nil)
+      editor ||= ENV['EDITOR'] || 'vi'
       Tempfile.open('reviewrequest.md') do |f|
         f << initial_text
         f.flush
 
-        editor = repo.config['core.editor'] || ENV['EDITOR'] || 'vi'
         flags = case editor
         when 'mate', 'emacs', 'subl'
           '-w'

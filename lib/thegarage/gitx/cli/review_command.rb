@@ -153,7 +153,7 @@ module Thegarage
           description_template << changelog
           description_template << PULL_REQUEST_FOOTER
 
-          body = ask_editor(description_template.join("\n"))
+          body = ask_editor(description_template.join("\n"), repo.config['core.editor'])
           body.gsub(PULL_REQUEST_FOOTER, '').chomp.strip
         end
       end
