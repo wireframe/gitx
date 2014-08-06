@@ -1,5 +1,17 @@
+require 'English'
+
 class Thor
   module Actions
+    # execute a shell command and raise an error if non-zero exit code is returned
+    # return the string output from the command
+    def run_cmd(cmd, options = {})
+      say "$ #{cmd}"
+      output = `#{cmd}`
+      success = $CHILD_STATUS.to_i == 0
+      fail "#{cmd} failed" unless success || options[:allow_failure]
+      output
+    end
+
     # launch configured editor to retreive message/string
     # see http://osdir.com/ml/ruby-talk/2010-06/msg01424.html
     # see https://gist.github.com/rkumar/456809

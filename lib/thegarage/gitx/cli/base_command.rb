@@ -1,7 +1,6 @@
 require 'thor'
 require 'pathname'
 require 'rugged'
-require 'English'
 require 'thegarage/gitx'
 
 module Thegarage
@@ -37,37 +36,12 @@ module Thegarage
           repo.branches.find(&:head?)
         end
 
-        # execute a shell command and raise an error if non-zero exit code is returned
-        # return the string output from the command
-        def run_cmd(cmd, options = {})
-          say "$ #{cmd}"
-          output = `#{cmd}`
-          success = $CHILD_STATUS.to_i == 0
-          fail "#{cmd} failed" unless success || options[:allow_failure]
-          output
-        end
-
         def aggregate_branch?(branch)
           AGGREGATE_BRANCHES.include?(branch)
         end
 
         def assert_not_protected_branch!(branch, action)
           raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
-        end
-
-        # retrieve a list of branches
-        def branches(options = {})
-          branches = []
-          args = []
-          args << '-r' if options[:remote]
-          args << "--merged #{options[:merged].is_a?(String) ? options[:merged] : ''}" if options[:merged]
-          output = `git branch #{args.join(' ')}`.split("\n")
-          output.each do |branch|
-            branch = branch.gsub(/\*/, '').strip.split(' ').first
-            branch = branch.split('/').last if options[:remote]
-            branches << branch unless RESERVED_BRANCHES.include?(branch)
-          end
-          branches.uniq
         end
       end
     end

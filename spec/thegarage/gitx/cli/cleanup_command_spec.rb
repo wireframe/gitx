@@ -20,13 +20,12 @@ describe Thegarage::Gitx::Cli::CleanupCommand do
     before do
       allow(cli).to receive(:say)
 
-      expect(cli).to receive(:merged_remote_branches).and_return(%w( merged-remote-feature ))
-      expect(cli).to receive(:merged_local_branches).and_return(%w( merged-local-feature ))
-
       expect(cli).to receive(:run_cmd).with('git checkout master').ordered
       expect(cli).to receive(:run_cmd).with('git pull').ordered
       expect(cli).to receive(:run_cmd).with('git remote prune origin').ordered
+      expect(cli).to receive(:run_cmd).with('git branch -r --merged').and_return("merged-remote-feature").ordered
       expect(cli).to receive(:run_cmd).with('git push origin --delete merged-remote-feature').ordered
+      expect(cli).to receive(:run_cmd).with('git branch --merged').and_return("merged-local-feature").ordered
       expect(cli).to receive(:run_cmd).with('git branch -d merged-local-feature').ordered
 
       cli.cleanup
