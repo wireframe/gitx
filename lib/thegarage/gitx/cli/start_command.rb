@@ -17,7 +17,7 @@ module Thegarage
 
           checkout_branch Thegarage::Gitx::BASE_BRANCH
           run_cmd 'git pull'
-          repo.create_branch branch_name, 'master'
+          repo.create_branch branch_name, Thegarage::Gitx::BASE_BRANCH
           checkout_branch branch_name
         end
 
