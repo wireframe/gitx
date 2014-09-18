@@ -56,8 +56,11 @@ describe Thegarage::Gitx::Cli::StartCommand do
         should meet_expectations
       end
     end
-    context 'when branch already exists in remote repo' do
+    context 'when branch already exists in local repo' do
+      let(:branches) { double(each_name: ['bar']) }
       before do
+        expect(repo).to receive(:branches).and_return(branches)
+
         expect(cli).to receive(:ask).and_return('new-branch')
 
         expect(cli).to receive(:checkout_branch).with('master').ordered
@@ -65,7 +68,25 @@ describe Thegarage::Gitx::Cli::StartCommand do
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
 
-        cli.start 'master'
+        cli.start 'bar'
+      end
+      it 'prompts user to enter a new branch name' do
+        should meet_expectations
+      end
+    end
+    context 'when branch already exists in remote repo' do
+      let(:branches) { double(each_name: ['origin/bar']) }
+      before do
+        expect(repo).to receive(:branches).and_return(branches)
+
+        expect(cli).to receive(:ask).and_return('new-branch')
+
+        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:run_cmd).with('git pull').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+
+        cli.start 'bar'
       end
       it 'prompts user to enter a new branch name' do
         should meet_expectations
