@@ -9,8 +9,7 @@ module Thegarage
     module Cli
       class IntegrateCommand < BaseCommand
         desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
-        method_option :resume, :type => :boolean, :aliases => '-r', :desc => 'resume merging of feature-branch'
-        method_option :feature_branch, :type => :string, :desc => 'the feature branch that you are attempting to integrate'
+        method_option :resume, :type => :string, :aliases => '-r', :desc => 'resume merging of feature-branch'
         def integrate(target_branch = 'staging')
           branch = current_branch.name
           if options[:resume]
@@ -26,7 +25,6 @@ module Thegarage
             say target_branch, :green
 
             refresh_branch_from_remote target_branch
-            # run_cmd "git merge #{branch}"
             merge_feature_branch branch
             run_cmd "git push origin HEAD"
             checkout_branch branch
@@ -56,14 +54,15 @@ module Thegarage
         end
 
         def resume
+          feature_branch = options[:resume]
           say "Resuming Integration of "
-          say "#{options[:feature_branch]}", :green
+          say "#{feature_branch}", :green
 
           run_cmd "git push origin HEAD"
-          until check_if_branch_exists? options[:feature_branch]
-            raise "#{options[:feature_branch]} does not exist please make sure you typed the correct branch and run command again"
+          until check_if_branch_exists? feature_branch
+            raise "#{feature_branch} does not exist please make sure you typed the correct branch and run command again"
           end
-          checkout_branch options[:feature_branch]
+          checkout_branch feature_branch
         end
 
         def check_if_branch_exists?(branch)
