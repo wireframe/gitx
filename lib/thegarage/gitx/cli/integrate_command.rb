@@ -19,7 +19,7 @@ module Thegarage
           say "into "
           say target_branch, :green
 
-          create_remote_branch(branch, target_branch) unless remote_branch_exists?(target_branch)
+          create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
           refresh_branch_from_remote(target_branch)
           run_cmd "git merge #{branch}"
           run_cmd "git push origin HEAD"
@@ -44,7 +44,7 @@ module Thegarage
           repo.branches.each_name(:remote).include?("origin/#{target_branch}")
         end
 
-        def create_remote_branch(branch, target_branch)
+        def create_remote_branch(target_branch)
           repo.create_branch(target_branch, Thegarage::Gitx::BASE_BRANCH)
           run_cmd "git push origin #{target_branch}:#{target_branch}"
         end
