@@ -3,26 +3,34 @@ require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
 
+
 module Thegarage
   module Gitx
     module Cli
       class IntegrateCommand < BaseCommand
         desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
+        method_option :resume, :type => :boolean, :aliases => '-r', :desc => 'resume merging of feature-branch'
+        method_option :feature_branch, :type => :string, :desc => 'the feature branch that you are attempting to integrate'
         def integrate(target_branch = 'staging')
           branch = current_branch.name
-          assert_integratable_branch!(branch, target_branch)
+          if options[:resume]
+            resume
+          else
+            assert_integratable_branch!(branch, target_branch)
 
-          UpdateCommand.new.update
+            UpdateCommand.new.update
 
-          say "Integrating "
-          say "#{branch} ", :green
-          say "into "
-          say target_branch, :green
+            say "Integrating "
+            say "#{branch} ", :green
+            say "into "
+            say target_branch, :green
 
-          refresh_branch_from_remote target_branch
-          run_cmd "git merge #{branch}"
-          run_cmd "git push origin HEAD"
-          checkout_branch branch
+            refresh_branch_from_remote target_branch
+            # run_cmd "git merge #{branch}"
+            merge_feature_branch branch
+            run_cmd "git push origin HEAD"
+            checkout_branch branch
+          end
         end
 
         private
@@ -37,6 +45,33 @@ module Thegarage
           run_cmd "git branch -D #{target_branch}", :allow_failure => true
           run_cmd "git fetch origin"
           checkout_branch target_branch
+        end
+
+        def merge_feature_branch(branch)
+          begin
+            run_cmd "git merge #{branch}"
+          rescue
+            raise "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
+          end
+        end
+
+        def resume
+          say "Resuming Integration of "
+          say "#{options[:feature_branch]}", :green
+
+          run_cmd "git push origin HEAD"
+          until check_if_branch_exists? options[:feature_branch]
+            raise "#{options[:feature_branch]} does not exist please make sure you typed the correct branch and run command again"
+          end
+          checkout_branch options[:feature_branch]
+        end
+
+        def check_if_branch_exists?(branch)
+          return true if local_branches.include?(branch)
+        end
+
+        def local_branches
+          @local_branches ||= repo.branches.each_name(:local).to_a.map { |branch| branch }
         end
       end
     end
