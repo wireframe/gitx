@@ -1,7 +1,7 @@
 require 'coveralls'
 Coveralls.wear! do
   ::SimpleCov.add_filter 'spec'
-  ::SimpleCov.add_filter 'lib/thegarage/gitx/thor_extensions.rb'
+  ::SimpleCov.add_filter 'lib/thegarage/gitx/extensions'
 end
 require 'rubygems'
 require 'bundler/setup'
