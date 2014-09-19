@@ -12,23 +12,22 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
   let(:cli) { Thegarage::Gitx::Cli::IntegrateCommand.new(args, options, config) }
   let(:current_branch) { double('fake branch', name: 'feature-branch', head?: true) }
   let(:repo) { cli.send(:repo) }
-  let(:branches) { [current_branch] }
+  let(:remote_branch_names) { [] }
 
   before do
-    allow(repo).to receive(:branches).and_return(branches)
+    allow(cli).to receive(:current_branch).and_return(current_branch)
+    allow(repo).to receive(:branches).and_return(double(each_name: remote_branch_names))
   end
 
   describe '#integrate' do
     let(:fake_update_command) { double('fake update command') }
-    let(:remote_branches) { double(each_name: ['origin/staging'] )}
     before do
       allow(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
     end
-    context 'when target branch is ommitted' do
+    context 'when target branch is ommitted and remote branch exists' do
+      let(:remote_branch_names) { ['origin/staging'] }
       before do
         expect(fake_update_command).to receive(:update)
-
-        expect(repo).to receive(:branches).and_return(remote_branches)
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
@@ -44,11 +43,10 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       end
     end
     context 'when staging branch does not exist remotely' do
-      let(:remote_branches) { double(each_name: [] )}
+      let(:remote_branch_names) { [] }
       before do
         expect(fake_update_command).to receive(:update)
 
-        expect(repo).to receive(:branches).and_return(remote_branches)
         expect(repo).to receive(:create_branch).with('staging', 'master')
 
         expect(cli).to receive(:run_cmd).with('git push origin staging:staging').ordered
@@ -66,12 +64,10 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
     end
-    context 'when target branch == prototype' do
-      let(:remote_branches) { double(each_name: ['origin/prototype'] )}
+    context 'when target branch == prototype and remote branch exists' do
+      let(:remote_branch_names) { ['origin/prototype'] }
       before do
         expect(fake_update_command).to receive(:update)
-
-        expect(repo).to receive(:branches).and_return(remote_branches)
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D prototype", allow_failure: true).ordered
