@@ -1,5 +1,7 @@
 require 'coveralls'
-Coveralls.wear!
+Coveralls.wear! do
+  ::SimpleCov.add_filter 'spec'
+end
 require 'rubygems'
 require 'bundler/setup'
 
