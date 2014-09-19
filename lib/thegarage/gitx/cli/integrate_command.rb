@@ -19,7 +19,8 @@ module Thegarage
           say "into "
           say target_branch, :green
 
-          refresh_branch_from_remote target_branch
+          create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
+          refresh_branch_from_remote(target_branch)
           run_cmd "git merge #{branch}"
           run_cmd "git push origin HEAD"
           checkout_branch branch
@@ -33,9 +34,18 @@ module Thegarage
 
         # nuke local branch and pull fresh version from remote repo
         def refresh_branch_from_remote(target_branch)
-          run_cmd "git branch -D #{target_branch}", :allow_failure => true
           run_cmd "git fetch origin"
+          run_cmd "git branch -D #{target_branch}", :allow_failure => true
           checkout_branch target_branch
+        end
+
+        def remote_branch_exists?(target_branch)
+          repo.branches.each_name(:remote).include?("origin/#{target_branch}")
+        end
+
+        def create_remote_branch(target_branch)
+          repo.create_branch(target_branch, Thegarage::Gitx::BASE_BRANCH)
+          run_cmd "git push origin #{target_branch}:#{target_branch}"
         end
       end
     end
