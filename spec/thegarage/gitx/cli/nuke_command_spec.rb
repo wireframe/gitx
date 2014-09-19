@@ -101,5 +101,65 @@ describe Thegarage::Gitx::Cli::NukeCommand do
         expect { cli.nuke('prototype') }.to raise_error(/No known good tag found for branch/)
       end
     end
+    context 'when database migrations exist and user cancels operation' do
+      let(:buildtag) { 'build-master-2013-10-01-01' }
+      let(:good_branch) { 'master' }
+      let(:bad_branch) { 'prototype' }
+      let(:migrations) do
+        %w( db/migrate/20140715194946_create_users.rb db/migrate/20140730063034_update_user_account.rb ).join("\n")
+      end
+      before do
+        FileUtils.mkdir_p('db/migrate')
+
+        expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
+
+        expect(cli).to receive(:ask).and_return(good_branch)
+        expect(cli).to receive(:yes?).with('Reset prototype to build-master-2013-10-01-01? (y/n)', :green).and_return(true)
+        expect(cli).to receive(:run_cmd).with("git diff build-master-2013-10-01-01...prototype --name-only db/migrate").and_return(migrations)
+        expect(cli).to receive(:yes?).with('Are you sure you want to nuke prototype? (y/n) ', :green).and_return(false)
+
+        cli.nuke 'prototype'
+      end
+      after do
+        FileUtils.rm_rf('db/migrate')
+      end
+      it 'prompts for nuke confirmation' do
+        should meet_expectations
+      end
+    end
+    context 'when database migrations exist and user approves operation' do
+      let(:buildtag) { 'build-master-2013-10-01-01' }
+      let(:good_branch) { 'master' }
+      let(:bad_branch) { 'prototype' }
+      let(:migrations) do
+        %w( db/migrate/20140715194946_create_users.rb db/migrate/20140730063034_update_user_account.rb ).join("\n")
+      end
+      before do
+        FileUtils.mkdir_p('db/migrate')
+
+        expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
+
+        expect(cli).to receive(:ask).and_return(good_branch)
+        expect(cli).to receive(:yes?).with('Reset prototype to build-master-2013-10-01-01? (y/n)', :green).and_return(true)
+        expect(cli).to receive(:run_cmd).with("git diff build-master-2013-10-01-01...prototype --name-only db/migrate").and_return(migrations)
+        expect(cli).to receive(:yes?).with('Are you sure you want to nuke prototype? (y/n) ', :green).and_return(true)
+
+        expect(cli).to receive(:run_cmd).with("git checkout master").ordered
+        expect(cli).to receive(:run_cmd).with("git branch -D prototype", allow_failure: true).ordered
+        expect(cli).to receive(:run_cmd).with("git push origin --delete prototype", allow_failure: true).ordered
+        expect(cli).to receive(:run_cmd).with("git checkout -b prototype build-master-2013-10-01-01").ordered
+        expect(cli).to receive(:run_cmd).with("git push origin prototype").ordered
+        expect(cli).to receive(:run_cmd).with("git branch --set-upstream-to origin/prototype").ordered
+        expect(cli).to receive(:run_cmd).with("git checkout master").ordered
+
+        cli.nuke 'prototype'
+      end
+      after do
+        FileUtils.rm_rf('db/migrate')
+      end
+      it 'prompts for nuke confirmation' do
+        should meet_expectations
+      end
+    end
   end
 end
