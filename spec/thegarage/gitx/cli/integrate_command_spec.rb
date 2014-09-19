@@ -105,13 +105,19 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
           resume: 'feature-branch'
         }
       end
+      let(:repo) { cli.send(:repo) }
+      let(:branches) { double(each_name: ['my-feature-branch'])}
       before do
+        expect(repo).to receive(:branches).and_return(branches)
+
+        expect(cli).to receive(:ask).and_return('my-feature-branch')
+
         expect(cli).not_to receive(:run_cmd).with("git branch -D staging")
         expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
-        expect(options[:resume]).to match("feature-branch")
-        expect(cli).not_to receive(:run_cmd).with("git checkout feature-branch").and_raise('some error').ordered
+        expect(cli).to receive(:run_cmd).with("git checkout my-feature-branch").ordered
 
-        expect { cli.integrate }.to raise_error("#{options[:resume]} does not exist please make sure you typed the correct branch and run command again")
+        cli.integrate
+        # expect { cli.integrate }
       end
       it 'raises error' do
         should meet_expectations

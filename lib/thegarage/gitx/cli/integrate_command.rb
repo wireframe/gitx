@@ -61,7 +61,7 @@ module Thegarage
 
           run_cmd "git push origin HEAD"
           until check_if_branch_exists? feature_branch
-            raise "#{feature_branch} does not exist please make sure you typed the correct branch and run command again"
+            feature_branch = ask("#{feature_branch} does not exist please enter the correct branch from this list #{local_branches}")
           end
           checkout_branch feature_branch
         end
