@@ -10,11 +10,12 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
     }
   end
   let(:cli) { Thegarage::Gitx::Cli::IntegrateCommand.new(args, options, config) }
+  let(:current_branch) { double('fake branch', name: 'feature-branch', head?: true) }
   let(:repo) { cli.send(:repo) }
-  let(:branch) { double('fake branch', name: 'feature-branch') }
+  let(:branches) { [current_branch] }
 
   before do
-    allow(cli).to receive(:current_branch).and_return(branch)
+    allow(repo).to receive(:branches).and_return(branches)
   end
 
   describe '#integrate' do
@@ -85,9 +86,9 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
     end
-    context 'when target branch != staging || prototype' do
+    context 'when target branch is not an aggregate branch' do
       it 'raises an error' do
-        expect { cli.integrate('some-other-branch') }.to raise_error(/Only aggregate branches are allowed for integration/)
+        expect { cli.integrate('some-other-branch') }.to raise_error(/Invalid aggregate branch: some-other-branch must be one of supported aggregate branches/)
       end
     end
   end
