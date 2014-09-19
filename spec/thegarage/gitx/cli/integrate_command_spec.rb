@@ -55,10 +55,9 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
     end
-    context 'when target branch != staging || prototype' do
+    context 'when target branch is not an aggregate branch' do
       it 'raises an error' do
-
-        expect { cli.integrate('some-other-branch') }.to raise_error(/Only aggregate branches are allowed for integration/)
+        expect { cli.integrate('some-other-branch') }.to raise_error(/Invalid aggregate branch: some-other-branch must be one of supported aggregate branches/)
       end
     end
   end

@@ -10,7 +10,7 @@ module Thegarage
         desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
         def integrate(target_branch = 'staging')
           branch = current_branch.name
-          assert_integratable_branch!(branch, target_branch)
+          assert_aggregate_branch!(target_branch)
 
           UpdateCommand.new.update
 
@@ -27,9 +27,8 @@ module Thegarage
 
         private
 
-        def assert_integratable_branch!(branch, target_branch)
-          assert_not_protected_branch!(branch, 'integrate') unless aggregate_branch?(target_branch)
-          raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(target_branch) || target_branch == Thegarage::Gitx::BASE_BRANCH
+        def assert_aggregate_branch!(target_branch)
+          fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{AGGREGATE_BRANCHES}" unless aggregate_branch?(target_branch)
         end
 
         # nuke local branch and pull fresh version from remote repo
