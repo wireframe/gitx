@@ -10,10 +10,12 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
     }
   end
   let(:cli) { Thegarage::Gitx::Cli::IntegrateCommand.new(args, options, config) }
-  let(:branch) { double('fake branch', name: 'feature-branch') }
+  let(:current_branch) { double('fake branch', name: 'feature-branch', head?: true) }
+  let(:repo) { cli.send(:repo) }
+  let(:branches) { [current_branch] }
 
   before do
-    allow(cli).to receive(:current_branch).and_return(branch)
+    allow(repo).to receive(:branches).and_return(branches)
   end
 
   describe '#integrate' do
