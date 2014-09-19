@@ -1,5 +1,6 @@
 require 'English'
 
+# :nocov:
 class Thor
   module Actions
     # execute a shell command and raise an error if non-zero exit code is returned
@@ -37,3 +38,4 @@ class Thor
     end
   end
 end
+# :nocov:

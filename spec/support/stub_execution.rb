@@ -1,5 +1,6 @@
 # protip to prevent execution of shell commands during testsuite
 # see http://stackoverflow.com/questions/1628586/mock-system-call-in-ruby
+# :nocov:
 module ShellExecutionStub
   def included(base)
     base.class_eval do
@@ -18,3 +19,4 @@ module ShellExecutionStub
 end
 
 Kernel.send(:include, ShellExecutionStub)
+# :nocov:
