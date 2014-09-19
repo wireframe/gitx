@@ -69,8 +69,9 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git checkout staging").ordered
         expect(cli).to receive(:run_cmd).with("git merge feature-branch").and_raise('git merge feature-branch failed').ordered
+        expect(cli).to receive(:exit).and_raise(SystemExit)
 
-        expect { cli.integrate }.to raise_error("Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume feature-branch flag")
+        expect { cli.integrate }.to raise_error(SystemExit)
       end
       it 'raises a helpful error' do
         should meet_expectations

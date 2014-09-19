@@ -49,7 +49,8 @@ module Thegarage
           begin
             run_cmd "git merge #{branch}"
           rescue
-            raise "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
+            say "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
+            exit
           end
         end
 
