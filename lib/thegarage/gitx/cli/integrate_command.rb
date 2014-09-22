@@ -3,7 +3,6 @@ require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
 
-
 module Thegarage
   module Gitx
     module Cli
