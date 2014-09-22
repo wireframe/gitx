@@ -145,7 +145,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
 
         cli.integrate
       end
-      it 'raises error' do
+      it 'asks user for feature-branch name' do
         should meet_expectations
       end
     end

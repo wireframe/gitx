@@ -71,7 +71,7 @@ module Thegarage
         end
 
         def local_branches
-          @local_branches ||= repo.branches.each_name(:local).map { |branch| branch }
+          @local_branches ||= repo.branches.each_name(:local)
         end
 
         def remote_branch_exists?(target_branch)
