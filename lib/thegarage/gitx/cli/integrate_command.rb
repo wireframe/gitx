@@ -15,7 +15,7 @@ module Thegarage
           if options[:resume]
             resume
           else
-            assert_integratable_branch!(branch, target_branch)
+            assert_aggregate_branch!(target_branch)
 
             UpdateCommand.new.update
 
@@ -24,7 +24,8 @@ module Thegarage
             say "into "
             say target_branch, :green
 
-            refresh_branch_from_remote target_branch
+            create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
+            refresh_branch_from_remote(target_branch)
             merge_feature_branch branch
             run_cmd "git push origin HEAD"
             checkout_branch branch
@@ -33,15 +34,14 @@ module Thegarage
 
         private
 
-        def assert_integratable_branch!(branch, target_branch)
-          assert_not_protected_branch!(branch, 'integrate') unless aggregate_branch?(target_branch)
-          raise "Only aggregate branches are allowed for integration: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(target_branch) || target_branch == Thegarage::Gitx::BASE_BRANCH
+        def assert_aggregate_branch!(target_branch)
+          fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{AGGREGATE_BRANCHES}" unless aggregate_branch?(target_branch)
         end
 
         # nuke local branch and pull fresh version from remote repo
         def refresh_branch_from_remote(target_branch)
-          run_cmd "git branch -D #{target_branch}", :allow_failure => true
           run_cmd "git fetch origin"
+          run_cmd "git branch -D #{target_branch}", :allow_failure => true
           checkout_branch target_branch
         end
 
@@ -49,7 +49,7 @@ module Thegarage
           begin
             run_cmd "git merge #{branch}"
           rescue
-            say "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
+            say "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag", :red
             exit
           end
         end
@@ -72,6 +72,15 @@ module Thegarage
 
         def local_branches
           @local_branches ||= repo.branches.each_name(:local).map { |branch| branch }
+        end
+
+        def remote_branch_exists?(target_branch)
+          repo.branches.each_name(:remote).include?("origin/#{target_branch}")
+        end
+
+        def create_remote_branch(target_branch)
+          repo.create_branch(target_branch, Thegarage::Gitx::BASE_BRANCH)
+          run_cmd "git push origin #{target_branch}:#{target_branch}"
         end
       end
     end

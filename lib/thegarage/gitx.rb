@@ -1,6 +1,6 @@
 require 'thegarage/gitx/version'
-require 'thegarage/gitx/string_extensions'
-require 'thegarage/gitx/thor_extensions'
+require 'thegarage/gitx/extensions/string'
+require 'thegarage/gitx/extensions/thor'
 
 module Thegarage
   module Gitx
