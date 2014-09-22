@@ -67,11 +67,11 @@ module Thegarage
         end
 
         def check_if_branch_exists?(branch)
-          return true if local_branches.include?(branch)
+          local_branches.include?(branch)
         end
 
         def local_branches
-          @local_branches ||= repo.branches.each_name(:local).to_a.map { |branch| branch }
+          @local_branches ||= repo.branches.each_name(:local).map { |branch| branch }
         end
       end
     end

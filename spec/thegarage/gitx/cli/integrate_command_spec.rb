@@ -117,7 +117,23 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with("git checkout my-feature-branch").ordered
 
         cli.integrate
-        # expect { cli.integrate }
+      end
+      it 'raises error' do
+        should meet_expectations
+      end
+    end
+    context 'with --resume flag with no feature branch passed' do
+      let(:options) do
+        {
+          resume:''
+        }
+      end
+      let(:repo) { cli.send(:repo) }
+      let(:branches) { double(each_name: ['my-feature-branch'])}
+      before do
+        expect(repo).to receive(:branches).and_return(branches)
+
+        cli.integrate
       end
       it 'raises error' do
         should meet_expectations
