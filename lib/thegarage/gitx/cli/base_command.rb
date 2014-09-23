@@ -11,7 +11,6 @@ module Thegarage
 
         class MergeError < Thor::Error; end
 
-
         AGGREGATE_BRANCHES = %w( staging prototype )
         RESERVED_BRANCHES = %w( HEAD master next_release ) + AGGREGATE_BRANCHES
         add_runtime_options!
