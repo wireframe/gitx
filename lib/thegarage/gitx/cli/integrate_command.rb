@@ -23,6 +23,8 @@ module Thegarage
 
         private
 
+        class MergeError < Thor::Error; end
+
         def print_message(branch, integration_branch)
           message = options[:resume] ? 'Resuming integration of' : 'Integrating'
           say "#{message} "
@@ -36,8 +38,7 @@ module Thegarage
           begin
             run_cmd "git merge #{branch}"
           rescue
-            say "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag", :red
-            exit
+            raise MergeError, "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
           end
           run_cmd "git push origin HEAD"
         end
