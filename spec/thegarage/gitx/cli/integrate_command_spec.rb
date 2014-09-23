@@ -12,11 +12,15 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
   let(:cli) { Thegarage::Gitx::Cli::IntegrateCommand.new(args, options, config) }
   let(:current_branch) { double('fake branch', name: 'feature-branch', head?: true) }
   let(:repo) { cli.send(:repo) }
-  let(:remote_branch_names) { [] }
+  let(:remote_branch_names) { ['origin/staging', 'origin/prototype'] }
+  let(:local_branch_names) { ['feature-branch'] }
 
   before do
     allow(cli).to receive(:current_branch).and_return(current_branch)
-    allow(repo).to receive(:branches).and_return(double(each_name: remote_branch_names))
+    branches = double('fake branches')
+    allow(branches).to receive(:each_name).with(:local).and_return(local_branch_names)
+    allow(branches).to receive(:each_name).with(:remote).and_return(remote_branch_names)
+    allow(repo).to receive(:branches).and_return(branches)
   end
 
   describe '#integrate' do
@@ -24,7 +28,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
     before do
       allow(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
     end
-    context 'when target branch is ommitted and remote branch exists' do
+    context 'when integration branch is ommitted and remote branch exists' do
       let(:remote_branch_names) { ['origin/staging'] }
       before do
         expect(fake_update_command).to receive(:update)
@@ -64,7 +68,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
     end
-    context 'when target branch == prototype and remote branch exists' do
+    context 'when integration branch == prototype and remote branch exists' do
       let(:remote_branch_names) { ['origin/prototype'] }
       before do
         expect(fake_update_command).to receive(:update)
@@ -82,7 +86,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
     end
-    context 'when target branch is not an aggregate branch' do
+    context 'when integration branch is not an aggregate branch' do
       it 'raises an error' do
         expect { cli.integrate('some-other-branch') }.to raise_error(/Invalid aggregate branch: some-other-branch must be one of supported aggregate branches/)
       end
@@ -111,13 +115,11 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         }
       end
       let(:repo) { cli.send(:repo) }
-      let(:branches) { double(each_name: ['feature-branch']) }
       before do
-        expect(repo).to receive(:branches).and_return(branches)
+        expect(fake_update_command).to receive(:update)
 
         expect(cli).not_to receive(:run_cmd).with("git branch -D staging")
-        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
-        expect(options[:resume]).to match("feature-branch")
+        expect(cli).not_to receive(:run_cmd).with("git push origin HEAD")
         expect(cli).to receive(:run_cmd).with("git checkout feature-branch")
 
         cli.integrate
@@ -134,14 +136,14 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       end
       let(:repo) { cli.send(:repo) }
       let(:branches) { double(each_name: ['my-feature-branch'])}
+      let(:local_branch_names) { ['another-feature-branch'] }
       before do
-        expect(repo).to receive(:branches).and_return(branches)
-
-        expect(cli).to receive(:ask).and_return('my-feature-branch')
+        expect(fake_update_command).to receive(:update)
+        expect(cli).to receive(:ask).and_return('another-feature-branch')
 
         expect(cli).not_to receive(:run_cmd).with("git branch -D staging")
-        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
-        expect(cli).to receive(:run_cmd).with("git checkout my-feature-branch").ordered
+        expect(cli).not_to receive(:run_cmd).with("git push origin HEAD")
+        expect(cli).to receive(:run_cmd).with("git checkout another-feature-branch").ordered
 
         cli.integrate
       end

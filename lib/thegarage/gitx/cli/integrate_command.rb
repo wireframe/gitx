@@ -9,63 +9,62 @@ module Thegarage
       class IntegrateCommand < BaseCommand
         desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
         method_option :resume, :type => :string, :aliases => '-r', :desc => 'resume merging of feature-branch'
-        def integrate(target_branch = 'staging')
-          branch = current_branch.name
-          if options[:resume]
-            resume
-          else
-            assert_aggregate_branch!(target_branch)
+        def integrate(integration_branch = 'staging')
+          assert_aggregate_branch!(integration_branch)
 
-            UpdateCommand.new.update
+          branch = feature_branch_name
+          print_message(branch, integration_branch)
 
-            say "Integrating "
-            say "#{branch} ", :green
-            say "into "
-            say target_branch, :green
+          UpdateCommand.new.update
 
-            create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
-            refresh_branch_from_remote(target_branch)
-            merge_feature_branch branch
-            run_cmd "git push origin HEAD"
-            checkout_branch branch
-          end
+          integrate_branch(branch, integration_branch) unless options[:resume]
+          checkout_branch branch
         end
 
         private
 
-        def assert_aggregate_branch!(target_branch)
-          fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{AGGREGATE_BRANCHES}" unless aggregate_branch?(target_branch)
+        def print_message(branch, integration_branch)
+          message = options[:resume] ? 'Resuming integration of' : 'Integrating'
+          say "#{message} "
+          say "#{branch} ", :green
+          say "into "
+          say integration_branch, :green
         end
 
-        # nuke local branch and pull fresh version from remote repo
-        def refresh_branch_from_remote(target_branch)
-          run_cmd "git fetch origin"
-          run_cmd "git branch -D #{target_branch}", :allow_failure => true
-          checkout_branch target_branch
-        end
-
-        def merge_feature_branch(branch)
+        def integrate_branch(branch, integration_branch)
+          fetch_remote_branch(integration_branch)
           begin
             run_cmd "git merge #{branch}"
           rescue
             say "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag", :red
             exit
           end
-        end
-
-        def resume
-          feature_branch = options[:resume]
-          say "Resuming Integration of "
-          say "#{feature_branch}", :green
-
           run_cmd "git push origin HEAD"
-          until check_if_branch_exists? feature_branch
-            feature_branch = ask("#{feature_branch} does not exist please enter the correct branch from this list #{local_branches}")
-          end
-          checkout_branch feature_branch
         end
 
-        def check_if_branch_exists?(branch)
+        def feature_branch_name
+          @feature_branch ||= begin
+            feature_branch = options[:resume] || current_branch.name
+            until local_branch_exists?(feature_branch)
+              feature_branch = ask("#{feature_branch} does not exist. Please select one of the available local branches: #{local_branches}")
+            end
+            feature_branch
+          end
+        end
+
+        def assert_aggregate_branch!(target_branch)
+          fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{AGGREGATE_BRANCHES}" unless aggregate_branch?(target_branch)
+        end
+
+        # nuke local branch and pull fresh version from remote repo
+        def fetch_remote_branch(target_branch)
+          create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
+          run_cmd "git fetch origin"
+          run_cmd "git branch -D #{target_branch}", :allow_failure => true
+          checkout_branch target_branch
+        end
+
+        def local_branch_exists?(branch)
           local_branches.include?(branch)
         end
 
