@@ -91,7 +91,18 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect { cli.integrate('some-other-branch') }.to raise_error(/Invalid aggregate branch: some-other-branch must be one of supported aggregate branches/)
       end
     end
-    context 'when merge conflicts occur' do
+    context 'when merge conflicts occur during the updatecommand execution' do
+      let(:remote_branch_names) { ['origin/staging'] }
+      before do
+        expect(fake_update_command).to receive(:update).and_raise(Thegarage::Gitx::Cli::BaseCommand::MergeError)
+
+        expect { cli.integrate }.to raise_error(Thegarage::Gitx::Cli::BaseCommand::MergeError, 'Merge Conflict Occurred. Please Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command')
+      end
+      it 'raises a helpful error' do
+        should meet_expectations
+      end
+    end
+    context 'when merge conflicts occur with the integrate command' do
       let(:remote_branch_names) { ['origin/staging'] }
       before do
         expect(fake_update_command).to receive(:update)

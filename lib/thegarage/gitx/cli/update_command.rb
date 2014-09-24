@@ -8,7 +8,7 @@ module Thegarage
       class UpdateCommand < BaseCommand
         desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
         def update
-          say "Updating"
+          say "Updating "
           say "#{current_branch.name} ", :green
           say "with latest changes from "
           say Thegarage::Gitx::BASE_BRANCH, :green
@@ -24,7 +24,7 @@ module Thegarage
           begin
             run_cmd "git pull origin #{branch}"
           rescue
-            fail MergeError, "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume flag"
+            fail MergeError, "Merge Conflict Occurred. Please fix merge conflict and rerun the update command"
           end
         end
 

@@ -42,7 +42,7 @@ describe Thegarage::Gitx::Cli::UpdateCommand do
 
         expect(cli).to receive(:run_cmd).with('git pull origin feature-branch').and_raise('merge error').ordered
 
-        expect { cli.update }.to raise_error('Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume flag')
+        expect { cli.update }.to raise_error(Thegarage::Gitx::Cli::BaseCommand::MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the update command')
       end
       it 'raises error' do
         should meet_expectations
@@ -55,7 +55,7 @@ describe Thegarage::Gitx::Cli::UpdateCommand do
         expect(cli).to receive(:run_cmd).with('git pull origin feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git pull origin master').and_raise('merge error occurred').ordered
 
-        expect { cli.update }.to raise_error('Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume flag')
+        expect { cli.update }.to raise_error(Thegarage::Gitx::Cli::BaseCommand::MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the update command')
       end
       it 'raises error' do
         should meet_expectations
