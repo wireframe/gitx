@@ -3,7 +3,6 @@ require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
 require 'thegarage/gitx/cli/github'
-require 'octokit'
 
 module Thegarage
   module Gitx
@@ -50,18 +49,6 @@ module Thegarage
 
             pull_request
           end
-        end
-
-        # @return [Sawyer::Resource] data structure of pull request info if found
-        # @return nil if no pull request found
-        def find_pull_request(branch)
-          head_reference = "#{github_organization}:#{branch}"
-          params = {
-            head: head_reference,
-            state: 'open'
-          }
-          pull_requests = github_client.pull_requests(github_slug, params)
-          pull_requests.first
         end
 
         # @see http://developer.github.com/v3/pulls/
