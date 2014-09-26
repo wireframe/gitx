@@ -5,6 +5,14 @@ module Thegarage
     module Cli
       module Github
         CLIENT_URL = 'https://github.com/thegarage/thegarage-gitx'
+        PULL_REQUEST_FOOTER = <<-EOS.dedent
+          # Pull Request Protips(tm):
+          # * Include description of how this change accomplishes the task at hand.
+          # * Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
+          # * Review CONTRIBUTING.md for recommendations of artifacts, links, images, screencasts, etc.
+          #
+          # This footer will automatically be stripped from the pull request description
+        EOS
 
         # @return [Sawyer::Resource] data structure of pull request info if found
         # @return nil if no pull request found
@@ -16,6 +24,34 @@ module Thegarage
           }
           pull_requests = github_client.pull_requests(github_slug, params)
           pull_requests.first
+        end
+
+        # @see http://developer.github.com/v3/pulls/
+        def create_pull_request(branch)
+          say "Creating pull request for "
+          say "#{branch} ", :green
+          say "against "
+          say "#{Thegarage::Gitx::BASE_BRANCH} ", :green
+          say "in "
+          say github_slug, :green
+
+          title = branch
+          body = pull_request_body(branch)
+          github_client.create_pull_request(github_slug, Thegarage::Gitx::BASE_BRANCH, branch, title, body)
+        end
+
+        def pull_request_body(branch)
+          changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --no-merges --pretty=format:'* %s%n%b'"
+          description = options[:description]
+
+          description_template = []
+          description_template << "#{description}\n" if description
+          description_template << '### Changelog'
+          description_template << changelog
+          description_template << PULL_REQUEST_FOOTER
+
+          body = ask_editor(description_template.join("\n"), repo.config['core.editor'])
+          body.gsub(PULL_REQUEST_FOOTER, '').chomp.strip
         end
 
         # token is cached in local git config for future use

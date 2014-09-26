@@ -55,6 +55,44 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments")
       end
     end
+    context 'when a pullrequest doesnt exist for the feature-branch' do
+      let(:authorization_token) { '123123' }
+      let(:changelog) { '* made some fixes' }
+      let(:new_pull_request) do
+        {
+          html_url: "https://path/to/html/pull/request",
+          issue_url: "https://api/path/to/issue/url",
+          number: 10,
+          head: {
+            ref: "branch_name"
+          }
+        }
+      end
+      before do
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(fake_update_command).to receive(:update)
+
+        expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
+        expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
+        expect(cli).to receive(:run_cmd).with("git checkout staging").ordered
+        expect(cli).to receive(:run_cmd).with("git merge feature-branch").ordered
+        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
+        expect(cli).to receive(:run_cmd).with("git checkout feature-branch").ordered
+
+        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
+
+        stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
+        VCR.use_cassette('pull_request_does_not_exist') do
+          cli.integrate
+        end
+      end
+      it 'creates github pull request' do
+        should meet_expectations
+      end
+      it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
     context 'when staging branch does not exist remotely' do
       let(:authorization_token) { '123123' }
       let(:remote_branch_names) { [] }
