@@ -2,11 +2,13 @@ require 'thor'
 require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
+require 'thegarage/gitx/cli/github'
 
 module Thegarage
   module Gitx
     module Cli
       class IntegrateCommand < BaseCommand
+        include Github
         desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
         method_option :resume, :type => :string, :aliases => '-r', :desc => 'resume merging of feature-branch'
         def integrate(integration_branch = 'staging')
@@ -23,6 +25,9 @@ module Thegarage
 
           integrate_branch(branch, integration_branch) unless options[:resume]
           checkout_branch branch
+
+          pull_request = find_or_create_pull_request(branch)
+          create_integrate_comment(pull_request)
         end
 
         private
@@ -82,6 +87,11 @@ module Thegarage
         def create_remote_branch(target_branch)
           repo.create_branch(target_branch, Thegarage::Gitx::BASE_BRANCH)
           run_cmd "git push origin #{target_branch}:#{target_branch}"
+        end
+
+        def create_integrate_comment(pull_request)
+          comment = '[gitx] integrated into staging :twisted_rightwards_arrows:'
+          github_client.add_comment(github_slug, pull_request.number, comment)
         end
       end
     end
