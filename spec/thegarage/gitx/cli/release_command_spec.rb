@@ -55,6 +55,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
       end
     end
     context 'when user confirms release and pull request does not exist' do
+      let(:authorization_token) { '123123' }
       let(:fake_update_command) { double('fake update command', update: nil) }
       let(:fake_integrate_command) { double('fake integrate command') }
       let(:fake_cleanup_command) { double('fake cleanup command', cleanup: nil) }
@@ -69,6 +70,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
         }
       end
       before do
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         allow(cli).to receive(:ask_editor).and_return('description')
 
         expect(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command).twice
