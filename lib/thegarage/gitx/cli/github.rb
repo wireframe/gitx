@@ -14,6 +14,22 @@ module Thegarage
           # This footer will automatically be stripped from the pull request description
         EOS
 
+        def find_or_create_pull_request(branch, command)
+          pull_request = find_pull_request(branch)
+          if pull_request
+            create_integrate_comment(pull_request) if command == 'integrate'
+            create_bump_comment(pull_request) if options[:bump]
+            pull_request
+          else
+            UpdateCommand.new.update if command == 'review'
+            pull_request = create_pull_request(branch)
+            say 'Pull request created: '
+            say pull_request.html_url, :green
+
+            pull_request
+          end
+        end
+
         # @return [Sawyer::Resource] data structure of pull request info if found
         # @return nil if no pull request found
         def find_pull_request(branch)
