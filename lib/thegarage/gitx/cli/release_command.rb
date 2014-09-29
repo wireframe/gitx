@@ -4,7 +4,7 @@ require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
 require 'thegarage/gitx/cli/integrate_command'
 require 'thegarage/gitx/cli/cleanup_command'
-require 'thegarage/gitx/cli/github'
+require 'thegarage/gitx/github'
 
 module Thegarage
   module Gitx

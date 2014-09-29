@@ -2,7 +2,7 @@ require 'thor'
 require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
 require 'thegarage/gitx/cli/update_command'
-require 'thegarage/gitx/cli/github'
+require 'thegarage/gitx/github'
 
 module Thegarage
   module Gitx
