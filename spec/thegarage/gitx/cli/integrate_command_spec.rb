@@ -69,6 +69,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         }
       end
       before do
+        allow(cli).to receive(:ask_editor).and_return('description')
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(fake_update_command).to receive(:update)
 
