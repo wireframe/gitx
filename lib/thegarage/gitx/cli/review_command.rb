@@ -21,27 +21,13 @@ module Thegarage
 
           branch = current_branch.name
           pull_request = find_or_create_pull_request(branch)
+          create_bump_comment(pull_request) if options[:bump]
           assign_pull_request(pull_request) if options[:assignee]
 
           run_cmd "open #{pull_request.html_url}" if options[:open]
         end
 
         private
-
-        def find_or_create_pull_request(branch)
-          pull_request = find_pull_request(branch)
-          if pull_request
-            create_bump_comment(pull_request) if options[:bump]
-            pull_request
-          else
-            UpdateCommand.new.update
-            pull_request = create_pull_request(branch)
-            say 'Pull request created: '
-            say pull_request.html_url, :green
-
-            pull_request
-          end
-        end
 
         def assign_pull_request(pull_request)
           assignee = options[:assignee]

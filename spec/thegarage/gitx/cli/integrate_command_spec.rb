@@ -52,10 +52,11 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
       it 'posts comment to pull request' do
-        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments")
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
+          with(body: {body: '[gitx] integrated into staging :twisted_rightwards_arrows:'})
       end
     end
-    context 'when a pullrequest doesnt exist for the feature-branch' do
+    context 'when a pull request doesnt exist for the feature-branch' do
       let(:authorization_token) { '123123' }
       let(:changelog) { '* made some fixes' }
       let(:new_pull_request) do
@@ -71,7 +72,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       before do
         allow(cli).to receive(:ask_editor).and_return('description')
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(fake_update_command).to receive(:update)
+        expect(fake_update_command).to receive(:update).twice
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
@@ -83,12 +84,18 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
 
         stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
+        stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments').to_return(:status => 201)
+
         VCR.use_cassette('pull_request_does_not_exist') do
           cli.integrate
         end
       end
       it 'creates github pull request' do
         should meet_expectations
+      end
+      it 'creates github comment for integration' do
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
+          with(body: {body: '[gitx] integrated into staging :twisted_rightwards_arrows:'})
       end
       it 'runs expected commands' do
         should meet_expectations

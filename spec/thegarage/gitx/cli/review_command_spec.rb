@@ -133,7 +133,8 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         end
       end
       it 'posts comment to github' do
-        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments")
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
+          with(body: {body: 'comment description'})
       end
     end
   end
