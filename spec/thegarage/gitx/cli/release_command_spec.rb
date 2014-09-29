@@ -32,6 +32,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
       let(:fake_update_command) { double('fake update command', update: nil) }
       let(:fake_integrate_command) { double('fake integrate command') }
       let(:fake_cleanup_command) { double('fake cleanup command', cleanup: nil) }
+      let(:authorization_token) { '123123' }
       before do
         expect(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
         expect(Thegarage::Gitx::Cli::IntegrateCommand).to receive(:new).and_return(fake_integrate_command)
@@ -40,6 +41,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
         expect(fake_integrate_command).to receive(:integrate).with('staging')
 
         expect(cli).to receive(:yes?).and_return(true)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(cli).to receive(:run_cmd).with("git checkout master").ordered
         expect(cli).to receive(:run_cmd).with("git pull origin master").ordered
