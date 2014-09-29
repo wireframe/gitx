@@ -26,7 +26,7 @@ module Thegarage
           integrate_branch(branch, integration_branch) unless options[:resume]
           checkout_branch branch
 
-          find_or_create_pull_request(branch, 'integrate')
+          find_or_create_pull_request(branch)
         end
 
         private
@@ -92,6 +92,20 @@ module Thegarage
           comment = '[gitx] integrated into staging :twisted_rightwards_arrows:'
 
           github_client.add_comment(github_slug, pull_request.number, comment)
+        end
+
+        def find_or_create_pull_request(branch)
+          pull_request = find_pull_request(branch)
+          if pull_request
+            create_integrate_comment(pull_request)
+            pull_request
+          else
+            pull_request = create_pull_request(branch)
+            say 'Pull request created: '
+            say pull_request.html_url, :green
+
+            pull_request
+          end
         end
       end
     end
