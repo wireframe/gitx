@@ -26,8 +26,7 @@ module Thegarage
           integrate_branch(branch, integration_branch) unless options[:resume]
           checkout_branch branch
 
-          pull_request = find_or_create_pull_request(branch)
-          create_integrate_comment(pull_request)
+          create_integrate_comment(branch) unless RESERVED_BRANCHES.include?(branch)
         end
 
         private
@@ -89,7 +88,8 @@ module Thegarage
           run_cmd "git push origin #{target_branch}:#{target_branch}"
         end
 
-        def create_integrate_comment(pull_request)
+        def create_integrate_comment(branch)
+          pull_request = find_or_create_pull_request(branch)
           comment = '[gitx] integrated into staging :twisted_rightwards_arrows:'
           github_client.add_comment(github_slug, pull_request.number, comment)
         end
