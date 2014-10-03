@@ -56,6 +56,28 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
           with(body: {body: '[gitx] integrated into staging :twisted_rightwards_arrows:'})
       end
     end
+    context 'when current_branch == master' do
+      let(:current_branch) { double('fake branch', name: 'master', head?: true) }
+      let(:local_branch_names) { ['master'] }
+      let(:authorization_token) { '123123' }
+      let(:remote_branch_names) { ['origin/staging'] }
+      before do
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(fake_update_command).to receive(:update)
+
+        expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
+        expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
+        expect(cli).to receive(:run_cmd).with("git checkout staging").ordered
+        expect(cli).to receive(:run_cmd).with("git merge master").ordered
+        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
+        expect(cli).to receive(:run_cmd).with("git checkout master").ordered
+
+        cli.integrate
+      end
+      it 'does not create pull request' do
+        expect(WebMock).to_not have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/pulls")
+      end
+    end
     context 'when a pull request doesnt exist for the feature-branch' do
       let(:authorization_token) { '123123' }
       let(:changelog) { '* made some fixes' }
