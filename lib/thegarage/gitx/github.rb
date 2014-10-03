@@ -54,7 +54,7 @@ module Thegarage
         end
 
         def pull_request_body(branch)
-          changelog = run_cmd "git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --no-merges --pretty=format:'* %s%n%b'"
+          changelog = run_cmd("git log #{Thegarage::Gitx::BASE_BRANCH}...#{branch} --reverse --no-merges --pretty=format:'* %s%n%b'")
           description = options[:description]
 
           description_template = []
