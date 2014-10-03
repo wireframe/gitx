@@ -47,7 +47,7 @@ module Thegarage
         end
 
         # helper to invoke other CLI commands
-        def invoke_command(command_class, method, args = [])
+        def execute_command(command_class, method, args = [])
           command_class.new.send(method, *args)
         end
       end

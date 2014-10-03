@@ -18,7 +18,7 @@ module Thegarage
 
           branch = current_branch.name
           assert_not_protected_branch!(branch, 'release')
-          invoke_command(UpdateCommand, :update)
+          execute_command(UpdateCommand, :update)
 
           find_or_create_pull_request(branch)
 
@@ -27,8 +27,8 @@ module Thegarage
           run_cmd "git merge --no-ff #{branch}"
           run_cmd "git push origin HEAD"
 
-          invoke_command(IntegrateCommand, :integrate, 'staging')
-          invoke_command(CleanupCommand, :cleanup)
+          execute_command(IntegrateCommand, :integrate, 'staging')
+          execute_command(CleanupCommand, :cleanup)
         end
       end
     end

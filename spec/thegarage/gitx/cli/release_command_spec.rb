@@ -31,9 +31,9 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
     context 'when user confirms release and pull request exists' do
       let(:authorization_token) { '123123' }
       before do
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
@@ -67,9 +67,9 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         allow(cli).to receive(:ask_editor).and_return('description')
 
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).twice
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).twice
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
 

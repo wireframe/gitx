@@ -29,7 +29,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       let(:remote_branch_names) { ['origin/staging'] }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
@@ -59,7 +59,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       let(:remote_branch_names) { ['origin/staging'] }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
@@ -90,7 +90,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       before do
         allow(cli).to receive(:ask_editor).and_return('description')
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).twice
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).twice
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
@@ -124,7 +124,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       let(:remote_branch_names) { [] }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
 
         expect(repo).to receive(:create_branch).with('staging', 'master')
 
@@ -155,7 +155,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       let(:remote_branch_names) { ['origin/prototype'] }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D prototype", allow_failure: true).ordered
@@ -185,7 +185,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
     context 'when merge conflicts occur during the Thegarage::Gitx::Cli::updatecommand execution' do
       let(:remote_branch_names) { ['origin/staging'] }
       before do
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).and_raise(Thegarage::Gitx::Cli::BaseCommand::MergeError)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).and_raise(Thegarage::Gitx::Cli::BaseCommand::MergeError)
 
         expect { cli.integrate }.to raise_error(Thegarage::Gitx::Cli::BaseCommand::MergeError, 'Merge Conflict Occurred. Please Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command')
       end
@@ -196,7 +196,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
     context 'when merge conflicts occur with the integrate command' do
       let(:remote_branch_names) { ['origin/staging'] }
       before do
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
         expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
@@ -220,7 +220,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).not_to receive(:run_cmd).with("git branch -D staging")
         expect(cli).not_to receive(:run_cmd).with("git push origin HEAD")
@@ -249,7 +249,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
       let(:authorization_token) { '123123' }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:invoke_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
         expect(cli).to receive(:ask).and_return('feature-branch')
 
         expect(cli).not_to receive(:run_cmd).with("git branch -D staging")
