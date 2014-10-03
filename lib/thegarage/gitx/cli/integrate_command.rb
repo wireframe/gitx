@@ -18,7 +18,7 @@ module Thegarage
           print_message(branch, integration_branch)
 
           begin
-            UpdateCommand.new.update
+            execute_command(UpdateCommand, :update)
           rescue
             fail MergeError, "Merge Conflict Occurred. Please Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command"
           end

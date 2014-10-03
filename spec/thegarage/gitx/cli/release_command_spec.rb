@@ -29,16 +29,11 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
       end
     end
     context 'when user confirms release and pull request exists' do
-      let(:fake_update_command) { double('fake update command', update: nil) }
-      let(:fake_integrate_command) { double('fake integrate command') }
-      let(:fake_cleanup_command) { double('fake cleanup command', cleanup: nil) }
       let(:authorization_token) { '123123' }
       before do
-        expect(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
-        expect(Thegarage::Gitx::Cli::IntegrateCommand).to receive(:new).and_return(fake_integrate_command)
-        expect(Thegarage::Gitx::Cli::CleanupCommand).to receive(:new).and_return(fake_cleanup_command)
-
-        expect(fake_integrate_command).to receive(:integrate).with('staging')
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
@@ -58,9 +53,6 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
     end
     context 'when user confirms release and pull request does not exist' do
       let(:authorization_token) { '123123' }
-      let(:fake_update_command) { double('fake update command', update: nil) }
-      let(:fake_integrate_command) { double('fake integrate command') }
-      let(:fake_cleanup_command) { double('fake cleanup command', cleanup: nil) }
       let(:new_pull_request) do
         {
           html_url: "https://path/to/html/pull/request",
@@ -75,12 +67,9 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         allow(cli).to receive(:ask_editor).and_return('description')
 
-        expect(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command).twice
-        expect(Thegarage::Gitx::Cli::IntegrateCommand).to receive(:new).and_return(fake_integrate_command)
-        expect(Thegarage::Gitx::Cli::CleanupCommand).to receive(:new).and_return(fake_cleanup_command)
-
-        expect(fake_update_command).to receive(:update).twice
-        expect(fake_integrate_command).to receive(:integrate).with('staging')
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).twice
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
 

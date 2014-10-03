@@ -45,6 +45,11 @@ module Thegarage
         def assert_not_protected_branch!(branch, action)
           raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
         end
+
+        # helper to invoke other CLI commands
+        def execute_command(command_class, method, args = [])
+          command_class.new.send(method, *args)
+        end
       end
     end
   end

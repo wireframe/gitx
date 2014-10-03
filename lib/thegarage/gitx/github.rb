@@ -17,7 +17,7 @@ module Thegarage
         def find_or_create_pull_request(branch)
           pull_request = find_pull_request(branch)
           pull_request ||= begin
-            UpdateCommand.new.update
+            execute_command(UpdateCommand, :update)
             pull_request = create_pull_request(branch)
             say 'Created pull request: '
             say pull_request.html_url, :green
