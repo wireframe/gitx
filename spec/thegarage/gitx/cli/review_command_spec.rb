@@ -43,7 +43,8 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         expect(Thegarage::Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
 
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
+        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return("* old commit\n\n* new commit").ordered
+        expect(cli).to receive(:ask_editor).with("### Changelog\n* old commit\n\n* new commit\n#{Thegarage::Gitx::Cli::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
         VCR.use_cassette('pull_request_does_not_exist') do
