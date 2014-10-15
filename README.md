@@ -45,7 +45,10 @@ release the current feature branch to master.  This operation will perform the f
 * merge in latest code from master branch
 * prompt user to confirm they actually want to perform the release
 * merge current branch into master
-* cleanup merged branches from remote server
+* (optional) cleanup merged branches from remote server
+
+options:
+* `--cleanup` = automatically cleanup merged branches after release complete
 
 # Extra Utility Git Extensions
 
