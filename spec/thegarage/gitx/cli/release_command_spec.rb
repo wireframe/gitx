@@ -33,7 +33,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
       before do
         expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
         expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
+        expect(cli).to_not receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
@@ -69,7 +69,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
 
         expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update).twice
         expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
+        expect(cli).to_not receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
 
@@ -88,6 +88,37 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
         should meet_expectations
       end
       it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
+    context 'when --cleanup flag passed' do
+      let(:options) do
+        {
+          cleanup: true
+        }
+      end
+      let(:authorization_token) { '123123' }
+      before do
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::UpdateCommand, :update)
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::IntegrateCommand, :integrate, 'staging')
+        expect(cli).to receive(:execute_command).with(Thegarage::Gitx::Cli::CleanupCommand, :cleanup)
+
+        expect(cli).to receive(:yes?).and_return(true)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+
+        expect(cli).to receive(:run_cmd).with("git checkout master").ordered
+        expect(cli).to receive(:run_cmd).with("git pull origin master").ordered
+        expect(cli).to receive(:run_cmd).with("git merge --no-ff feature-branch").ordered
+        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
+
+        VCR.use_cassette('pull_request_does_exist') do
+          cli.release
+        end
+      end
+      it 'runs expected commands' do
+        should meet_expectations
+      end
+      it 'prunes merged branches (git cleanup)' do
         should meet_expectations
       end
     end

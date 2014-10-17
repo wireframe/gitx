@@ -13,6 +13,7 @@ module Thegarage
         include Github
 
         desc 'release', 'release the current branch to production'
+        method_option :cleanup, :type => :boolean, :desc => 'cleanup merged branches after release'
         def release
           return unless yes?("Release #{current_branch.name} to production? (y/n)", :green)
 
@@ -28,7 +29,7 @@ module Thegarage
           run_cmd "git push origin HEAD"
 
           execute_command(IntegrateCommand, :integrate, 'staging')
-          execute_command(CleanupCommand, :cleanup)
+          execute_command(CleanupCommand, :cleanup) if options[:cleanup]
         end
       end
     end
