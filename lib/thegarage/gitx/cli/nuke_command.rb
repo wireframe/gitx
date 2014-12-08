@@ -14,7 +14,7 @@ module Thegarage
 
           last_known_good_tag = current_build_tag(good_branch)
           return unless yes?("Reset #{bad_branch} to #{last_known_good_tag}? (y/n)", :green)
-          fail "Only aggregate branches are allowed to be reset: #{AGGREGATE_BRANCHES}" unless aggregate_branch?(bad_branch)
+          fail "Only aggregate branches are allowed to be reset: #{config[:aggregate_branches]}" unless aggregate_branch?(bad_branch)
           return if migrations_need_to_be_reverted?(bad_branch, last_known_good_tag)
 
           say "Resetting "

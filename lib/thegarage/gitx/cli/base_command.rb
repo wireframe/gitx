@@ -1,6 +1,7 @@
 require 'thor'
 require 'pathname'
 require 'rugged'
+require 'yaml'
 require 'thegarage/gitx'
 
 module Thegarage
@@ -11,8 +12,11 @@ module Thegarage
 
         class MergeError < Thor::Error; end
 
-        AGGREGATE_BRANCHES = %w( staging prototype )
-        RESERVED_BRANCHES = %w( HEAD master next_release ) + AGGREGATE_BRANCHES
+        DEFAULT_CONFIG = {
+          aggregate_branches: %w( staging prototype ),
+          reserved_branches: %w( HEAD master next_release staging prototype ),
+          taggable_branches: %w( master staging )
+        }
         add_runtime_options!
 
         method_option :trace, :type => :boolean, :aliases => '-v'
@@ -39,16 +43,25 @@ module Thegarage
         end
 
         def aggregate_branch?(branch)
-          AGGREGATE_BRANCHES.include?(branch)
+          config[:aggregate_branches].include?(branch)
         end
 
         def assert_not_protected_branch!(branch, action)
-          raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
+          raise "Cannot #{action} reserved branch" if config[:reserved_branches].include?(branch) || aggregate_branch?(branch)
         end
 
         # helper to invoke other CLI commands
         def execute_command(command_class, method, args = [])
           command_class.new.send(method, *args)
+        end
+
+        def config
+          @configuration ||= if File.exists?(".git_workflow")
+            config_file = ::YAML::load_file(".git_workflow") || {}
+            Thor::CoreExt::HashWithIndifferentAccess.new(DEFAULT_CONFIG.merge(config_file))
+          else
+            DEFAULT_CONFIG
+          end
         end
       end
     end
