@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'thegarage/gitx/cli', 'track_command.rb')
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'thegarage/gitx/cli/track_command'
 args = ARGV.dup.unshift('track')
 Thegarage::Gitx::Cli::TrackCommand.start(args)
