@@ -22,6 +22,10 @@ module Thegarage
           execute_command(UpdateCommand, :update)
 
           find_or_create_pull_request(branch)
+          status = branch_status(branch)
+          if status != 'success'
+            return unless yes?("Branch status is currently: #{status}.  Proceed with release? (y/n)", :red)
+          end
 
           checkout_branch Thegarage::Gitx::BASE_BRANCH
           run_cmd "git pull origin #{Thegarage::Gitx::BASE_BRANCH}"
