@@ -39,6 +39,13 @@ module Thegarage
           pull_requests.first
         end
 
+        # Get the current commit status of a branch
+        # @see https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
+        def branch_status(branch)
+          response = github_client.status(github_slug, branch)
+          response.state
+        end
+
         # @see http://developer.github.com/v3/pulls/
         def create_pull_request(branch)
           say "Creating pull request for "

@@ -10,7 +10,9 @@ http_interactions:
       Accept:
       - application/vnd.github.v3+json
       User-Agent:
-      - Octokit Ruby Gem 3.2.0
+      - Octokit Ruby Gem 3.4.0
+      Content-Type:
+      - application/json
       Authorization:
       - token 123123
       Accept-Encoding:
@@ -23,19 +25,19 @@ http_interactions:
       Server:
       - GitHub.com
       Date:
-      - Tue, 05 Aug 2014 17:14:02 GMT
+      - Wed, 10 Dec 2014 19:14:11 GMT
       Content-Type:
       - application/json; charset=utf-8
       Status:
-      - 401 Unauthorized
+      - 200 OK
       X-Github-Media-Type:
       - github.v3; format=json
       X-Ratelimit-Limit:
       - '60'
       X-Ratelimit-Remaining:
-      - '59'
+      - '58'
       X-Ratelimit-Reset:
-      - '1407262442'
+      - '1418242282'
       X-Xss-Protection:
       - 1; mode=block
       X-Frame-Options:
@@ -52,16 +54,16 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       X-Github-Request-Id:
-      - 46C5E25C:552F:1BC5411:53E110DA
+      - C6CBAFAF:141F:450BDAC:54889B83
       Strict-Transport-Security:
-      - max-age=31536000; includeSubdomains
+      - max-age=31536000; includeSubdomains; preload
       X-Content-Type-Options:
       - nosniff
     body:
       encoding: UTF-8
-      string: '[]'
+      string: '[{"html_url":"https://path/to/html/pull/request","issue_url":"https://api/path/to/issue/url","number":10,"head":{"ref":"branch_name"}}]'
     http_version:
-  recorded_at: Tue, 05 Aug 2014 17:14:02 GMT
+  recorded_at: Wed, 10 Dec 2014 19:14:11 GMT
 - request:
     method: get
     uri: https://api.github.com/repos/thegarage/thegarage-gitx/commits/feature-branch/status
@@ -127,7 +129,7 @@ http_interactions:
       - nosniff
     body:
       encoding: UTF-8
-      string: '{"state":"pending"}'
+      string: '{"state":"failure"}'
     http_version:
   recorded_at: Wed, 10 Dec 2014 19:14:11 GMT
 recorded_with: VCR 2.9.2

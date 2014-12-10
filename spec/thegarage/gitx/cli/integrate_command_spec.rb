@@ -40,7 +40,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
 
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
 
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
       end
@@ -139,7 +139,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
 
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
 
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
       end
@@ -166,7 +166,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
 
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
 
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate 'prototype'
         end
       end
@@ -228,7 +228,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
 
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
 
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
       end
@@ -257,7 +257,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with("git checkout feature-branch").ordered
 
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
       end

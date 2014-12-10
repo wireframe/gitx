@@ -71,7 +71,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to_not receive(:create_pull_request)
 
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.review
         end
       end
@@ -91,7 +91,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
 
         stub_request(:patch, /.*api.github.com.*/).to_return(:status => 200)
 
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.review
         end
       end
@@ -109,7 +109,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:run_cmd).with("open https://path/to/html/pull/request").ordered
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.review
         end
       end
@@ -129,7 +129,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         expect(cli).to receive(:ask_editor).and_return('comment description')
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
 
-        VCR.use_cassette('pull_request_does_exist') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.review
         end
       end
