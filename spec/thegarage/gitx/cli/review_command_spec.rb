@@ -141,7 +141,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       it 'creates pending build status for latest commit' do
         expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
-          with(body: {state: 'pending', context: 'peer_review'})
+          with(body: {state: 'pending', context: 'peer_review', description: 'Peer review in progress'})
       end
     end
   end

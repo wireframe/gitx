@@ -59,7 +59,7 @@ module Thegarage
 
         def set_review_status(state)
           latest_commit = repo.head.target_id
-          update_review_status(latest_commit, state)
+          update_review_status(latest_commit, state, 'Peer review in progress')
         end
       end
     end
