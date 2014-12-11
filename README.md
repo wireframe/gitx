@@ -35,7 +35,11 @@ options:
 * `--assign` or `-a` = assign pull request to github user
 * `--open` or `-o` = open pull request in default web browser.
 * `--bump` or `-b` = bump an existing pull request by posting a comment to re-review new changes
+* `--approve` = approve/signoff on pull request (with optional feedback)
+* `--reject` = reject pull request (with details)
 
+NOTE: the `--bump` option will also update the pull request commit status to mark the branch as 'pending peer review'.
+This setting is cleared when a reviewer approves or rejects the pull request.
 
 ## git release
 

@@ -44,9 +44,10 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
 
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return("* old commit\n\n* new commit").ordered
-        expect(cli).to receive(:ask_editor).with("### Changelog\n* old commit\n\n* new commit\n#{Thegarage::Gitx::Cli::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
+        expect(cli).to receive(:ask_editor).with("### Changelog\n* old commit\n\n* new commit\n#{Thegarage::Gitx::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
+
         VCR.use_cassette('pull_request_does_not_exist') do
           cli.review
         end
@@ -124,9 +125,11 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         }
       end
       let(:authorization_token) { '123123' }
+      let(:reference) { double('fake reference', target_id: 'e12da4') }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:ask_editor).and_return('comment description')
+        allow(repo).to receive(:head).and_return(reference)
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
@@ -136,6 +139,64 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       it 'posts comment to github' do
         expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
           with(body: {body: 'comment description'})
+      end
+      it 'creates pending build status for latest commit' do
+        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
+          with(body: {state: 'pending', context: 'peer_review', description: 'Peer review in progress'})
+      end
+    end
+    context 'when --reject flag is passed' do
+      let(:options) do
+        {
+          reject: true
+        }
+      end
+      let(:authorization_token) { '123123' }
+      let(:reference) { double('fake reference', target_id: 'e12da4') }
+      before do
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(cli).to receive(:ask_editor).and_return('comment body')
+        allow(repo).to receive(:head).and_return(reference)
+        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
+          cli.review
+        end
+      end
+      it 'posts comment to github' do
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
+          with(body: {body: 'comment body'})
+      end
+      it 'creates failure build status for latest commit' do
+        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
+          with(body: {state: 'failure', context: 'peer_review', description: 'Peer review rejected'})
+      end
+    end
+    context 'when --approve flag is passed' do
+      let(:options) do
+        {
+          approve: true
+        }
+      end
+      let(:authorization_token) { '123123' }
+      let(:reference) { double('fake reference', target_id: 'e12da4') }
+      before do
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(cli).to receive(:ask_editor).and_return('comment body')
+        allow(repo).to receive(:head).and_return(reference)
+        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
+          cli.review
+        end
+      end
+      it 'posts comment to github' do
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
+          with(body: {body: 'comment body'})
+      end
+      it 'creates success build status for latest commit' do
+        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
+          with(body: {state: 'success', context: 'peer_review', description: 'Peer review approved'})
       end
     end
   end
