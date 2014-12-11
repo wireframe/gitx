@@ -124,9 +124,11 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         }
       end
       let(:authorization_token) { '123123' }
+      let(:reference) { double('fake reference', target_id: 'e12da4') }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:ask_editor).and_return('comment description')
+        allow(repo).to receive(:head).and_return(reference)
         stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
@@ -136,6 +138,10 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       it 'posts comment to github' do
         expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
           with(body: {body: 'comment description'})
+      end
+      it 'creates pending build status for latest commit' do
+        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
+          with(body: {state: 'pending', context: 'peer_review'})
       end
     end
   end

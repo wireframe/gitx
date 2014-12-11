@@ -20,7 +20,9 @@ module Thegarage
           fail 'Github authorization token not found' unless authorization_token
 
           branch = current_branch.name
-          pull_request = find_or_create_pull_request(branch)
+          pull_request = find_or_create_pull_request(branch) do |_on_create|
+            # set_review_status('pending')
+          end
           create_bump_comment(pull_request) if options[:bump]
           assign_pull_request(pull_request) if options[:assignee]
 
@@ -51,6 +53,13 @@ module Thegarage
           comment = ask_editor(comment_template.join("\n"), repo.config['core.editor'])
           comment = comment.chomp.strip
           github_client.add_comment(github_slug, pull_request.number, comment)
+
+          set_review_status('pending')
+        end
+
+        def set_review_status(state)
+          latest_commit = repo.head.target_id
+          update_review_status(latest_commit, state)
         end
       end
     end
