@@ -47,6 +47,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         expect(cli).to receive(:ask_editor).with("### Changelog\n* old commit\n\n* new commit\n#{Thegarage::Gitx::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
+
         VCR.use_cassette('pull_request_does_not_exist') do
           cli.review
         end

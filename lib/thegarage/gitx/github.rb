@@ -14,15 +14,13 @@ module Thegarage
         # This footer will automatically be stripped from the pull request description
       EOS
 
-      def find_or_create_pull_request(branch, &create_callback)
+      def find_or_create_pull_request(branch)
         pull_request = find_pull_request(branch)
         pull_request ||= begin
           execute_command(Thegarage::Gitx::Cli::UpdateCommand, :update)
           pull_request = create_pull_request(branch)
           say 'Created pull request: '
           say pull_request.html_url, :green
-
-          create_callback.call if create_callback
 
           pull_request
         end
