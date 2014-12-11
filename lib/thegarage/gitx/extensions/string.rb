@@ -1,7 +1,8 @@
 class String
+  # @see http://api.rubyonrails.org/classes/String.html#method-i-strip_heredoc
   def undent
-    a = $1 if match(/\A(\s+)(.*\n)(?:\1.*\n)*\z/)
-    gsub(/^#{a}/,'')
+    indent = scan(/^[ \t]*(?=\S)/).min.size || 0
+    gsub(/^[ \t]{#{indent}}/, '')
   end
   alias :dedent :undent
 
