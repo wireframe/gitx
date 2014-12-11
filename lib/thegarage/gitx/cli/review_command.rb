@@ -8,7 +8,7 @@ module Thegarage
   module Gitx
     module Cli
       class ReviewCommand < BaseCommand
-        include Github
+        include Thegarage::Gitx::Github
 
         desc "review", "Create or update a pull request on github"
         method_option :description, :type => :string, :aliases => '-d', :desc => 'pull request description'

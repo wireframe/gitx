@@ -8,7 +8,7 @@ module Thegarage
   module Gitx
     module Cli
       class IntegrateCommand < BaseCommand
-        include Github
+        include Thegarage::Gitx::Github
         desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
         method_option :resume, :type => :string, :aliases => '-r', :desc => 'resume merging of feature-branch'
         def integrate(integration_branch = 'staging')

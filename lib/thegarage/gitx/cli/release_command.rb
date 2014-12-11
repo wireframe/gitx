@@ -10,7 +10,7 @@ module Thegarage
   module Gitx
     module Cli
       class ReleaseCommand < BaseCommand
-        include Github
+        include Thegarage::Gitx::Github
 
         desc 'release', 'release the current branch to production'
         method_option :cleanup, :type => :boolean, :desc => 'cleanup merged branches after release'
