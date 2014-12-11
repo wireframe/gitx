@@ -75,14 +75,14 @@ module Thegarage
           comment = get_editor_input(REJECTION_COMMENT_TEMPLATE)
           github_client.add_comment(github_slug, pull_request.number, comment)
 
-          set_review_status('failure', 'Peer review complete')
+          set_review_status('failure', 'Peer review rejected')
         end
 
         def approve_pull_request(pull_request)
           comment = get_editor_input(APPROVAL_COMMENT_TEMPLATE)
           github_client.add_comment(github_slug, pull_request.number, comment)
 
-          set_review_status('success', 'Peer review complete')
+          set_review_status('success', 'Peer review approved')
         end
 
         def get_editor_input(template)

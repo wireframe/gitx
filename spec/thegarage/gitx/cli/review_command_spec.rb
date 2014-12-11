@@ -169,7 +169,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       it 'creates failure build status for latest commit' do
         expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
-          with(body: {state: 'failure', context: 'peer_review', description: 'Peer review complete'})
+          with(body: {state: 'failure', context: 'peer_review', description: 'Peer review rejected'})
       end
     end
     context 'when --approve flag is passed' do
@@ -196,7 +196,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       it 'creates success build status for latest commit' do
         expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
-          with(body: {state: 'success', context: 'peer_review', description: 'Peer review complete'})
+          with(body: {state: 'success', context: 'peer_review', description: 'Peer review approved'})
       end
     end
   end
