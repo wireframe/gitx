@@ -10,22 +10,27 @@ module Thegarage
       class ReviewCommand < BaseCommand
         include Thegarage::Gitx::Github
 
-        BUMP_COMMENT_TEMPLATE = <<-EOS.dedent
-          [gitx] review bump :tada:
-
-          ### Changelog Summary
+        BUMP_COMMENT_PREFIX = '[gitx] review bump :tada:'
+        BUMP_COMMENT_FOOTER = <<-EOS.dedent
+          # Bump comments should include:
+          # * summary of what changed
+          #
+          # This footer will automatically be stripped from the created comment
         EOS
-        APPROVAL_COMMENT_TEMPLATE = <<-EOS.dedent
-          [gitx] review approved :shipit:
-
-          ### Feedback
-
-          ### Follow-up Items
+        APPROVAL_COMMENT_PREFIX  = '[gitx] review approved :shipit:'
+        APPROVAL_COMMENT_FOOTER = <<-EOS.dedent
+          # Approval comments can include:
+          # * feedback
+          # * post-release follow-up items
+          #
+          # This footer will automatically be stripped from the created comment
         EOS
-        REJECTION_COMMENT_TEMPLATE = <<-EOS.dedent
-          [gitx] review rejected
-
-          ### Feedback
+        REJECTION_COMMENT_PREFIX = '[gitx] review rejected'
+        REJECTION_COMMENT_FOOTER = <<-EOS.dedent
+          # Rejection comments should include:
+          # * feedback for fixes required before approved
+          #
+          # This footer will automatically be stripped from the created comment
         EOS
 
         desc "review", "Create or update a pull request on github"
@@ -65,29 +70,25 @@ module Thegarage
         end
 
         def bump_pull_request(pull_request)
-          comment = get_editor_input(BUMP_COMMENT_TEMPLATE)
-          github_client.add_comment(github_slug, pull_request.number, comment)
-
+          comment = comment_from_template(pull_request, BUMP_COMMENT_PREFIX, BUMP_COMMENT_FOOTER)
           set_review_status('pending', 'Peer review in progress')
         end
 
         def reject_pull_request(pull_request)
-          comment = get_editor_input(REJECTION_COMMENT_TEMPLATE)
-          github_client.add_comment(github_slug, pull_request.number, comment)
-
+          comment = comment_from_template(pull_request, REJECTION_COMMENT_PREFIX, REJECTION_COMMENT_FOOTER)
           set_review_status('failure', 'Peer review rejected')
         end
 
         def approve_pull_request(pull_request)
-          comment = get_editor_input(APPROVAL_COMMENT_TEMPLATE)
-          github_client.add_comment(github_slug, pull_request.number, comment)
-
+          comment = comment_from_template(pull_request, APPROVAL_COMMENT_PREFIX, APPROVAL_COMMENT_FOOTER)
           set_review_status('success', 'Peer review approved')
         end
 
-        def get_editor_input(template)
-          text = ask_editor(template, repo.config['core.editor'])
-          text = text.chomp.strip
+        def comment_from_template(pull_request, prefix, footer)
+          text = ask_editor("\n\n#{footer}", repo.config['core.editor'])
+          comment = [prefix, text].join("\n\n")
+          comment = comment.gsub(footer, '').chomp.strip
+          github_client.add_comment(github_slug, pull_request.number, comment)
         end
 
         def set_review_status(state, description)

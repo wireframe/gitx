@@ -18,7 +18,7 @@ class Thor
     # see http://rdoc.info/github/visionmedia/commander/master/Commander/UI.ask_editor
     def ask_editor(initial_text = '', editor = nil)
       editor ||= ENV['EDITOR'] || 'vi'
-      Tempfile.open('reviewrequest.md') do |f|
+      Tempfile.open('comment.md') do |f|
         f << initial_text
         f.flush
 
