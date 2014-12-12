@@ -85,14 +85,10 @@ module Thegarage
         end
 
         def comment_from_template(pull_request, prefix, footer)
-          comment = [prefix, get_editor_input(footer)].join("\n\n")
-          comment.chomp(footer).strip
+          text = ask_editor("\n\n#{footer}", repo.config['core.editor'])
+          comment = [prefix, text].join("\n\n")
+          comment = comment.gsub(footer, '').chomp.strip
           github_client.add_comment(github_slug, pull_request.number, comment)
-        end
-
-        def get_editor_input(template)
-          text = ask_editor(template, repo.config['core.editor'])
-          text = text.chomp.strip
         end
 
         def set_review_status(state, description)
