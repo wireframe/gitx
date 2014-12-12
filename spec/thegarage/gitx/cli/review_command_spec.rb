@@ -138,7 +138,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       it 'posts comment to github' do
         expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
-          with(body: {body: 'comment description'})
+          with(body: {body: "[gitx] review bump :tada:\n\ncomment description"})
       end
       it 'creates pending build status for latest commit' do
         expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
@@ -165,7 +165,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       it 'posts comment to github' do
         expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
-          with(body: {body: 'comment body'})
+          with(body: {body: "[gitx] review rejected\n\ncomment body"})
       end
       it 'creates failure build status for latest commit' do
         expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
@@ -192,7 +192,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       end
       it 'posts comment to github' do
         expect(WebMock).to have_requested(:post, "https://api.github.com/repos/thegarage/thegarage-gitx/issues/10/comments").
-          with(body: {body: 'comment body'})
+          with(body: {body: "[gitx] review approved :shipit:\n\ncomment body"})
       end
       it 'creates success build status for latest commit' do
         expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/statuses/e12da4').
