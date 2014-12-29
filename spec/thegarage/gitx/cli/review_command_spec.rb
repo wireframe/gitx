@@ -9,7 +9,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
       pretend: true
     }
   end
-  let(:cli) { Thegarage::Gitx::Cli::ReviewCommand.new(args, options, config) }
+  let(:cli) { described_class.new(args, options, config) }
   let(:repo) { double('fake repo', config: repo_config) }
   let(:repo_config) do
     {
@@ -224,6 +224,31 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
 
         expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password)
         expect(cli).to receive(:ask).with('Github two factor authorization token (if enabled): ', {:echo => false}).and_return(nil)
+
+        @auth_token = cli.send(:authorization_token)
+      end
+      it 'stores authorization_token in git config' do
+        expect(repo_config).to include('thegarage.gitx.githubauthtoken' => authorization_token)
+      end
+      it { expect(@auth_token).to eq authorization_token }
+    end
+    context 'when config.authorization_token is nil and first request fails' do
+      let(:repo_config) do
+        {
+          'remote.origin.url' => 'https://github.com/thegarage/thegarage-gitx',
+          'github.user' => 'ryan@codecrate.com'
+        }
+      end
+      let(:github_password) { 'secretz' }
+      let(:authorization_token) { '123981239123' }
+      before do
+        stub_request(:post, "https://ryan@codecrate.com:secretz@api.github.com/authorizations").
+          to_return(:status => 401, :body => JSON.dump(token: authorization_token), :headers => {'Content-Type' => 'application/json'}).
+          then.
+          to_return(:status => 200, :body => JSON.dump(token: authorization_token), :headers => {'Content-Type' => 'application/json'})
+
+        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', {:echo => false}).and_return(github_password).twice
+        expect(cli).to receive(:ask).with('Github two factor authorization token (if enabled): ', {:echo => false}).and_return(nil).twice
 
         @auth_token = cli.send(:authorization_token)
       end

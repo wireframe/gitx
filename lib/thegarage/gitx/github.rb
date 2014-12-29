@@ -98,6 +98,8 @@ module Thegarage
         client = Octokit::Client.new(login: username, password: password)
         response = client.create_authorization(authorization_request_options)
         response.token
+      rescue Octokit::ClientError
+        retry
       end
 
       def authorization_request_options
