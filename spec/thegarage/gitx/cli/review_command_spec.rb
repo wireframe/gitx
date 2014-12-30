@@ -209,7 +209,7 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         end.to raise_error(/Github user not configured/)
       end
     end
-    context 'when config.authorization_token is nil' do
+    context 'when global config token is nil' do
       let(:repo_config) do
         {
           'remote.origin.url' => 'https://github.com/thegarage/thegarage-gitx',
@@ -227,12 +227,12 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
 
         @auth_token = cli.send(:authorization_token)
       end
-      it 'stores authorization_token in git config' do
-        expect(repo_config).to include('thegarage.gitx.githubauthtoken' => authorization_token)
+      it 'stores authorization_token in global config' do
+        expect(global_config).to include('token' => authorization_token)
       end
       it { expect(@auth_token).to eq authorization_token }
     end
-    context 'when config.authorization_token is nil and first request fails' do
+    context 'when global authorization_token is nil and first request fails' do
       let(:repo_config) do
         {
           'remote.origin.url' => 'https://github.com/thegarage/thegarage-gitx',
@@ -252,21 +252,28 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
 
         @auth_token = cli.send(:authorization_token)
       end
-      it 'stores authorization_token in git config' do
-        expect(repo_config).to include('thegarage.gitx.githubauthtoken' => authorization_token)
+      it 'stores authorization_token in global config' do
+        expect(global_config).to include('token' => authorization_token)
       end
       it { expect(@auth_token).to eq authorization_token }
     end
-    context 'when there is an existing authorization_token' do
+    context 'when the global config has an existing token' do
       let(:authorization_token) { '123981239123' }
       let(:repo_config) do
         {
           'remote.origin.url' => 'https://github.com/thegarage/thegarage-gitx',
-          'github.user' => 'ryan@codecrate.com',
-          'thegarage.gitx.githubauthtoken' => authorization_token
+          'github.user' => 'ryan@codecrate.com'
+        }
+      end
+      let(:config) do
+        {
+          'token' => authorization_token
         }
       end
       before do
+        File.open(global_config_file, 'w') do |file|
+          file.write(config.to_yaml)
+        end
         @auth_token = cli.send(:authorization_token)
       end
       it { expect(@auth_token).to eq authorization_token }
@@ -291,8 +298,8 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
 
         @auth_token = cli.send(:authorization_token)
       end
-      it 'stores authorization_token in git config' do
-        expect(repo_config).to include('thegarage.gitx.githubauthtoken' => authorization_token)
+      it 'stores authorization_token in global config' do
+        expect(global_config).to include('token' => authorization_token)
       end
       it { expect(@auth_token).to eq authorization_token }
     end

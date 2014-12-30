@@ -23,3 +23,6 @@ pkg
 
 ## bundler
 Gemfile.lock
+
+## RSpec temp files
+spec/tmp
