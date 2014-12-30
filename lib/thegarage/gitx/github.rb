@@ -98,6 +98,9 @@ module Thegarage
         client = Octokit::Client.new(login: username, password: password)
         response = client.create_authorization(authorization_request_options)
         response.token
+      rescue Octokit::ClientError => e
+        say "Error creating authorization: #{e.message}", :red
+        retry
       end
 
       def authorization_request_options
