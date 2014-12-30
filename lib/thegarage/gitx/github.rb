@@ -147,9 +147,10 @@ module Thegarage
       end
 
       def global_config_file
-        config_dir = File.dirname(File.expand_path(GLOBAL_CONFIG_FILE))
+        config_file = File.expand_path(GLOBAL_CONFIG_FILE)
+        config_dir = File.dirname(config_file)
         ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exists?(config_dir)
-        File.expand_path(GLOBAL_CONFIG_FILE)
+        config_file
       end
 
       def global_config
