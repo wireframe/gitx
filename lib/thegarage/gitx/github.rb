@@ -82,42 +82,41 @@ module Thegarage
         body.gsub(PULL_REQUEST_FOOTER, '').chomp.strip
       end
 
-      # token is cached in local git config for future use
+      # authorization token used for github API calls
+      # the token is cached on the filesystem for future use
       # @return [String] auth token stored in git (current repo, user config or installed global settings)
       # @see http://developer.github.com/v3/oauth/#scopes
       # @see http://developer.github.com/v3/#user-agent-required
       def authorization_token
         auth_token = global_config['token']
-        return auth_token unless auth_token.to_s.blank?
-
-        auth_token = create_authorization
-        save_global_config('token' => auth_token)
+        auth_token ||= begin
+          new_token = create_authorization
+          save_global_config('token' => new_token)
+          new_token
+        end
         auth_token
       end
 
       def create_authorization
-        password = ask("Github password for #{username}: ", :echo => false)
-        say ''
+        password = ask_without_echo("Github password for #{username}: ")
         client = Octokit::Client.new(login: username, password: password)
-        response = client.create_authorization(authorization_request_options)
+        options = {
+          :scopes => ['repo'],
+          :note => github_client_name,
+          :note_url => CLIENT_URL
+        }
+        two_factor_auth_token = ask_without_echo("Github two factor authorization token (if enabled): ")
+        options[:headers] = {'X-GitHub-OTP' => two_factor_auth_token} if two_factor_auth_token
+        response = client.create_authorization(options)
         response.token
       rescue Octokit::ClientError => e
         say "Error creating authorization: #{e.message}", :red
         retry
       end
 
-      def authorization_request_options
+      def github_client_name
         timestamp = Time.now.utc.strftime('%FT%R:%S%z')
         client_name = "The Garage Git eXtensions #{timestamp}"
-        options = {
-          :scopes => ['repo'],
-          :note => client_name,
-          :note_url => CLIENT_URL
-        }
-        two_factor_auth_token = ask("Github two factor authorization token (if enabled): ", :echo => false)
-        say ''
-        options[:headers] = {'X-GitHub-OTP' => two_factor_auth_token} if two_factor_auth_token
-        options
       end
 
       def github_client
@@ -159,12 +158,19 @@ module Thegarage
       def save_global_config(options)
         config_dir = File.dirname(global_config_file)
         ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exists?(config_dir)
+
+        @config = global_config.merge(options)
         File.open(global_config_file, "a+") do |file|
-          existing_content = YAML.load(file.read) || {}
           file.truncate(0)
-          file.write(existing_content.merge(options).to_yaml)
+          file.write(@config.to_yaml)
         end
         File.chmod(0600, global_config_file)
+      end
+
+      def ask_without_echo(message)
+        value = ask(message, echo: false)
+        say ''
+        value
       end
     end
   end
