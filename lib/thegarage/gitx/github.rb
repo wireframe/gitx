@@ -1,8 +1,11 @@
 require 'octokit'
+require 'fileutils'
+require 'yaml'
 
 module Thegarage
   module Gitx
     module Github
+      GLOBAL_CONFIG_FILE = '~/.config/gitx/github.yml'
       REVIEW_CONTEXT = 'peer_review'
       CLIENT_URL = 'https://github.com/thegarage/thegarage-gitx'
       PULL_REQUEST_FOOTER = <<-EOS.dedent
@@ -84,11 +87,11 @@ module Thegarage
       # @see http://developer.github.com/v3/oauth/#scopes
       # @see http://developer.github.com/v3/#user-agent-required
       def authorization_token
-        auth_token = repo.config['thegarage.gitx.githubauthtoken']
+        auth_token = global_config['token']
         return auth_token unless auth_token.to_s.blank?
 
         auth_token = create_authorization
-        repo.config['thegarage.gitx.githubauthtoken'] = auth_token
+        save_global_config('token' => auth_token)
         auth_token
       end
 
@@ -141,6 +144,27 @@ module Thegarage
 
       def github_organization
         github_slug.split('/').first
+      end
+
+      def global_config_file
+        config_dir = File.dirname(File.expand_path(GLOBAL_CONFIG_FILE))
+        ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exists?(config_dir)
+        File.expand_path(GLOBAL_CONFIG_FILE)
+      end
+
+      def global_config
+        @config ||= begin
+          File.exists?(global_config_file) ? YAML.load_file(global_config_file) : {}
+        end
+      end
+
+      def save_global_config(options)
+        File.open(global_config_file, "a+") do |file|
+          existing_content = YAML.load(file.read) || {}
+          file.truncate(0)
+          file.write(existing_content.merge(options).to_yaml)
+        end
+        File.chmod(0600, global_config_file)
       end
     end
   end
