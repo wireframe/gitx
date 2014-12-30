@@ -147,10 +147,7 @@ module Thegarage
       end
 
       def global_config_file
-        config_file = File.expand_path(GLOBAL_CONFIG_FILE)
-        config_dir = File.dirname(config_file)
-        ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exists?(config_dir)
-        config_file
+        File.expand_path(GLOBAL_CONFIG_FILE)
       end
 
       def global_config
@@ -160,6 +157,8 @@ module Thegarage
       end
 
       def save_global_config(options)
+        config_dir = File.dirname(global_config_file)
+        ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exists?(config_dir)
         File.open(global_config_file, "a+") do |file|
           existing_content = YAML.load(file.read) || {}
           file.truncate(0)
