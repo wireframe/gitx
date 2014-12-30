@@ -107,8 +107,8 @@ module Thegarage
       end
 
       def authorization_request_options
-        timestamp = Time.now.utc.strftime('%Y-%m-%dT%H:%M:%S%z')
-        client_name = "The Garage Git eXtensions - #{github_slug} #{timestamp}"
+        timestamp = Time.now.utc.strftime('%FT%R:%S%z')
+        client_name = "The Garage Git eXtensions #{timestamp}"
         options = {
           :scopes => ['repo'],
           :note => client_name,
