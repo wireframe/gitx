@@ -36,7 +36,7 @@ module Thegarage
             branch
           end
           branches.uniq!
-          branches -= config[:reserved_branches]
+          branches -= config.reserved_branches
           branches.reject! { |b| aggregate_branch?(b) }
 
           branches
