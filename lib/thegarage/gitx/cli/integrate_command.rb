@@ -59,10 +59,6 @@ module Thegarage
           end
         end
 
-        def assert_aggregate_branch!(target_branch)
-          fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{config.aggregate_branches}" unless aggregate_branch?(target_branch)
-        end
-
         # nuke local branch and pull fresh version from remote repo
         def fetch_remote_branch(target_branch)
           create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
