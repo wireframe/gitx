@@ -26,7 +26,7 @@ module Thegarage
           integrate_branch(branch, integration_branch) unless options[:resume]
           checkout_branch branch
 
-          create_integrate_comment(branch) unless RESERVED_BRANCHES.include?(branch)
+          create_integrate_comment(branch) unless config.reserved_branch?(branch)
         end
 
         private
@@ -57,10 +57,6 @@ module Thegarage
             end
             feature_branch
           end
-        end
-
-        def assert_aggregate_branch!(target_branch)
-          fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{AGGREGATE_BRANCHES}" unless aggregate_branch?(target_branch)
         end
 
         # nuke local branch and pull fresh version from remote repo

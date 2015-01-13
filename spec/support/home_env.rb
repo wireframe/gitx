@@ -3,7 +3,7 @@
 RSpec.configure do |config|
   config.before do
     @old_home = ENV['HOME']
-    ENV['HOME'] = File.join(__dir__, '../tmp')
+    ENV['HOME'] = temp_dir
   end
   config.after do
     ENV['HOME'] = @old_home

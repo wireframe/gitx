@@ -11,8 +11,6 @@ module Thegarage
 
         class MergeError < Thor::Error; end
 
-        AGGREGATE_BRANCHES = %w( staging prototype )
-        RESERVED_BRANCHES = %w( HEAD master next_release ) + AGGREGATE_BRANCHES
         add_runtime_options!
 
         method_option :trace, :type => :boolean, :aliases => '-v'
@@ -38,17 +36,21 @@ module Thegarage
           repo.branches.find(&:head?)
         end
 
-        def aggregate_branch?(branch)
-          AGGREGATE_BRANCHES.include?(branch)
+        def assert_aggregate_branch!(target_branch)
+          fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{config.aggregate_branches}" unless config.aggregate_branch?(target_branch)
         end
 
         def assert_not_protected_branch!(branch, action)
-          raise "Cannot #{action} reserved branch" if RESERVED_BRANCHES.include?(branch) || aggregate_branch?(branch)
+          raise "Cannot #{action} reserved branch" if config.reserved_branch?(branch) || config.aggregate_branch?(branch)
         end
 
         # helper to invoke other CLI commands
         def execute_command(command_class, method, args = [])
           command_class.new.send(method, *args)
+        end
+
+        def config
+          @configuration ||= Thegarage::Gitx::Configuration.new(repo.workdir)
         end
       end
     end

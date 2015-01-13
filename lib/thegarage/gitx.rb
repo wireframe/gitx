@@ -1,4 +1,5 @@
 require 'thegarage/gitx/version'
+require 'thegarage/gitx/configuration'
 require 'thegarage/gitx/extensions/string'
 require 'thegarage/gitx/extensions/thor'
 
