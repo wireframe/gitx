@@ -26,7 +26,7 @@ update the local feature branch with latest remote changes plus upstream release
 
 integrate the current feature branch into an aggregate branch (ex: prototype, staging)
 
-## git review
+## git review <feature_branch_name (optional, default: current_branch)>
 
 create a pull request on github for peer review of the current branch.  This command is re-runnable
 in order to re-assign pull requests.
