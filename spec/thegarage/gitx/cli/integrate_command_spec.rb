@@ -98,7 +98,7 @@ describe Thegarage::Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with("git merge feature-branch").ordered
         expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
         expect(cli).to receive(:run_cmd).with("git checkout feature-branch").ordered
-
+        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
 
         stub_request(:post, 'https://api.github.com/repos/thegarage/thegarage-gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})

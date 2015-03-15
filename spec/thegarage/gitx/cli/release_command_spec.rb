@@ -96,6 +96,7 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:yes?).with('Release feature-branch to production? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: pending.  Proceed with release? (y/n)', :red).and_return(true)
 
+        expect(cli).to receive(:run_cmd).with("git checkout feature-branch").ordered
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
         expect(cli).to receive(:run_cmd).with("git checkout master").ordered
         expect(cli).to receive(:run_cmd).with("git pull origin master").ordered
@@ -138,9 +139,6 @@ describe Thegarage::Gitx::Cli::ReleaseCommand do
         end
       end
       it 'runs expected commands' do
-        should meet_expectations
-      end
-      it 'prunes merged branches (git cleanup)' do
         should meet_expectations
       end
     end

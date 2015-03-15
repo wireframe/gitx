@@ -1,7 +1,6 @@
 require 'thor'
 require 'thegarage/gitx'
 require 'thegarage/gitx/cli/base_command'
-require 'thegarage/gitx/cli/update_command'
 require 'thegarage/gitx/github'
 
 module Thegarage
@@ -41,10 +40,10 @@ module Thegarage
         method_option :approve, :type => :boolean, :desc => 'approve the pull request an post comment on pull request'
         method_option :reject, :type => :boolean, :desc => 'reject the pull request an post comment on pull request'
         # @see http://developer.github.com/v3/pulls/
-        def review
+        def review(branch = nil)
           fail 'Github authorization token not found' unless authorization_token
 
-          branch = current_branch.name
+          branch ||= current_branch.name
           pull_request = find_or_create_pull_request(branch)
           bump_pull_request(pull_request) if options[:bump]
           approve_pull_request(pull_request) if options[:approve]

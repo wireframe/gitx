@@ -1,6 +1,7 @@
 require 'octokit'
 require 'fileutils'
 require 'yaml'
+require 'thegarage/gitx/cli/update_command'
 
 module Thegarage
   module Gitx
@@ -20,6 +21,7 @@ module Thegarage
       def find_or_create_pull_request(branch)
         pull_request = find_pull_request(branch)
         pull_request ||= begin
+          checkout_branch(branch)
           execute_command(Thegarage::Gitx::Cli::UpdateCommand, :update)
           pull_request = create_pull_request(branch)
           say 'Created pull request: '
