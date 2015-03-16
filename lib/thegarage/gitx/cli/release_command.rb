@@ -14,11 +14,12 @@ module Thegarage
 
         desc 'release', 'release the current branch to production'
         method_option :cleanup, :type => :boolean, :desc => 'cleanup merged branches after release'
-        def release
+        def release(branch = nil)
           return unless yes?("Release #{current_branch.name} to production? (y/n)", :green)
 
-          branch = current_branch.name
+          branch ||= current_branch.name
           assert_not_protected_branch!(branch, 'release')
+          checkout_branch(branch)
           execute_command(UpdateCommand, :update)
 
           find_or_create_pull_request(branch)

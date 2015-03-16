@@ -26,7 +26,7 @@ update the local feature branch with latest remote changes plus upstream release
 
 integrate the current feature branch into an aggregate branch (ex: prototype, staging)
 
-## git review
+## git review <feature_branch_name (optional, default: current_branch)>
 
 create a pull request on github for peer review of the current branch.  This command is re-runnable
 in order to re-assign pull requests.
@@ -41,13 +41,14 @@ options:
 NOTE: the `--bump` option will also update the pull request commit status to mark the branch as 'pending peer review'.
 This setting is cleared when a reviewer approves or rejects the pull request.
 
-## git release
+## git release <feature_branch_name (optional, default: current_branch)
 
-release the current feature branch to master.  This operation will perform the following:
+release the feature branch to master.  This operation will perform the following:
 
-* pull in latest code from remote branch
-* merge in latest code from master branch
+* pull latest code from remote feature branch
+* pull latest code from master branch
 * prompt user to confirm they actually want to perform the release
+* check if pull request commit status is currently successful
 * merge current branch into master
 * (optional) cleanup merged branches from remote server
 
