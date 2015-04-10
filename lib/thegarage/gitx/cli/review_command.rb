@@ -70,17 +70,17 @@ module Thegarage
 
         def bump_pull_request(pull_request)
           comment = comment_from_template(pull_request, BUMP_COMMENT_PREFIX, BUMP_COMMENT_FOOTER)
-          set_review_status('pending', 'Peer review in progress')
+          update_review_status(pull_request, 'pending', 'Peer review in progress')
         end
 
         def reject_pull_request(pull_request)
           comment = comment_from_template(pull_request, REJECTION_COMMENT_PREFIX, REJECTION_COMMENT_FOOTER)
-          set_review_status('failure', 'Peer review rejected')
+          update_review_status(pull_request, 'failure', 'Peer review rejected')
         end
 
         def approve_pull_request(pull_request)
           comment = comment_from_template(pull_request, APPROVAL_COMMENT_PREFIX, APPROVAL_COMMENT_FOOTER)
-          set_review_status('success', 'Peer review approved')
+          update_review_status(pull_request, 'success', 'Peer review approved')
         end
 
         def comment_from_template(pull_request, prefix, footer)
@@ -88,11 +88,6 @@ module Thegarage
           comment = [prefix, text].join("\n\n")
           comment = comment.gsub(footer, '').chomp.strip
           github_client.add_comment(github_slug, pull_request.number, comment)
-        end
-
-        def set_review_status(state, description)
-          latest_commit = repo.head.target_id
-          update_review_status(latest_commit, state, description)
         end
       end
     end
