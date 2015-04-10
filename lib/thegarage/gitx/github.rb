@@ -52,7 +52,8 @@ module Thegarage
       end
 
       # Update build status with peer review status
-      def update_review_status(commit_sha, state, description)
+      def update_review_status(pull_request, state, description)
+        commit_sha = pull_request.head.sha
         github_client.create_status(github_slug, commit_sha, state, context: REVIEW_CONTEXT, description: description)
       end
 
