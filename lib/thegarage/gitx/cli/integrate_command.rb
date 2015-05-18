@@ -11,6 +11,7 @@ module Thegarage
         include Thegarage::Gitx::Github
         desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
         method_option :resume, :type => :string, :aliases => '-r', :desc => 'resume merging of feature-branch'
+        method_option :comment, :type => :boolean, :aliases => '-c', :desc => 'add a comment to the pull request for this branch. Creates a new PR if none exists.'
         def integrate(integration_branch = 'staging')
           assert_aggregate_branch!(integration_branch)
 
@@ -26,7 +27,7 @@ module Thegarage
           integrate_branch(branch, integration_branch) unless options[:resume]
           checkout_branch branch
 
-          create_integrate_comment(branch) unless config.reserved_branch?(branch)
+          create_integrate_comment(branch) if options[:comment] && !config.reserved_branch?(branch)
         end
 
         private
