@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Thegarage::Gitx::VERSION
   spec.authors       = ["Ryan Sonnek"]
   spec.email         = ["ryan.sonnek@gmail.com"]
-  spec.description   = %q{Git eXtensions for common development workflow}
+  spec.description   = %q{Git eXtensions for improved development workflow}
   spec.summary       = %q{Utility scripts for Git to increase productivity for common operations}
   spec.homepage      = ""
   spec.license       = "MIT"
