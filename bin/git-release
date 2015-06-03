@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/release_command'
+require 'gitx/cli/release_command'
 args = ARGV.dup.unshift('release')
-Thegarage::Gitx::Cli::ReleaseCommand.start(args)
+Gitx::Cli::ReleaseCommand.start(args)

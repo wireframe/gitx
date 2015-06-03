@@ -1,16 +1,12 @@
-# thegarage-gitx
+[![Build Status](https://travis-ci.org/wireframe/gitx.png?branch=master)](https://travis-ci.org/wireframe/gitx)
+[![Code Coverage](https://coveralls.io/repos/wireframe/gitx/badge.png)](https://coveralls.io/r/wireframe/gitx)
+[![Code Climate](https://codeclimate.com/github/wireframe/gitx.png)](https://codeclimate.com/github/wireframe/gitx)
 
-[![Build Status](https://travis-ci.org/thegarage/thegarage-gitx.png?branch=master)](https://travis-ci.org/thegarage/thegarage-gitx)
-[![Code Coverage](https://coveralls.io/repos/thegarage/thegarage-gitx/badge.png)](https://coveralls.io/r/thegarage/thegarage-gitx)
-[![Code Climate](https://codeclimate.com/github/thegarage/thegarage-gitx.png)](https://codeclimate.com/github/thegarage/thegarage-gitx)
+# GitX
 
-Useful Git eXtensions for Development workflow at The Garage.
+> Useful Git eXtensions for improved development workflows
 
-Inspired by the [socialcast-git-extensions gem](https://github.com/socialcast/socialcast-git-extensions)
-
-# Git Extensions for Workflow
-
-### Options
+### Global Options
 * `--trace` or `-v` = verbose output for debugging commands
 * `--pretend` or `-p` = dry run commands and do not actually invoke operations
 
@@ -70,7 +66,8 @@ reset an aggregate branch (ex: prototype, staging) back to a known good state.
 create a build tag for the current Travis-CI build and push it back to origin
 
 
-## Note on Patches/Pull Requests
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 * Fork the project.
 * Make your feature addition or bug fix.
@@ -80,6 +77,11 @@ create a build tag for the current Travis-CI build and push it back to origin
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
-## Copyright
+## Related Projects
+* [socialcast-git-extensions](https://github.com/socialcast/socialcast-git-extensions)
+* [thegarage-gitx](https://github.com/thegarage/thegarage-gitx)
 
-Copyright (c) 2013 The Garage, Inc. See LICENSE for details.
+
+## Copyright
+See [LICENSE.txt](LICENSE.txt)
+

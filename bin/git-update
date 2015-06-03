@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/update_command'
+require 'gitx/cli/update_command'
 args = ARGV.dup.unshift('update')
-Thegarage::Gitx::Cli::UpdateCommand.start(args)
+Gitx::Cli::UpdateCommand.start(args)

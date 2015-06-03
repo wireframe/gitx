@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.github.com/repos/thegarage/thegarage-gitx/pulls?head=thegarage:feature-branch&state=open
+    uri: https://api.github.com/repos/wireframe/gitx/pulls?head=wireframe:feature-branch&state=open
     body:
       encoding: US-ASCII
       string: ''
@@ -48,7 +48,7 @@ http_interactions:
       X-Github-Media-Type:
       - github.v3; format=json
       Link:
-      - <https://api.github.com/repositories/17608725/pulls?head=thegarage%3Afeature-branch&state=open&page=0>;
+      - <https://api.github.com/repositories/17608725/pulls?head=wireframe%3Afeature-branch&state=open&page=0>;
         rel="last"
       X-Xss-Protection:
       - 1; mode=block
@@ -80,7 +80,7 @@ http_interactions:
   recorded_at: Tue, 05 Aug 2014 16:36:03 GMT
 - request:
     method: get
-    uri: https://api.github.com/repos/thegarage/thegarage-gitx/commits/feature-branch/status
+    uri: https://api.github.com/repos/wireframe/gitx/commits/feature-branch/status
     body:
       encoding: US-ASCII
       string: ''

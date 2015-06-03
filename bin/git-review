@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/review_command'
+require 'gitx/cli/review_command'
 args = ARGV.dup.unshift('review')
-Thegarage::Gitx::Cli::ReviewCommand.start(args)
+Gitx::Cli::ReviewCommand.start(args)
