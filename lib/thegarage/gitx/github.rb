@@ -91,7 +91,7 @@ module Thegarage
       # @see http://developer.github.com/v3/oauth/#scopes
       # @see http://developer.github.com/v3/#user-agent-required
       def authorization_token
-        auth_token = global_config['token']
+        auth_token = ENV['GITX_GITHUB_TOKEN'] || global_config['token']
         auth_token ||= begin
           new_token = create_authorization
           save_global_config('token' => new_token)

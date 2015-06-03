@@ -245,6 +245,19 @@ describe Thegarage::Gitx::Cli::ReviewCommand do
         end.to raise_error(/Github user not configured/)
       end
     end
+    context 'when ENV[GITX_GITHUB_TOKEN] is set' do
+      let(:auth_token) { '123123' }
+      before do
+        ENV['GITX_GITHUB_TOKEN'] = auth_token
+        expect(cli).to_not receive(:ask)
+        @auth_token = cli.send(:authorization_token)
+      end
+      after do
+        ENV.delete('GITX_GITHUB_TOKEN')
+      end
+      it { expect(@auth_token).to eq auth_token }
+      it { is_expected.to meet_expectations }
+    end
     context 'when global config token is nil' do
       let(:repo_config) do
         {
