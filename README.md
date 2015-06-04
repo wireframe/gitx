@@ -4,7 +4,7 @@
 
 # GitX
 
-> Useful Git eXtensions for improved development workflows
+> Git eXtensions for improved development workflows
 
 ### Global Options
 * `--trace` or `-v` = verbose output for debugging commands
