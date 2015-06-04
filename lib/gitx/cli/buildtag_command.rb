@@ -5,7 +5,6 @@ require 'gitx/cli/base_command'
 module Gitx
   module Cli
     class BuildtagCommand < BaseCommand
-
       desc 'buildtag', 'create a tag for the current build and push it back to origin (supports Travis CI and Codeship)'
       def buildtag
         fail 'Unknown branch. Environment variables TRAVIS_BRANCH or CI_BRANCH are required' unless branch_name

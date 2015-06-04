@@ -21,9 +21,9 @@ describe Gitx::Cli::BaseCommand do
   describe 'with custom .gitx.yml config file' do
     let(:config) do
       {
-  'aggregate_branches' => %w( foo bar ),
-  'reserved_branches' => %w( baz qux ),
-  'taggable_branches' => %w( quux corge )
+        'aggregate_branches' => %w( foo bar ),
+        'reserved_branches' => %w( baz qux ),
+        'taggable_branches' => %w( quux corge )
       }
     end
     before do

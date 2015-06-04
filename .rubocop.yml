@@ -1,0 +1,12 @@
+LineLength:
+  Max: 200
+
+Documentation:
+  Enabled: false
+
+StringLiterals:
+  EnforcedStyle: single_quotes
+
+FileName:
+  Exclude:
+    - bin/*

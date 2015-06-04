@@ -103,12 +103,12 @@ module Gitx
       password = ask_without_echo("Github password for #{username}: ")
       client = Octokit::Client.new(login: username, password: password)
       options = {
-        :scopes => ['repo'],
-        :note => github_client_name,
-        :note_url => CLIENT_URL
+        scopes: ['repo'],
+        note: github_client_name,
+        note_url: CLIENT_URL
       }
       two_factor_auth_token = ask_without_echo('Github two factor authorization token (if enabled): ')
-      options[:headers] = {'X-GitHub-OTP' => two_factor_auth_token} if two_factor_auth_token
+      options[:headers] = { 'X-GitHub-OTP' => two_factor_auth_token } if two_factor_auth_token
       response = client.create_authorization(options)
       response.token
     rescue Octokit::ClientError => e
@@ -122,7 +122,7 @@ module Gitx
     end
 
     def github_client
-      @client ||= Octokit::Client.new(:access_token => authorization_token)
+      @client ||= Octokit::Client.new(access_token: authorization_token)
     end
 
     # @return [String] github username (ex: 'wireframe') of the current github.user
@@ -140,7 +140,7 @@ module Gitx
     #   https://github.com/wireframe/gitx.git #=> wireframe/gitx
     def github_slug
       remote = repo.config['remote.origin.url']
-      remote.to_s.gsub(/\.git$/,'').split(/[:\/]/).last(2).join('/')
+      remote.to_s.gsub(/\.git$/, '').split(/[:\/]/).last(2).join('/')
     end
 
     def github_organization
@@ -153,13 +153,13 @@ module Gitx
 
     def global_config
       @config ||= begin
-        File.exists?(global_config_file) ? YAML.load_file(global_config_file) : {}
+        File.exist?(global_config_file) ? YAML.load_file(global_config_file) : {}
       end
     end
 
     def save_global_config(options)
       config_dir = File.dirname(global_config_file)
-      ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exists?(config_dir)
+      ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exist?(config_dir)
 
       @config = global_config.merge(options)
       File.open(global_config_file, 'a+') do |file|

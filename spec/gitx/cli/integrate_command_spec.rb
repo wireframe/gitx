@@ -38,7 +38,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
@@ -91,7 +91,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
@@ -115,7 +115,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate 'prototype'
@@ -174,7 +174,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).not_to receive(:run_cmd).with('git push origin HEAD')
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch')
 
-        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
@@ -201,7 +201,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).not_to receive(:run_cmd).with('git push origin HEAD')
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
@@ -227,7 +227,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(:status => 201)
+        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
@@ -237,8 +237,8 @@ describe Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
       it 'posts comment to pull request' do
-        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').
-          with(body: {body: '[gitx] integrated into staging :twisted_rightwards_arrows:'})
+        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
+          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
       end
     end
     context 'with --comment flag when a pull request doesn\'t exist for the feature-branch' do
@@ -271,8 +271,8 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return('2013-01-01 did some stuff').ordered
 
-        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
-        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').to_return(:status => 201)
+        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_not_exist') do
           cli.integrate
@@ -282,8 +282,8 @@ describe Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
       it 'creates github comment for integration' do
-        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').
-          with(body: {body: '[gitx] integrated into staging :twisted_rightwards_arrows:'})
+        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
+          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
       end
     end
   end

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'gitx/cli/integrate_command'
 args = ARGV.dup.unshift('integrate')
 Gitx::Cli::IntegrateCommand.start(args)
