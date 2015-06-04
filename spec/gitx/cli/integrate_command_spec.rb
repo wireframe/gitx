@@ -47,8 +47,9 @@ describe Gitx::Cli::IntegrateCommand do
       it 'defaults to staging branch' do
         should meet_expectations
       end
-      it 'does not post comment to pull request' do
-        expect(WebMock).to_not have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
+      it 'posts comment to pull request' do
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/wireframe/gitx/issues/10/comments")
+          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
       end
     end
     context 'when current_branch == master' do
@@ -71,6 +72,54 @@ describe Gitx::Cli::IntegrateCommand do
       end
       it 'does not create pull request' do
         expect(WebMock).to_not have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
+      end
+      it 'does not post comment on pull request' do
+        expect(WebMock).to_not have_requested(:post, "https://api.github.com/repos/wireframe/gitx/issues/10/comments")
+      end
+    end
+    context 'when a pull request doesnt exist for the feature-branch' do
+      let(:authorization_token) { '123123' }
+      let(:changelog) { '* made some fixes' }
+      let(:new_pull_request) do
+        {
+          html_url: "https://path/to/html/pull/request",
+          issue_url: "https://api/path/to/issue/url",
+          number: 10,
+          head: {
+            ref: "branch_name"
+          }
+        }
+      end
+      before do
+        allow(cli).to receive(:ask_editor).and_return('description')
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update).twice
+
+        expect(cli).to receive(:run_cmd).with("git fetch origin").ordered
+        expect(cli).to receive(:run_cmd).with("git branch -D staging", allow_failure: true).ordered
+        expect(cli).to receive(:run_cmd).with("git checkout staging").ordered
+        expect(cli).to receive(:run_cmd).with("git merge feature-branch").ordered
+        expect(cli).to receive(:run_cmd).with("git push origin HEAD").ordered
+        expect(cli).to receive(:run_cmd).with("git checkout feature-branch").ordered
+        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return("2013-01-01 did some stuff").ordered
+
+        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
+        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').to_return(:status => 201)
+
+        VCR.use_cassette('pull_request_does_not_exist') do
+          cli.integrate
+        end
+      end
+      it 'creates github pull request' do
+        should meet_expectations
+      end
+      it 'creates github comment for integration' do
+        expect(WebMock).to have_requested(:post, "https://api.github.com/repos/wireframe/gitx/issues/10/comments")
+          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
+      end
+      it 'runs expected commands' do
+        should meet_expectations
       end
     end
     context 'when staging branch does not exist remotely' do
@@ -135,7 +184,7 @@ describe Gitx::Cli::IntegrateCommand do
       before do
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update).and_raise(Gitx::Cli::BaseCommand::MergeError)
 
-        expect { cli.integrate }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge Conflict Occurred. Please Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command')
+        expect { cli.integrate }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge conflict occurred.  Please fix merge conflict and rerun the integrate command')
       end
       it 'raises a helpful error' do
         should meet_expectations
@@ -151,7 +200,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
         expect(cli).to receive(:run_cmd).with('git merge feature-branch').and_raise('git merge feature-branch failed').ordered
 
-        expect { cli.integrate }.to raise_error(/Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume feature-branch flag/)
+        expect { cli.integrate }.to raise_error(/Merge conflict occurred.  Please fix merge conflict and rerun command with --resume feature-branch flag/)
       end
       it 'raises a helpful error' do
         should meet_expectations
@@ -208,82 +257,6 @@ describe Gitx::Cli::IntegrateCommand do
       end
       it 'asks user for feature-branch name' do
         should meet_expectations
-      end
-    end
-    context 'for default integration (to staging) with --comment flag' do
-      let(:options) do
-        { comment: true }
-      end
-      let(:authorization_token) { '123123' }
-      let(:remote_branch_names) { ['origin/staging'] }
-      before do
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
-
-        expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
-        expect(cli).to receive(:run_cmd).with('git branch -D staging', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
-        expect(cli).to receive(:run_cmd).with('git merge feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-
-        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
-
-        VCR.use_cassette('pull_request_does_exist_with_success_status') do
-          cli.integrate
-        end
-      end
-      it 'defaults to staging branch' do
-        should meet_expectations
-      end
-      it 'posts comment to pull request' do
-        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
-          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
-      end
-    end
-    context 'with --comment flag when a pull request doesn\'t exist for the feature-branch' do
-      let(:options) do
-        { comment: true }
-      end
-      let(:authorization_token) { '123123' }
-      let(:changelog) { '* made some fixes' }
-      let(:new_pull_request) do
-        {
-          html_url: 'https://path/to/html/pull/request',
-          issue_url: 'https://api/path/to/issue/url',
-          number: 10,
-          head: {
-            ref: 'branch_name'
-          }
-        }
-      end
-      before do
-        allow(cli).to receive(:ask_editor).and_return('description')
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update).twice
-
-        expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
-        expect(cli).to receive(:run_cmd).with('git branch -D staging', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
-        expect(cli).to receive(:run_cmd).with('git merge feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return('2013-01-01 did some stuff').ordered
-
-        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
-        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').to_return(status: 201)
-
-        VCR.use_cassette('pull_request_does_not_exist') do
-          cli.integrate
-        end
-      end
-      it 'creates github pull request' do
-        should meet_expectations
-      end
-      it 'creates github comment for integration' do
-        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
-          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
       end
     end
   end
