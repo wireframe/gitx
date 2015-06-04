@@ -20,11 +20,9 @@ module Gitx
       private
 
       def update_branch(branch)
-        begin
-          run_cmd "git pull origin #{branch}"
-        rescue
-          fail MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the update command'
-        end
+        run_cmd "git pull origin #{branch}"
+      rescue
+        raise MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the update command'
       end
 
       def remote_branch_exists?(branch)

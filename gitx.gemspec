@@ -8,12 +8,12 @@ Gem::Specification.new do |spec|
   spec.version       = Gitx::VERSION
   spec.authors       = ['Ryan Sonnek']
   spec.email         = ['ryan.sonnek@gmail.com']
-  spec.description   = %q{Git eXtensions for improved development workflow}
-  spec.summary       = %q{Utility scripts for Git to increase productivity for common operations}
+  spec.description   = 'Git eXtensions for improved development workflow'
+  spec.summary       = 'Utility scripts for Git to increase productivity for common operations'
   spec.homepage      = ''
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files`.split($/)
+  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'terminal-notifier'
   spec.add_development_dependency 'terminal-notifier-guard'
+  spec.add_development_dependency 'rubocop'
 end

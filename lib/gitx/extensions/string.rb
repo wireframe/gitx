@@ -4,9 +4,9 @@ class String
     indent = scan(/^[ \t]*(?=\S)/).min.size || 0
     gsub(/^[ \t]{#{indent}}/, '')
   end
-  alias :dedent :undent
+  alias_method :dedent, :undent
 
   def blank?
-    self.to_s == ''
+    to_s == ''
   end
 end

@@ -12,7 +12,7 @@ module Gitx
 
       add_runtime_options!
 
-      method_option :trace, :type => :boolean, :aliases => '-v'
+      method_option :trace, type: :boolean, aliases: '-v'
       def initialize(*args)
         super(*args)
       end
@@ -40,7 +40,7 @@ module Gitx
       end
 
       def assert_not_protected_branch!(branch, action)
-        raise "Cannot #{action} reserved branch" if config.reserved_branch?(branch) || config.aggregate_branch?(branch)
+        fail "Cannot #{action} reserved branch" if config.reserved_branch?(branch) || config.aggregate_branch?(branch)
       end
 
       # helper to invoke other CLI commands

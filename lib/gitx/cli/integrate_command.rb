@@ -9,8 +9,8 @@ module Gitx
     class IntegrateCommand < BaseCommand
       include Gitx::Github
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
-      method_option :resume, :type => :string, :aliases => '-r', :desc => 'resume merging of feature-branch'
-      method_option :comment, :type => :boolean, :aliases => '-c', :desc => 'add a comment to the pull request for this branch. Creates a new PR if none exists.'
+      method_option :resume, type: :string, aliases: '-r', desc: 'resume merging of feature-branch'
+      method_option :comment, type: :boolean, aliases: '-c', desc: 'add a comment to the pull request for this branch. Creates a new PR if none exists.'
       def integrate(integration_branch = 'staging')
         assert_aggregate_branch!(integration_branch)
 
@@ -20,7 +20,7 @@ module Gitx
         begin
           execute_command(UpdateCommand, :update)
         rescue
-          fail MergeError, 'Merge Conflict Occurred. Please Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command'
+          raise MergeError, 'Merge Conflict Occurred. Please Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command'
         end
 
         integrate_branch(branch, integration_branch) unless options[:resume]
@@ -44,7 +44,7 @@ module Gitx
         begin
           run_cmd "git merge #{branch}"
         rescue
-          fail MergeError, "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
+          raise MergeError, "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
         end
         run_cmd 'git push origin HEAD'
       end
@@ -63,7 +63,7 @@ module Gitx
       def fetch_remote_branch(target_branch)
         create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
         run_cmd 'git fetch origin'
-        run_cmd "git branch -D #{target_branch}", :allow_failure => true
+        run_cmd "git branch -D #{target_branch}", allow_failure: true
         checkout_branch target_branch
       end
 

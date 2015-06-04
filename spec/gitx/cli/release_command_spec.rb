@@ -128,7 +128,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
 
-        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(:status => 201, :body => new_pull_request.to_json, :headers => {'Content-Type' => 'application/json'})
+        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
         VCR.use_cassette('pull_request_does_not_exist') do
           cli.release
         end

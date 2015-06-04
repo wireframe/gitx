@@ -12,7 +12,7 @@ module Gitx
       include Gitx::Github
 
       desc 'release', 'release the current branch to production'
-      method_option :cleanup, :type => :boolean, :desc => 'cleanup merged branches after release'
+      method_option :cleanup, type: :boolean, desc: 'cleanup merged branches after release'
       def release(branch = nil)
         return unless yes?("Release #{current_branch.name} to production? (y/n)", :green)
 

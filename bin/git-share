@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'gitx/cli/share_command'
 args = ARGV.dup.unshift('share')
 Gitx::Cli::ShareCommand.start(args)
