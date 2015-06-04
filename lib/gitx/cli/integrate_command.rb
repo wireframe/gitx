@@ -19,7 +19,7 @@ module Gitx
         begin
           execute_command(UpdateCommand, :update)
         rescue
-          fail MergeError, 'Merge conflict occurred.  Please fix merge conflict and rerun the integrate command'
+          raise MergeError, 'Merge conflict occurred.  Please fix merge conflict and rerun the integrate command'
         end
 
         integrate_branch(branch, integration_branch) unless options[:resume]
@@ -43,7 +43,7 @@ module Gitx
         begin
           run_cmd "git merge #{branch}"
         rescue
-          fail MergeError, "Merge conflict occurred.  Please fix merge conflict and rerun command with --resume #{branch} flag"
+          raise MergeError, "Merge conflict occurred.  Please fix merge conflict and rerun command with --resume #{branch} flag"
         end
         run_cmd 'git push origin HEAD'
       end
