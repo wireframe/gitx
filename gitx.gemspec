@@ -38,8 +38,6 @@ Gem::Specification.new do |spec|
 
   # configure gem version for continuous integration builds
   if ENV['TRAVIS_JOB_NUMBER']
-    digits = spec.version.to_s.split '.'
-    digits[-1] = digits[-1].to_s.succ
-    spec.version = digits.join('.') + ".ci.#{ENV['TRAVIS_JOB_NUMBER']}"
+    spec.version = "#{spec.version}.ci.#{ENV['TRAVIS_JOB_NUMBER']}"
   end
 end
