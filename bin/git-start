@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/start_command'
+require 'gitx/cli/start_command'
 args = ARGV.dup.unshift('start')
-Thegarage::Gitx::Cli::StartCommand.start(args)
+Gitx::Cli::StartCommand.start(args)

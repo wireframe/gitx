@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/share_command'
+require 'gitx/cli/share_command'
 args = ARGV.dup.unshift('share')
-Thegarage::Gitx::Cli::ShareCommand.start(args)
+Gitx::Cli::ShareCommand.start(args)

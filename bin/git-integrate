@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/integrate_command'
+require 'gitx/cli/integrate_command'
 args = ARGV.dup.unshift('integrate')
-Thegarage::Gitx::Cli::IntegrateCommand.start(args)
+Gitx::Cli::IntegrateCommand.start(args)

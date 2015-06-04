@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/nuke_command'
+require 'gitx/cli/nuke_command'
 args = ARGV.dup.unshift('nuke')
-Thegarage::Gitx::Cli::NukeCommand.start(args)
+Gitx::Cli::NukeCommand.start(args)

@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.github.com/repos/thegarage/thegarage-gitx/pulls?head=thegarage:feature-branch&state=open
+    uri: https://api.github.com/repos/wireframe/gitx/pulls?head=wireframe:feature-branch&state=open
     body:
       encoding: US-ASCII
       string: ''
@@ -66,7 +66,7 @@ http_interactions:
   recorded_at: Wed, 10 Dec 2014 19:14:11 GMT
 - request:
     method: get
-    uri: https://api.github.com/repos/thegarage/thegarage-gitx/commits/feature-branch/status
+    uri: https://api.github.com/repos/wireframe/gitx/commits/feature-branch/status
     body:
       encoding: US-ASCII
       string: ''

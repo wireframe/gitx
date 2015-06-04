@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'thegarage/gitx/cli/buildtag_command'
+require 'gitx/cli/buildtag_command'
 args = ARGV.dup.unshift('buildtag')
-Thegarage::Gitx::Cli::BuildtagCommand.start(args)
+Gitx::Cli::BuildtagCommand.start(args)
