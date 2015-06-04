@@ -20,7 +20,7 @@ module Gitx
         begin
           execute_command(UpdateCommand, :update)
         rescue
-          raise MergeError, 'Merge Conflict Occurred. Please Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command'
+          raise MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command'
         end
 
         integrate_branch(branch, integration_branch) unless options[:resume]
