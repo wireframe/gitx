@@ -6,6 +6,9 @@
 
 > Git eXtensions for improved development workflows
 
+These custom scripts are automatically registered into the git namespace
+so they are available without learning any new commands!
+
 ### Global Options
 * `--trace` or `-v` = verbose output for debugging commands
 * `--pretend` or `-p` = dry run commands and do not actually invoke operations
