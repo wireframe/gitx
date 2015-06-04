@@ -1,6 +1,8 @@
 language: ruby
-rvm:
-  - '2.1.2'
 before_install:
-  - git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-  - git fetch
+- git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+- git fetch
+deploy:
+  provider: rubygems
+  api_key:
+    secure: RHedFaKxfm4yxqJzSEOPZr+OrcS5B1uiPwRjpIHau4hzPysDiTHzjIiFO78o1qrl7UeX9c5k0RQZJGp+9OB/H+WgbyfUzX2C2RbUuHRZubTvFaBvf8qe2D5+7fvj0FdzYS6xKZ23N1FW4vN17M6sViJYlCncB3fxzRA/BHxQlkL1LbQOn9zChI9eZ/gQrKrnziL1IvBSAMygBLHEEMq18lFf+mHiXFJDw/2dghbnPFZh5WYWCbfe/dS7trTJZWax+4xZDmXIqNi3cZiGn5dj2HhMUBX9xHRJORVtplxvP/9ZVuxqdY499DdtsEvemZKEmdggk/jYyxkfKFy+SQSkqRkUAcAS/LmsSn0wkJRiKXSqxTyvF063nct4DQCPjd+HGIFVkVG+4Vknwusg78TZ/BoMlOJnGS7TIuZRdcRujBsoAEqnz9imCz9sMk6IJmyc4XYuwQmPaxQtn0iODt0wAtr3chuPV2IC3j5CdXnXoU00iYS+zZXfVJgBcrdiCuuHnhxGzdKixzgXQ8fUnkniN/uWc0T2X9BvGnf3gyqJEZb7uIXOkozrXF6allXBiM6fXC9X0tL06qjdhaY/WKnmFGThcIBayxrS51GIDcKOGoVaSx/juVDpScwtof2jJplLz09w+36Rz7zMB67xo4yaGp/TPI+CbMc+0+my4+3B9lg=

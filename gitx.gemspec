@@ -35,4 +35,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'terminal-notifier'
   spec.add_development_dependency 'terminal-notifier-guard'
   spec.add_development_dependency 'rubocop'
+
+  # configure gem version for continuous integration builds
+  if ENV['TRAVIS_JOB_NUMBER']
+    digits = spec.version.to_s.split '.'
+    digits[-1] = digits[-1].to_s.succ
+    spec.version = digits.join('.') + ".ci.#{ENV['TRAVIS_JOB_NUMBER']}"
+  end
 end
