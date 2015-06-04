@@ -1,8 +1,12 @@
-Metrics/LineLength:
+LineLength:
   Max: 200
-Style/Documentation:
+
+Documentation:
   Enabled: false
 
-Style/FileName:
+StringLiterals:
+  EnforcedStyle: single_quotes
+
+FileName:
   Exclude:
     - bin/*
