@@ -10,7 +10,6 @@ module Gitx
       include Gitx::Github
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
       method_option :resume, type: :string, aliases: '-r', desc: 'resume merging of feature-branch'
-      method_option :comment, type: :boolean, aliases: '-c', desc: 'add a comment to the pull request for this branch. Creates a new PR if none exists.'
       def integrate(integration_branch = 'staging')
         assert_aggregate_branch!(integration_branch)
 
@@ -20,13 +19,13 @@ module Gitx
         begin
           execute_command(UpdateCommand, :update)
         rescue
-          raise MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the integrate command'
+          raise MergeError, 'Merge conflict occurred.  Please fix merge conflict and rerun the integrate command'
         end
 
         integrate_branch(branch, integration_branch) unless options[:resume]
         checkout_branch branch
 
-        create_integrate_comment(branch) if options[:comment] && !config.reserved_branch?(branch)
+        create_integrate_comment(branch) unless config.reserved_branch?(branch)
       end
 
       private
@@ -44,7 +43,7 @@ module Gitx
         begin
           run_cmd "git merge #{branch}"
         rescue
-          raise MergeError, "Merge Conflict Occurred. Please fix merge conflict and rerun command with --resume #{branch} flag"
+          raise MergeError, "Merge conflict occurred.  Please fix merge conflict and rerun command with --resume #{branch} flag"
         end
         run_cmd 'git push origin HEAD'
       end
