@@ -71,13 +71,15 @@ module Gitx
     end
 
     def pull_request_body(branch)
-      changelog = run_cmd("git log #{Gitx::BASE_BRANCH}...#{branch} --reverse --no-merges --pretty=format:'* %s%n%b'")
+      changelog = run_cmd("git log #{Gitx::BASE_BRANCH}...#{branch} --reverse --no-merges --pretty=format:'* %B'")
       description = options[:description]
 
       description_template = []
       description_template << "#{description}\n" if description
-      description_template << '### Changelog'
+      description_template << '### What changed?'
       description_template << changelog
+      description_template << '### What was fixed?'
+      description_template << '### What needs to be done?'
       description_template << PULL_REQUEST_FOOTER
 
       body = ask_editor(description_template.join("\n"), repo.config['core.editor'])
