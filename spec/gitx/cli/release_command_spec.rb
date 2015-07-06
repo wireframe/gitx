@@ -122,7 +122,7 @@ describe Gitx::Cli::ReleaseCommand do
 
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return('2013-01-01 did some stuff').ordered
+        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return('2013-01-01 did some stuff').ordered
         expect(cli).to receive(:run_cmd).with('git checkout master').ordered
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
         expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered

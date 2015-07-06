@@ -39,13 +39,14 @@ describe Gitx::Cli::ReviewCommand do
           }
         }
       end
+      let(:changelog) { "* old commit\n\n* new commit" }
       before do
         expect(Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
 
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return("* old commit\n\n* new commit").ordered
-        expect(cli).to receive(:ask_editor).with("### Changelog\n* old commit\n\n* new commit\n#{Gitx::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
+        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return(changelog).ordered
+        expect(cli).to receive(:ask_editor).with("### What changed?\n#{changelog}\n### What was fixed?\n### What needs to be done?\n#{Gitx::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
 
@@ -74,13 +75,14 @@ describe Gitx::Cli::ReviewCommand do
           }
         }
       end
+      let(:changelog) { "* old commit\n\n* new commit" }
       before do
         expect(Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
 
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %s%n%b'").and_return("* old commit\n\n* new commit").ordered
-        expect(cli).to receive(:ask_editor).with("### Changelog\n* old commit\n\n* new commit\n#{Gitx::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
+        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return(changelog).ordered
+        expect(cli).to receive(:ask_editor).with("### What changed?\n#{changelog}\n### What was fixed?\n### What needs to be done?\n#{Gitx::Github::PULL_REQUEST_FOOTER}", anything).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
 
