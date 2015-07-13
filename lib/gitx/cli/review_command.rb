@@ -83,9 +83,9 @@ module Gitx
       end
 
       def comment_from_template(pull_request, prefix, footer)
-        text = ask_editor("\n\n#{footer}", repo.config['core.editor'])
+        text = ask_editor('', editor: repo.config['core.editor'], footer: footer)
         comment = [prefix, text].join("\n\n")
-        comment = comment.gsub(footer, '').chomp.strip
+        comment = comment.chomp.strip
         github_client.add_comment(github_slug, pull_request.number, comment)
       end
     end
