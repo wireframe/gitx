@@ -16,9 +16,10 @@ class Thor
     # see http://osdir.com/ml/ruby-talk/2010-06/msg01424.html
     # see https://gist.github.com/rkumar/456809
     # see http://rdoc.info/github/visionmedia/commander/master/Commander/UI.ask_editor
-    def ask_editor(initial_text = '', editor = nil)
+    def ask_editor(initial_text = '', editor: nil, footer: nil)
       editor ||= ENV['EDITOR'] || 'vi'
-      Tempfile.open('comment.md') do |f|
+      text += "\n\n#{footer}" if footer
+      text = Tempfile.open('text.md') do |f|
         f << initial_text
         f.flush
 
@@ -34,6 +35,8 @@ class Thor
         Process.waitpid(pid)
         File.read(f.path)
       end
+      text = text.gsub(footer, '') if footer
+      text.chomp.strip
     end
   end
 end

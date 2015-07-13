@@ -78,12 +78,10 @@ module Gitx
       description_template << "#{description}\n" if description
       description_template << '### What changed?'
       description_template << changelog
-      description_template << '### What was fixed?'
-      description_template << '### What needs to be done?'
-      description_template << PULL_REQUEST_FOOTER
+      description_template << "### What was fixed?\n"
+      description_template << "### What else needs to be done?"
 
-      body = ask_editor(description_template.join("\n"), repo.config['core.editor'])
-      body.gsub(PULL_REQUEST_FOOTER, '').chomp.strip
+      body = ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
     end
 
     # authorization token used for github API calls
