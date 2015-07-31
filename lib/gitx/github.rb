@@ -65,7 +65,7 @@ module Gitx
       say 'in '
       say github_slug, :green
 
-      title = branch
+      title = branch.gsub(/[-_]/, ' ')
       body = pull_request_body(branch)
       github_client.create_pull_request(github_slug, Gitx::BASE_BRANCH, branch, title, body)
     end
