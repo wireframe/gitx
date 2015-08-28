@@ -2,19 +2,14 @@ require 'yaml'
 
 module Gitx
   class Configuration
-    DEFAULT_CONFIG = {
-      'aggregate_branches' => %w( staging prototype ),
-      'reserved_branches' => %w( HEAD master next_release staging prototype ),
-      'taggable_branches' => %w( master staging )
-    }
     CONFIG_FILE = '.gitx.yml'
 
     attr_reader :config
 
     def initialize(root_dir)
-      @config = Thor::CoreExt::HashWithIndifferentAccess.new(DEFAULT_CONFIG)
-      config_file_path = File.join(root_dir, CONFIG_FILE)
-      @config.merge!(::YAML.load_file(config_file_path)) if File.exist?(config_file_path)
+      @config = Thor::CoreExt::HashWithIndifferentAccess.new
+      @config.merge!(load_config(File.join(__dir__, 'defaults.yml')))
+      @config.merge!(load_config(File.join(root_dir, CONFIG_FILE)))
     end
 
     def aggregate_branches
@@ -39,6 +34,17 @@ module Gitx
 
     def taggable_branch?(branch)
       taggable_branches.include?(branch)
+    end
+
+    private
+
+    # load configuration file
+    def load_config(path)
+      if File.exist?(path)
+        ::YAML.load_file(path)
+      else
+        {}
+      end
     end
   end
 end

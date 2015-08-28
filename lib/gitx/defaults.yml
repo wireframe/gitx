@@ -1,0 +1,13 @@
+---
+aggregate_branches:
+  - staging
+  - prototype
+reserved_branches:
+  - HEAD
+  - master
+  - next_release
+  - staging
+  - prototype
+taggable_branches:
+  - master
+  - staging

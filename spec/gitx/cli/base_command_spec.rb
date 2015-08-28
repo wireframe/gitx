@@ -14,7 +14,7 @@ describe Gitx::Cli::BaseCommand do
 
   describe 'without custom .gitx.yml config file' do
     it 'provides default options' do
-      expect(cli.send(:config).config).to eq Gitx::Configuration::DEFAULT_CONFIG
+      expect(cli.send(:config).config).to eq ::YAML.load_file(File.join(__dir__, '../../../lib/gitx/defaults.yml'))
     end
   end
 
