@@ -11,3 +11,5 @@ reserved_branches:
 taggable_branches:
   - master
   - staging
+after_release:
+  - git integrate

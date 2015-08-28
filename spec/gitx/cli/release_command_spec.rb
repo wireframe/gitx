@@ -12,6 +12,7 @@ describe Gitx::Cli::ReleaseCommand do
   let(:cli) { described_class.new(args, options, config) }
   let(:branch) { double('fake branch', name: 'feature-branch') }
   let(:authorization_token) { '123123' }
+  let(:repo) { cli.send(:repo) }
 
   before do
     allow(cli).to receive(:current_branch).and_return(branch)
@@ -31,9 +32,8 @@ describe Gitx::Cli::ReleaseCommand do
     end
     context 'when user confirms release and pull request exists with non-success status' do
       before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
-        expect(cli).to_not receive(:execute_command).with(Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to_not receive(:execute_command).with(Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).with('Release feature-branch to production? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: failure.  Proceed with release? (y/n)', :red).and_return(false)
@@ -52,11 +52,11 @@ describe Gitx::Cli::ReleaseCommand do
         should meet_expectations
       end
     end
-    context 'when user confirms release and pull request exists with success status' do
+    context 'when user confirms release and pull request exists with success status with default config' do
       before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
+
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to_not receive(:execute_command).with(Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
@@ -66,6 +66,38 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
         expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
+        expect(cli).to receive(:run_cmd).with('git integrate').ordered
+
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
+          cli.release
+        end
+      end
+      it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
+    context 'when user confirms release and pull request exists with success status with custom after_release config' do
+      let(:gitx_config) do
+        {
+          'after_release' => ['echo hello']
+        }
+      end
+      before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
+        File.open(File.join(temp_dir, '.gitx.yml'), 'w') do |f|
+          f.puts gitx_config.to_yaml
+        end
+        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
+
+        expect(cli).to receive(:yes?).and_return(true)
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+
+        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
+        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
+        expect(cli).to receive(:run_cmd).with('echo hello').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release
@@ -77,9 +109,8 @@ describe Gitx::Cli::ReleaseCommand do
     end
     context 'when target_branch is not nil and user confirms release and pull request exists with success status' do
       before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to_not receive(:execute_command).with(Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
@@ -89,6 +120,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
         expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
+        expect(cli).to receive(:run_cmd).with('git integrate').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release 'feature-branch'
@@ -110,12 +142,11 @@ describe Gitx::Cli::ReleaseCommand do
         }
       end
       before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         allow(cli).to receive(:ask_editor).and_return('description')
 
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update).twice
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to_not receive(:execute_command).with(Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).with('Release feature-branch to production? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: pending.  Proceed with release? (y/n)', :red).and_return(true)
@@ -127,6 +158,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
         expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
+        expect(cli).to receive(:run_cmd).with('git integrate').ordered
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
         VCR.use_cassette('pull_request_does_not_exist') do
@@ -147,9 +179,8 @@ describe Gitx::Cli::ReleaseCommand do
         }
       end
       before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::IntegrateCommand, :integrate, 'staging')
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::CleanupCommand, :cleanup)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
@@ -159,6 +190,8 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
         expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
+        expect(cli).to receive(:run_cmd).with('git integrate').ordered
+        expect(cli).to receive(:run_cmd).with('git cleanup').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release

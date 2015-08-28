@@ -36,6 +36,10 @@ module Gitx
       taggable_branches.include?(branch)
     end
 
+    def after_release_scripts
+      config[:after_release]
+    end
+
     private
 
     # load configuration file
