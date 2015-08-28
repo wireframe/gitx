@@ -4,7 +4,7 @@ aggregate_branches:
   - staging
   - prototype
 
-# list of branches that should not be cleaned up
+# list of branches that should not be deleted when cleaning up
 reserved_branches:
   - HEAD
   - master
