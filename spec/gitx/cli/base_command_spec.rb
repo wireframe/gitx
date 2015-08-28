@@ -13,8 +13,11 @@ describe Gitx::Cli::BaseCommand do
   let(:repo) { cli.send(:repo) }
 
   describe 'without custom .gitx.yml config file' do
+    before do
+      expect(repo).to receive(:workdir).and_return(temp_dir)
+    end
     it 'provides default options' do
-      expect(cli.send(:config).config).to eq Gitx::Configuration::DEFAULT_CONFIG
+      expect(cli.send(:config).config).to eq ::YAML.load_file(File.join(__dir__, '../../../lib/gitx/defaults.yml'))
     end
   end
 
