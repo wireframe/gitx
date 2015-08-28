@@ -2,7 +2,6 @@ require 'thor'
 require 'gitx'
 require 'gitx/cli/base_command'
 require 'gitx/cli/update_command'
-require 'gitx/cli/integrate_command'
 require 'gitx/cli/cleanup_command'
 require 'gitx/github'
 
@@ -21,19 +20,34 @@ module Gitx
         checkout_branch(branch)
         execute_command(UpdateCommand, :update)
 
-        find_or_create_pull_request(branch)
-        status = branch_status(branch)
-        if status != 'success'
-          return unless yes?("Branch status is currently: #{status}.  Proceed with release? (y/n)", :red)
-        end
+        return unless confirm_branch_status?(branch)
 
         checkout_branch Gitx::BASE_BRANCH
         run_cmd "git pull origin #{Gitx::BASE_BRANCH}"
         run_cmd "git merge --no-ff #{branch}"
         run_cmd 'git push origin HEAD'
 
-        execute_command(IntegrateCommand, :integrate, 'staging')
-        execute_command(CleanupCommand, :cleanup) if options[:cleanup]
+        after_release
+      end
+
+      private
+
+      def confirm_branch_status?(branch)
+        find_or_create_pull_request(branch)
+        status = branch_status(branch)
+        if status == 'success'
+          true
+        else
+          yes?("Branch status is currently: #{status}.  Proceed with release? (y/n)", :red)
+        end
+      end
+
+      def after_release
+        after_release_scripts = config.after_release_scripts.dup
+        after_release_scripts << 'git cleanup' if options[:cleanup]
+        after_release_scripts.each do |cmd|
+          run_cmd cmd
+        end
       end
     end
   end
