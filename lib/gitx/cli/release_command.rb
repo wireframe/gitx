@@ -2,7 +2,6 @@ require 'thor'
 require 'gitx'
 require 'gitx/cli/base_command'
 require 'gitx/cli/update_command'
-require 'gitx/cli/cleanup_command'
 require 'gitx/github'
 
 module Gitx
