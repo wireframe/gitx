@@ -1,15 +1,22 @@
 ---
+# list of branches eligable for integration
 aggregate_branches:
   - staging
   - prototype
+
+# list of branches that should not be cleaned up
 reserved_branches:
   - HEAD
   - master
   - next_release
   - staging
   - prototype
+
+# list of supported branches for generating buildtags
 taggable_branches:
   - master
   - staging
+
+# list of commands to execute after releasing feature branch
 after_release:
   - git integrate
