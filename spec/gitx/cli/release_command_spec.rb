@@ -41,7 +41,7 @@ describe Gitx::Cli::ReleaseCommand do
 
         expect(cli).to_not receive(:run_cmd).with('git checkout master')
         expect(cli).to_not receive(:run_cmd).with('git pull origin master')
-        expect(cli).to_not receive(:run_cmd).with('git merge --no-ff feature-branch')
+        expect(cli).to_not receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch')
         expect(cli).to_not receive(:run_cmd).with('git push origin HEAD')
 
         VCR.use_cassette('pull_request_does_exist_with_failure_status') do
@@ -64,7 +64,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git checkout master').ordered
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git integrate').ordered
 
@@ -95,7 +95,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git checkout master').ordered
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('echo hello').ordered
 
@@ -118,7 +118,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git checkout master').ordered
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git integrate').ordered
 
@@ -156,7 +156,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return('2013-01-01 did some stuff').ordered
         expect(cli).to receive(:run_cmd).with('git checkout master').ordered
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git integrate').ordered
 
@@ -188,7 +188,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git checkout master').ordered
         expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git integrate').ordered
         expect(cli).to receive(:run_cmd).with('git cleanup').ordered

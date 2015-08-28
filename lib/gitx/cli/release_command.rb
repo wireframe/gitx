@@ -20,11 +20,12 @@ module Gitx
         checkout_branch(branch)
         execute_command(UpdateCommand, :update)
 
+        pull_request = find_or_create_pull_request(branch)
         return unless confirm_branch_status?(branch)
 
         checkout_branch Gitx::BASE_BRANCH
         run_cmd "git pull origin #{Gitx::BASE_BRANCH}"
-        run_cmd "git merge --no-ff #{branch}"
+        run_cmd %Q(git merge --no-ff -m "[gitx] Releasing #{branch} to #{Gitx::BASE_BRANCH} (Pull request ##{pull_request.number})" #{branch})
         run_cmd 'git push origin HEAD'
 
         after_release
@@ -33,7 +34,6 @@ module Gitx
       private
 
       def confirm_branch_status?(branch)
-        find_or_create_pull_request(branch)
         status = branch_status(branch)
         if status == 'success'
           true
