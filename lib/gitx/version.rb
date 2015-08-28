@@ -1,3 +1,3 @@
 module Gitx
-  VERSION = '2.16.0.pre'
+  VERSION = '2.16.0'
 end
