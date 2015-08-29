@@ -35,7 +35,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(repo).to receive(:workdir).and_return(temp_dir)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
-        expect(cli).to receive(:yes?).with('Release feature-branch to production? (y/n)', :green).and_return(true)
+        expect(cli).to receive(:yes?).with('Release feature-branch to master? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: failure.  Proceed with release? (y/n)', :red).and_return(false)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
@@ -148,7 +148,7 @@ describe Gitx::Cli::ReleaseCommand do
 
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update).twice
 
-        expect(cli).to receive(:yes?).with('Release feature-branch to production? (y/n)', :green).and_return(true)
+        expect(cli).to receive(:yes?).with('Release feature-branch to master? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: pending.  Proceed with release? (y/n)', :red).and_return(true)
 
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
