@@ -14,6 +14,7 @@ describe Gitx::Cli::IntegrateCommand do
   let(:repo) { cli.send(:repo) }
   let(:remote_branch_names) { ['origin/staging', 'origin/prototype'] }
   let(:local_branch_names) { ['feature-branch'] }
+  let(:authorization_token) { '123123' }
 
   before do
     allow(cli).to receive(:current_branch).and_return(current_branch)
@@ -21,20 +22,19 @@ describe Gitx::Cli::IntegrateCommand do
     allow(branches).to receive(:each_name).with(:local).and_return(local_branch_names)
     allow(branches).to receive(:each_name).with(:remote).and_return(remote_branch_names)
     allow(repo).to receive(:branches).and_return(branches)
+    allow(cli).to receive(:authorization_token).and_return(authorization_token)
   end
 
   describe '#integrate' do
     context 'when integration branch is ommitted and remote branch exists' do
-      let(:authorization_token) { '123123' }
       let(:remote_branch_names) { ['origin/staging'] }
       before do
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
         expect(cli).to receive(:run_cmd).with('git branch -D staging', allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
-        expect(cli).to receive(:run_cmd).with('git merge feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Integrating feature-branch into staging (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
@@ -55,16 +55,14 @@ describe Gitx::Cli::IntegrateCommand do
     context 'when current_branch == master' do
       let(:current_branch) { double('fake branch', name: 'master', head?: true) }
       let(:local_branch_names) { ['master'] }
-      let(:authorization_token) { '123123' }
       let(:remote_branch_names) { ['origin/staging'] }
       before do
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
         expect(cli).to receive(:run_cmd).with('git branch -D staging', allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
-        expect(cli).to receive(:run_cmd).with('git merge master').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Integrating master into staging" master').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout master').ordered
 
@@ -78,7 +76,6 @@ describe Gitx::Cli::IntegrateCommand do
       end
     end
     context 'when a pull request doesnt exist for the feature-branch' do
-      let(:authorization_token) { '123123' }
       let(:changelog) { '* made some fixes' }
       let(:new_pull_request) do
         {
@@ -92,17 +89,16 @@ describe Gitx::Cli::IntegrateCommand do
       end
       before do
         allow(cli).to receive(:ask_editor).and_return('description')
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update).twice
 
+        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return('2013-01-01 did some stuff').ordered
         expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
         expect(cli).to receive(:run_cmd).with('git branch -D staging', allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
-        expect(cli).to receive(:run_cmd).with('git merge feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Integrating feature-branch into staging (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return('2013-01-01 did some stuff').ordered
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').to_return(status: 201)
@@ -123,10 +119,8 @@ describe Gitx::Cli::IntegrateCommand do
       end
     end
     context 'when staging branch does not exist remotely' do
-      let(:authorization_token) { '123123' }
       let(:remote_branch_names) { [] }
       before do
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(repo).to receive(:create_branch).with('staging', 'master')
@@ -136,7 +130,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
         expect(cli).to receive(:run_cmd).with('git branch -D staging', allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
-        expect(cli).to receive(:run_cmd).with('git merge feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Integrating feature-branch into staging (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
@@ -151,16 +145,14 @@ describe Gitx::Cli::IntegrateCommand do
       end
     end
     context 'when integration branch == prototype and remote branch exists' do
-      let(:authorization_token) { '123123' }
       let(:remote_branch_names) { ['origin/prototype'] }
       before do
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
         expect(cli).to receive(:run_cmd).with('git branch -D prototype', allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with('git checkout prototype').ordered
-        expect(cli).to receive(:run_cmd).with('git merge feature-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Integrating feature-branch into prototype (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
@@ -198,9 +190,11 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git fetch origin').ordered
         expect(cli).to receive(:run_cmd).with('git branch -D staging', allow_failure: true).ordered
         expect(cli).to receive(:run_cmd).with('git checkout staging').ordered
-        expect(cli).to receive(:run_cmd).with('git merge feature-branch').and_raise('git merge feature-branch failed').ordered
+        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Integrating feature-branch into staging (Pull request #10)" feature-branch').and_raise('git merge feature-branch failed').ordered
 
-        expect { cli.integrate }.to raise_error(/Merge conflict occurred.  Please fix merge conflict and rerun command with --resume feature-branch flag/)
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
+          expect { cli.integrate }.to raise_error(/Merge conflict occurred.  Please fix merge conflict and rerun command with --resume feature-branch flag/)
+        end
       end
       it 'raises a helpful error' do
         should meet_expectations
@@ -213,10 +207,7 @@ describe Gitx::Cli::IntegrateCommand do
         }
       end
       let(:repo) { cli.send(:repo) }
-      let(:authorization_token) { '123123' }
       before do
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
-
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).not_to receive(:run_cmd).with('git branch -D staging')
@@ -240,9 +231,7 @@ describe Gitx::Cli::IntegrateCommand do
         }
       end
       let(:local_branch_names) { ['feature-branch'] }
-      let(:authorization_token) { '123123' }
       before do
-        allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
         expect(cli).to receive(:ask).and_return('feature-branch')
 

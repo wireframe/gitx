@@ -22,10 +22,10 @@ module Gitx
           raise MergeError, 'Merge conflict occurred.  Please fix merge conflict and rerun the integrate command'
         end
 
-        integrate_branch(branch, integration_branch) unless options[:resume]
+        pull_request = pull_request_for_branch(branch)
+        integrate_branch(branch, integration_branch, pull_request) unless options[:resume]
         checkout_branch branch
-
-        create_integrate_comment(branch) unless config.reserved_branch?(branch)
+        create_integrate_comment(pull_request) if pull_request
       end
 
       private
@@ -38,10 +38,17 @@ module Gitx
         say integration_branch, :green
       end
 
-      def integrate_branch(branch, integration_branch)
+      def pull_request_for_branch(branch)
+        return nil if config.reserved_branch?(branch)
+        find_or_create_pull_request(branch)
+      end
+
+      def integrate_branch(branch, integration_branch, pull_request)
         fetch_remote_branch(integration_branch)
+        commit_message = "[gitx] Integrating #{branch} into #{integration_branch}"
+        commit_message += " (Pull request ##{pull_request.number})" if pull_request
         begin
-          run_cmd "git merge #{branch}"
+          run_cmd %Q(git merge --no-ff -m "#{commit_message}" #{branch})
         rescue
           raise MergeError, "Merge conflict occurred.  Please fix merge conflict and rerun command with --resume #{branch} flag"
         end
@@ -83,8 +90,7 @@ module Gitx
         run_cmd "git push origin #{target_branch}:#{target_branch}"
       end
 
-      def create_integrate_comment(branch)
-        pull_request = find_or_create_pull_request(branch)
+      def create_integrate_comment(pull_request)
         comment = '[gitx] integrated into staging :twisted_rightwards_arrows:'
         github_client.add_comment(github_slug, pull_request.number, comment)
       end
