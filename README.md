@@ -17,6 +17,9 @@ so they are available without learning any new commands!
 
 update local repository with latest upstream changes and create a new feature branch
 
+options:
+* `--issue` or `-i` = reference to github issue id this branch is related to
+
 ## git update
 
 update the local feature branch with latest remote changes plus upstream released changes.

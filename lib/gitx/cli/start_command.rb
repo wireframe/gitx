@@ -9,6 +9,7 @@ module Gitx
       VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/
 
       desc 'start', 'start a new git branch with latest changes from master'
+      method_option :issue, type: :numeric, aliases: '-i', desc: 'Github issue number'
       def start(branch_name = nil)
         until valid_new_branch_name?(branch_name)
           branch_name = ask("What would you like to name your branch? (ex: #{EXAMPLE_BRANCH_NAMES.sample})")
@@ -18,6 +19,7 @@ module Gitx
         run_cmd 'git pull'
         repo.create_branch branch_name, Gitx::BASE_BRANCH
         checkout_branch branch_name
+        run_cmd(%Q(git commit -m "Starting work on #{branch_name} (Issue ##{options[:issue]})" --allow-empty)) if options[:issue]
       end
 
       private
