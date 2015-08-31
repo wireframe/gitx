@@ -9,7 +9,7 @@ describe Gitx::Cli::StartCommand do
       pretend: true
     }
   end
-  let(:cli) { Gitx::Cli::StartCommand.new(args, options, config) }
+  let(:cli) { described_class.new(args, options, config) }
   let(:repo) { cli.send(:repo) }
 
   describe '#start' do
@@ -89,6 +89,25 @@ describe Gitx::Cli::StartCommand do
         cli.start 'bar'
       end
       it 'prompts user to enter a new branch name' do
+        should meet_expectations
+      end
+    end
+    context 'when --issue option is used' do
+      let(:options) do
+        {
+          issue: 10
+        }
+      end
+      before do
+        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:run_cmd).with('git pull').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+        expect(cli).to receive(:run_cmd).with('git commit -m "Starting work on new-branch (Issue #10)" --allow-empty').ordered
+
+        cli.start 'new-branch'
+      end
+      it 'creates empty commit with link to issue id' do
         should meet_expectations
       end
     end
