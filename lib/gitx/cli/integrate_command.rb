@@ -25,7 +25,6 @@ module Gitx
         pull_request = pull_request_for_branch(branch)
         integrate_branch(branch, integration_branch, pull_request) unless options[:resume]
         checkout_branch branch
-        create_integrate_comment(pull_request) if pull_request
       end
 
       private
@@ -88,11 +87,6 @@ module Gitx
       def create_remote_branch(target_branch)
         repo.create_branch(target_branch, Gitx::BASE_BRANCH)
         run_cmd "git push origin #{target_branch}:#{target_branch}"
-      end
-
-      def create_integrate_comment(pull_request)
-        comment = '[gitx] integrated into staging :twisted_rightwards_arrows:'
-        github_client.add_comment(github_slug, pull_request.number, comment)
       end
     end
   end

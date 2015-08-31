@@ -38,18 +38,12 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
-
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
       end
       it 'defaults to staging branch' do
         should meet_expectations
-      end
-      it 'posts comment to pull request' do
-        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
-          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
       end
     end
     context 'when current_branch == master' do
@@ -70,9 +64,6 @@ describe Gitx::Cli::IntegrateCommand do
       end
       it 'does not create pull request' do
         expect(WebMock).to_not have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
-      end
-      it 'does not post comment on pull request' do
-        expect(WebMock).to_not have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
       end
     end
     context 'when a pull request doesnt exist for the feature-branch' do
@@ -101,7 +92,6 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
-        stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments').to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_not_exist') do
           cli.integrate
@@ -109,10 +99,6 @@ describe Gitx::Cli::IntegrateCommand do
       end
       it 'creates github pull request' do
         should meet_expectations
-      end
-      it 'creates github comment for integration' do
-        expect(WebMock).to have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/issues/10/comments')
-          .with(body: { body: '[gitx] integrated into staging :twisted_rightwards_arrows:' })
       end
       it 'runs expected commands' do
         should meet_expectations
@@ -134,8 +120,6 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
-
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
@@ -155,8 +139,6 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Integrating feature-branch into prototype (Pull request #10)" feature-branch').ordered
         expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-
-        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate 'prototype'
@@ -214,8 +196,6 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).not_to receive(:run_cmd).with('git push origin HEAD')
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch')
 
-        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
-
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
@@ -239,7 +219,6 @@ describe Gitx::Cli::IntegrateCommand do
         expect(cli).not_to receive(:run_cmd).with('git push origin HEAD')
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
 
-        stub_request(:post, /.*api.github.com.*/).to_return(status: 201)
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.integrate
         end
