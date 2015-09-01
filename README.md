@@ -9,6 +9,12 @@
 These custom scripts are automatically registered into the git namespace
 so they are available without learning any new commands!
 
+## Installation
+
+```bash
+$ gem install gitx
+```
+
 ### Global Options
 * `--trace` or `-v` = verbose output for debugging commands
 * `--pretend` or `-p` = dry run commands and do not actually invoke operations
@@ -90,7 +96,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 * [socialcast-git-extensions](https://github.com/socialcast/socialcast-git-extensions)
 * [thegarage-gitx](https://github.com/thegarage/thegarage-gitx)
 
-
 ## Copyright
 See [LICENSE.txt](LICENSE.txt)
-
