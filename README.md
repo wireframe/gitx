@@ -77,6 +77,10 @@ reset an aggregate branch (ex: prototype, staging) back to a known good state.
 
 create a build tag for the current Travis-CI build and push it back to origin
 
+options:
+* `--branch` = configure the branch name related to the build tag
+* `--message` = configure the git message associated to the tag
+
 ## Configuration
 Any of the [default settings defined in the gem](lib/gitx/defaults.yml) can be overridden
 by creating a custom `.gitx.yml` file in the root directory of your project.
