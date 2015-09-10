@@ -61,17 +61,17 @@ module Gitx
       say 'Creating pull request for '
       say "#{branch} ", :green
       say 'against '
-      say "#{Gitx::BASE_BRANCH} ", :green
+      say "#{config.base_branch} ", :green
       say 'in '
       say github_slug, :green
 
       title = branch.gsub(/[-_]/, ' ')
       body = pull_request_body(branch)
-      github_client.create_pull_request(github_slug, Gitx::BASE_BRANCH, branch, title, body)
+      github_client.create_pull_request(github_slug, config.base_branch, branch, title, body)
     end
 
     def pull_request_body(branch)
-      changelog = run_cmd("git log #{Gitx::BASE_BRANCH}...#{branch} --reverse --no-merges --pretty=format:'* %B'")
+      changelog = run_cmd("git log #{config.base_branch}...#{branch} --reverse --no-merges --pretty=format:'* %B'")
       description = options[:description]
 
       description_template = []

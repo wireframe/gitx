@@ -12,7 +12,7 @@ module Gitx
       desc 'release', 'release the current branch to production'
       method_option :cleanup, type: :boolean, desc: 'cleanup merged branches after release'
       def release(branch = nil)
-        return unless yes?("Release #{current_branch.name} to #{Gitx::BASE_BRANCH}? (y/n)", :green)
+        return unless yes?("Release #{current_branch.name} to #{config.base_branch}? (y/n)", :green)
 
         branch ||= current_branch.name
         assert_not_protected_branch!(branch, 'release')
@@ -22,9 +22,9 @@ module Gitx
         pull_request = find_or_create_pull_request(branch)
         return unless confirm_branch_status?(branch)
 
-        checkout_branch Gitx::BASE_BRANCH
-        run_cmd "git pull origin #{Gitx::BASE_BRANCH}"
-        run_cmd %Q(git merge --no-ff -m "[gitx] Releasing #{branch} to #{Gitx::BASE_BRANCH} (Pull request ##{pull_request.number})" #{branch})
+        checkout_branch config.base_branch
+        run_cmd "git pull origin #{config.base_branch}"
+        run_cmd %Q(git merge --no-ff -m "[gitx] Releasing #{branch} to #{config.base_branch} (Pull request ##{pull_request.number})" #{branch})
         run_cmd 'git push origin HEAD'
 
         after_release
