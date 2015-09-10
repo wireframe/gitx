@@ -7,12 +7,12 @@ module Gitx
     class CleanupCommand < BaseCommand
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
       def cleanup
-        checkout_branch Gitx::BASE_BRANCH
+        checkout_branch config.base_branch
         run_cmd 'git pull'
         run_cmd 'git remote prune origin'
 
         say 'Deleting local and remote branches that have been merged into '
-        say Gitx::BASE_BRANCH, :green
+        say config.base_branch, :green
         merged_branches(remote: true).each do |branch|
           run_cmd "git push origin --delete #{branch}"
         end

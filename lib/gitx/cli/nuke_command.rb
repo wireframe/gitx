@@ -21,13 +21,13 @@ module Gitx
         say 'branch to '
         say last_known_good_tag, :green
 
-        checkout_branch Gitx::BASE_BRANCH
+        checkout_branch config.base_branch
         run_cmd "git branch -D #{bad_branch}", allow_failure: true
         run_cmd "git push origin --delete #{bad_branch}", allow_failure: true
         run_cmd "git checkout -b #{bad_branch} #{last_known_good_tag}"
         run_cmd "git push origin #{bad_branch}"
         run_cmd "git branch --set-upstream-to origin/#{bad_branch}"
-        checkout_branch Gitx::BASE_BRANCH
+        checkout_branch config.base_branch
       end
 
       private

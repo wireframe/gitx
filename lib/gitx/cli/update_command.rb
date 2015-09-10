@@ -10,10 +10,10 @@ module Gitx
         say 'Updating '
         say "#{current_branch.name} ", :green
         say 'with latest changes from '
-        say Gitx::BASE_BRANCH, :green
+        say config.base_branch, :green
 
         update_branch(current_branch.name) if remote_branch_exists?(current_branch.name)
-        update_branch(Gitx::BASE_BRANCH)
+        update_branch(config.base_branch)
         run_cmd 'git push origin HEAD'
       end
 

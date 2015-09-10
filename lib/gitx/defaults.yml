@@ -1,4 +1,7 @@
 ---
+# default base branch
+base_branch: master
+
 # list of branches eligable for integration
 aggregate_branches:
   - staging

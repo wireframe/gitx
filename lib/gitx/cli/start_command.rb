@@ -15,9 +15,9 @@ module Gitx
           branch_name = ask("What would you like to name your branch? (ex: #{EXAMPLE_BRANCH_NAMES.sample})")
         end
 
-        checkout_branch Gitx::BASE_BRANCH
+        checkout_branch config.base_branch
         run_cmd 'git pull'
-        repo.create_branch branch_name, Gitx::BASE_BRANCH
+        repo.create_branch branch_name, config.base_branch
         checkout_branch branch_name
         run_cmd(%Q(git commit -m "Starting work on #{branch_name} (Issue ##{options[:issue]})" --allow-empty)) if options[:issue]
       end

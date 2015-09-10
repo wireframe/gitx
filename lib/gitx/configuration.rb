@@ -12,6 +12,10 @@ module Gitx
       @config.merge!(load_config(File.join(root_dir, CONFIG_FILE)))
     end
 
+    def base_branch
+      config[:base_branch]
+    end
+
     def aggregate_branches
       config[:aggregate_branches]
     end

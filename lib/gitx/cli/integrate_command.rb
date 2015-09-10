@@ -85,7 +85,7 @@ module Gitx
       end
 
       def create_remote_branch(target_branch)
-        repo.create_branch(target_branch, Gitx::BASE_BRANCH)
+        repo.create_branch(target_branch, config.base_branch)
         run_cmd "git push origin #{target_branch}:#{target_branch}"
       end
     end

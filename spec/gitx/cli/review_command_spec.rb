@@ -10,7 +10,8 @@ describe Gitx::Cli::ReviewCommand do
     }
   end
   let(:cli) { described_class.new(args, options, config) }
-  let(:repo) { double('fake repo', config: repo_config) }
+  let(:repo) { double('fake repo', config: repo_config, workdir: repo_workdir) }
+  let(:repo_workdir) { File.expand_path(File.join(__dir__, '../../../')) }
   let(:repo_config) do
     {
       'remote.origin.url' => 'https://github.com/wireframe/gitx'
