@@ -1,14 +1,24 @@
-require 'English'
+require 'open3'
 
 class Thor
   module Actions
     # execute a shell command and raise an error if non-zero exit code is returned
     # return the string output from the command
-    def run_cmd(cmd, options = {})
-      say "$ #{cmd}"
-      output = `#{cmd}`
-      success = $CHILD_STATUS.to_i == 0
-      fail "#{cmd} failed" unless success || options[:allow_failure]
+    def run_cmd(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      cmd = args
+      say "$ #{cmd.join(' ')}", :yellow
+      output = ''
+
+      Open3.popen2e(*cmd) do |stdin, stdout_err, wait_thr|
+        while line = stdout_err.gets
+          say line, :yellow
+          output << line
+        end
+
+        exit_status = wait_thr.value
+        fail "#{cmd.join(' ')} failed" unless exit_status.success? || options[:allow_failure]
+      end
       output
     end
 
