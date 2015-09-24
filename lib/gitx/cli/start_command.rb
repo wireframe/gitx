@@ -16,10 +16,10 @@ module Gitx
         end
 
         checkout_branch config.base_branch
-        run_cmd 'git pull'
+        run_git_cmd 'pull'
         repo.create_branch branch_name, config.base_branch
         checkout_branch branch_name
-        run_cmd(%Q(git commit -m "Starting work on #{branch_name} (Issue ##{options[:issue]})" --allow-empty)) if options[:issue]
+        run_git_cmd('commit', '--allow-empty', '--message', "Starting work on #{branch_name} (Issue ##{options[:issue]})") if options[:issue]
       end
 
       private

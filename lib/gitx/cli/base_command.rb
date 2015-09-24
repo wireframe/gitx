@@ -26,6 +26,10 @@ module Gitx
         end
       end
 
+      def run_git_cmd(*cmd)
+        run_cmd('git', *cmd)
+      end
+
       def checkout_branch(branch_name)
         run_cmd "git checkout #{branch_name}"
       end
