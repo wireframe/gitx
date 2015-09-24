@@ -10,9 +10,11 @@ module Gitx
     CLIENT_URL = 'https://github.com/wireframe/gitx'
     PULL_REQUEST_FOOTER = <<-EOS.dedent
       # Pull Request Protips(tm):
-      # * Include description of how this change accomplishes the task at hand.
+      # * Describe how this change accomplishes the task at hand
       # * Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
-      # * Review CONTRIBUTING.md for recommendations of artifacts, links, images, screencasts, etc.
+      # * Include links to relevent resources and related tickets
+      # * Attach build artifacts, images, screenshots, screencasts, etc
+      # * Review CONTRIBUTING.md for relevant workflow requirements
       #
       # This footer will automatically be stripped from the pull request description
     EOS
@@ -76,10 +78,7 @@ module Gitx
 
       description_template = []
       description_template << "#{description}\n" if description
-      description_template << '### What changed?'
       description_template << changelog
-      description_template << "### What was fixed?\n"
-      description_template << "### What else needs to be done?"
 
       body = ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
     end

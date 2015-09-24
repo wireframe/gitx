@@ -47,7 +47,7 @@ describe Gitx::Cli::ReviewCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return(changelog).ordered
-        expect(cli).to receive(:ask_editor).with("### What changed?\n#{changelog}\n### What was fixed?\n\n### What else needs to be done?", hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return('description')
+        expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
 
@@ -84,7 +84,7 @@ describe Gitx::Cli::ReviewCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
         expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return(changelog).ordered
-        expect(cli).to receive(:ask_editor).with("### What changed?\n#{changelog}\n### What was fixed?\n\n### What else needs to be done?", hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return(pull_request_description)
+        expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return(pull_request_description)
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
           .with(body: {base: 'master', head: 'feature-branch', title: 'feature branch', body: pull_request_description}.to_json)
