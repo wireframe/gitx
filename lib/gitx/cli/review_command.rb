@@ -11,22 +11,23 @@ module Gitx
       BUMP_COMMENT_PREFIX = '[gitx] review bump :tada:'
       BUMP_COMMENT_FOOTER = <<-EOS.dedent
         # Bump comments should include:
-        # * summary of what changed
+        # * Summary of what changed
         #
         # This footer will automatically be stripped from the created comment
       EOS
       APPROVAL_COMMENT_PREFIX  = '[gitx] review approved :shipit:'
       APPROVAL_COMMENT_FOOTER = <<-EOS.dedent
         # Approval comments can include:
-        # * feedback
-        # * post-release follow-up items
+        # * Feedback
+        # * Follow-up items for after release
         #
         # This footer will automatically be stripped from the created comment
       EOS
       REJECTION_COMMENT_PREFIX = '[gitx] review rejected'
       REJECTION_COMMENT_FOOTER = <<-EOS.dedent
         # Rejection comments should include:
-        # * feedback for fixes required before approved
+        # * Feedback
+        # * Required changes before approved
         #
         # This footer will automatically be stripped from the created comment
       EOS
