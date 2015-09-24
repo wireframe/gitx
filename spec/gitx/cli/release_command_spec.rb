@@ -13,6 +13,7 @@ describe Gitx::Cli::ReleaseCommand do
   let(:branch) { double('fake branch', name: 'feature-branch') }
   let(:authorization_token) { '123123' }
   let(:repo) { cli.send(:repo) }
+  let(:executor) { cli.send(:executor) }
 
   before do
     allow(cli).to receive(:current_branch).and_return(branch)
@@ -22,7 +23,7 @@ describe Gitx::Cli::ReleaseCommand do
     context 'when user rejects release' do
       before do
         expect(cli).to receive(:yes?).and_return(false)
-        expect(cli).to_not receive(:run_cmd)
+        expect(executor).to_not receive(:execute)
 
         cli.release
       end
@@ -39,10 +40,10 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:yes?).with('Branch status is currently: failure.  Proceed with release? (y/n)', :red).and_return(false)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        expect(cli).to_not receive(:run_cmd).with('git checkout master')
-        expect(cli).to_not receive(:run_cmd).with('git pull origin master')
-        expect(cli).to_not receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch')
-        expect(cli).to_not receive(:run_cmd).with('git push origin HEAD')
+        expect(executor).to_not receive(:execute).with('git', 'checkout', 'master')
+        expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'master')
+        expect(executor).to_not receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch')
+        expect(executor).to_not receive(:execute).with('git', 'push', 'origin', 'HEAD')
 
         VCR.use_cassette('pull_request_does_exist_with_failure_status') do
           cli.release
@@ -61,12 +62,12 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
-        expect(cli).to receive(:run_cmd).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
+        expect(executor).to receive(:execute).with('git integrate').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release
@@ -92,12 +93,12 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
-        expect(cli).to receive(:run_cmd).with('echo hello').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
+        expect(executor).to receive(:execute).with('echo hello').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release
@@ -115,12 +116,12 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
-        expect(cli).to receive(:run_cmd).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
+        expect(executor).to receive(:execute).with('git integrate').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release 'feature-branch'
@@ -151,14 +152,14 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:yes?).with('Release feature-branch to master? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: pending.  Proceed with release? (y/n)', :red).and_return(true)
 
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return('2013-01-01 did some stuff').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
-        expect(cli).to receive(:run_cmd).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'master...feature-branch', '--reverse', '--no-merges', "--pretty=format:'* %B'").and_return('2013-01-01 did some stuff').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
+        expect(executor).to receive(:execute).with('git integrate').ordered
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
         VCR.use_cassette('pull_request_does_not_exist') do
@@ -185,13 +186,13 @@ describe Gitx::Cli::ReleaseCommand do
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git merge --no-ff -m "[gitx] Releasing feature-branch to master (Pull request #10)" feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
-        expect(cli).to receive(:run_cmd).with('git integrate').ordered
-        expect(cli).to receive(:run_cmd).with('git cleanup').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
+        expect(executor).to receive(:execute).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git cleanup').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release

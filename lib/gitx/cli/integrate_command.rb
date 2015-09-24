@@ -47,11 +47,11 @@ module Gitx
         commit_message = "[gitx] Integrating #{branch} into #{integration_branch}"
         commit_message += " (Pull request ##{pull_request.number})" if pull_request
         begin
-          run_cmd %Q(git merge --no-ff -m "#{commit_message}" #{branch})
+          run_git_cmd 'merge', '--no-ff', '--message', commit_message, branch
         rescue
           raise MergeError, "Merge conflict occurred.  Please fix merge conflict and rerun command with --resume #{branch} flag"
         end
-        run_cmd 'git push origin HEAD'
+        run_git_cmd 'push', 'origin', 'HEAD'
       end
 
       def feature_branch_name
@@ -67,8 +67,8 @@ module Gitx
       # nuke local branch and pull fresh version from remote repo
       def fetch_remote_branch(target_branch)
         create_remote_branch(target_branch) unless remote_branch_exists?(target_branch)
-        run_cmd 'git fetch origin'
-        run_cmd "git branch -D #{target_branch}", allow_failure: true
+        run_git_cmd 'fetch', 'origin'
+        run_git_cmd('branch', '--delete', '--force', target_branch) rescue Gitx::Executor::ExecutionError
         checkout_branch target_branch
       end
 
@@ -86,7 +86,7 @@ module Gitx
 
       def create_remote_branch(target_branch)
         repo.create_branch(target_branch, config.base_branch)
-        run_cmd "git push origin #{target_branch}:#{target_branch}"
+        run_git_cmd 'push', 'origin', "#{target_branch}:#{target_branch}"
       end
     end
   end

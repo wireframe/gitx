@@ -23,9 +23,9 @@ module Gitx
         return unless confirm_branch_status?(branch)
 
         checkout_branch config.base_branch
-        run_cmd "git pull origin #{config.base_branch}"
-        run_cmd %Q(git merge --no-ff -m "[gitx] Releasing #{branch} to #{config.base_branch} (Pull request ##{pull_request.number})" #{branch})
-        run_cmd 'git push origin HEAD'
+        run_git_cmd 'pull', 'origin', config.base_branch
+        run_git_cmd 'merge', '--no-ff', '--message', "[gitx] Releasing #{branch} to #{config.base_branch} (Pull request ##{pull_request.number})", branch
+        run_git_cmd 'push', 'origin', 'HEAD'
 
         after_release
       end

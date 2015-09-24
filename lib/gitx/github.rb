@@ -73,7 +73,7 @@ module Gitx
     end
 
     def pull_request_body(branch)
-      changelog = run_cmd("git log #{config.base_branch}...#{branch} --reverse --no-merges --pretty=format:'* %B'")
+      changelog = run_git_cmd('log', "#{config.base_branch}...#{branch}", '--reverse', '--no-merges', "--pretty=format:'* %B'")
       description = options[:description]
 
       description_template = []

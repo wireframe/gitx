@@ -22,11 +22,11 @@ module Gitx
         say last_known_good_tag, :green
 
         checkout_branch config.base_branch
-        run_cmd "git branch -D #{bad_branch}", allow_failure: true
-        run_cmd "git push origin --delete #{bad_branch}", allow_failure: true
-        run_cmd "git checkout -b #{bad_branch} #{last_known_good_tag}"
-        run_cmd "git push origin #{bad_branch}"
-        run_cmd "git branch --set-upstream-to origin/#{bad_branch}"
+        run_git_cmd('branch', '--delete', '--force', bad_branch) rescue Gitx::Executor::ExecutionError
+        run_git_cmd('push', 'origin', '--delete', bad_branch) rescue Gitx::Executor::ExecutionError
+        run_git_cmd 'checkout', '-b', bad_branch, last_known_good_tag
+        run_git_cmd 'push', 'origin', bad_branch
+        run_git_cmd 'branch', '--set-upstream-to', "origin/#{bad_branch}"
         checkout_branch config.base_branch
       end
 
@@ -34,7 +34,7 @@ module Gitx
 
       def migrations_need_to_be_reverted?(bad_branch, last_known_good_tag)
         return false unless File.exist?('db/migrate')
-        outdated_migrations = run_cmd("git diff #{last_known_good_tag}...#{bad_branch} --name-only db/migrate").split
+        outdated_migrations = run_git_cmd('diff', "#{last_known_good_tag}...#{bad_branch}", '--name-only', 'db/migrate').split
         return false if outdated_migrations.empty?
 
         say "#{bad_branch} contains migrations that may need to be reverted.  Ensure any reversable migrations are reverted on affected databases before nuking.", :red
@@ -53,8 +53,8 @@ module Gitx
       end
 
       def build_tags_for_branch(branch)
-        run_cmd 'git fetch --tags'
-        build_tags = run_cmd("git tag -l 'build-#{branch}-*'").split
+        run_git_cmd 'fetch', '--tags'
+        build_tags = run_git_cmd('tag', '--list', "build-#{branch}-*").split
         build_tags.sort
       end
     end

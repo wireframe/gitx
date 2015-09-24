@@ -50,7 +50,7 @@ module Gitx
         reject_pull_request(pull_request) if options[:reject]
         assign_pull_request(pull_request) if options[:assignee]
 
-        run_cmd "open #{pull_request.html_url}" if options[:open]
+        run_cmd('open', pull_request.html_url) if options[:open]
       end
 
       private

@@ -14,13 +14,13 @@ module Gitx
 
         update_branch(current_branch.name) if remote_branch_exists?(current_branch.name)
         update_branch(config.base_branch)
-        run_cmd 'git push origin HEAD'
+        run_git_cmd 'push', 'origin', 'HEAD'
       end
 
       private
 
       def update_branch(branch)
-        run_cmd "git pull origin #{branch}"
+        run_git_cmd 'pull', 'origin', branch
       rescue
         raise MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the update command'
       end

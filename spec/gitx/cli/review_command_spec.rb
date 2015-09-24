@@ -10,6 +10,7 @@ describe Gitx::Cli::ReviewCommand do
     }
   end
   let(:cli) { described_class.new(args, options, config) }
+  let(:executor) { cli.send(:executor) }
   let(:repo) { double('fake repo', config: repo_config, workdir: repo_workdir) }
   let(:repo_workdir) { File.expand_path(File.join(__dir__, '../../../')) }
   let(:repo_config) do
@@ -45,8 +46,8 @@ describe Gitx::Cli::ReviewCommand do
         expect(Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
 
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return(changelog).ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'master...feature-branch', '--reverse', '--no-merges', "--pretty=format:'* %B'").and_return(changelog).ordered
         expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
@@ -82,8 +83,8 @@ describe Gitx::Cli::ReviewCommand do
         expect(Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
 
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:run_cmd).with('git checkout feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with("git log master...feature-branch --reverse --no-merges --pretty=format:'* %B'").and_return(changelog).ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'master...feature-branch', '--reverse', '--no-merges', "--pretty=format:'* %B'").and_return(changelog).ordered
         expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return(pull_request_description)
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
@@ -151,7 +152,7 @@ describe Gitx::Cli::ReviewCommand do
       let(:authorization_token) { '123123' }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
-        expect(cli).to receive(:run_cmd).with('open https://path/to/html/pull/request').ordered
+        expect(executor).to receive(:execute).with('open', 'https://path/to/html/pull/request').ordered
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.review
         end

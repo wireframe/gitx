@@ -9,7 +9,8 @@ describe Gitx::Cli::NukeCommand do
       pretend: true
     }
   end
-  let(:cli) { Gitx::Cli::NukeCommand.new(args, options, config) }
+  let(:cli) { described_class.new(args, options, config) }
+  let(:executor) { cli.send(:executor) }
   let(:branch) { double('fake branch', name: 'feature-branch') }
 
   before do
@@ -31,13 +32,13 @@ describe Gitx::Cli::NukeCommand do
 
         expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
 
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git branch -D prototype', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git push origin --delete prototype', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git checkout -b prototype build-master-2013-10-01-01').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin prototype').ordered
-        expect(cli).to receive(:run_cmd).with('git branch --set-upstream-to origin/prototype').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
         cli.nuke bad_branch
       end
@@ -55,13 +56,13 @@ describe Gitx::Cli::NukeCommand do
 
         expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
 
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git branch -D prototype', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git push origin --delete prototype', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git checkout -b prototype build-master-2013-10-01-01').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin prototype').ordered
-        expect(cli).to receive(:run_cmd).with('git branch --set-upstream-to origin/prototype').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
         cli.nuke 'prototype'
       end
@@ -77,7 +78,7 @@ describe Gitx::Cli::NukeCommand do
 
         expect(cli).to receive(:current_build_tag).with('master').and_return(buildtag)
 
-        expect(cli).to_not receive(:run_cmd)
+        expect(executor).to_not receive(:execute)
 
         cli.nuke 'prototype'
       end
@@ -95,8 +96,8 @@ describe Gitx::Cli::NukeCommand do
       let(:bad_branch) { 'prototype' }
       let(:buildtags) { '' }
       it 'raises error' do
-        expect(cli).to receive(:run_cmd).with('git fetch --tags').ordered
-        expect(cli).to receive(:run_cmd).with("git tag -l 'build-master-*'").and_return(buildtags).ordered
+        expect(executor).to receive(:execute).with('git', 'fetch', '--tags').ordered
+        expect(executor).to receive(:execute).with('git', 'tag', '--list', 'build-master-*').and_return(buildtags).ordered
 
         expect { cli.nuke('prototype') }.to raise_error(/No known good tag found for branch/)
       end
@@ -115,7 +116,7 @@ describe Gitx::Cli::NukeCommand do
 
         expect(cli).to receive(:ask).and_return(good_branch)
         expect(cli).to receive(:yes?).with('Reset prototype to build-master-2013-10-01-01? (y/n)', :green).and_return(true)
-        expect(cli).to receive(:run_cmd).with('git diff build-master-2013-10-01-01...prototype --name-only db/migrate').and_return(migrations)
+        expect(executor).to receive(:execute).with('git', 'diff', 'build-master-2013-10-01-01...prototype', '--name-only', 'db/migrate').and_return(migrations)
         expect(cli).to receive(:yes?).with('Are you sure you want to nuke prototype? (y/n) ', :green).and_return(false)
 
         cli.nuke 'prototype'
@@ -141,16 +142,16 @@ describe Gitx::Cli::NukeCommand do
 
         expect(cli).to receive(:ask).and_return(good_branch)
         expect(cli).to receive(:yes?).with('Reset prototype to build-master-2013-10-01-01? (y/n)', :green).and_return(true)
-        expect(cli).to receive(:run_cmd).with('git diff build-master-2013-10-01-01...prototype --name-only db/migrate').and_return(migrations)
+        expect(executor).to receive(:execute).with('git', 'diff', 'build-master-2013-10-01-01...prototype', '--name-only', 'db/migrate').and_return(migrations)
         expect(cli).to receive(:yes?).with('Are you sure you want to nuke prototype? (y/n) ', :green).and_return(true)
 
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
-        expect(cli).to receive(:run_cmd).with('git branch -D prototype', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git push origin --delete prototype', allow_failure: true).ordered
-        expect(cli).to receive(:run_cmd).with('git checkout -b prototype build-master-2013-10-01-01').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin prototype').ordered
-        expect(cli).to receive(:run_cmd).with('git branch --set-upstream-to origin/prototype').ordered
-        expect(cli).to receive(:run_cmd).with('git checkout master').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
         cli.nuke 'prototype'
       end
