@@ -12,7 +12,7 @@ class Thor
 
       Open3.popen2e(*cmd) do |stdin, stdout_err, wait_thr|
         while line = stdout_err.gets
-          say line, :yellow
+          say(line, :yellow) if options[:trace]
           output << line
         end
 
