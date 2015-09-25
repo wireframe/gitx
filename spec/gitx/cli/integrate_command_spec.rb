@@ -84,7 +84,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
-        expect(executor).to receive(:execute).with('git', 'log', 'master...feature-branch', '--reverse', '--no-merges', "--pretty=format:'* %B'").and_return(changelog).ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', "--pretty=format:* %B").and_return(changelog).ordered
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
