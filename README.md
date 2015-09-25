@@ -15,10 +15,6 @@ so they are available without learning any new commands!
 $ gem install gitx
 ```
 
-### Global Options
-* `--trace` or `-v` = verbose output for debugging commands
-* `--pretend` or `-p` = dry run commands and do not actually invoke operations
-
 ## git start <new_branch_name (optional)>
 
 update local repository with latest upstream changes and create a new feature branch

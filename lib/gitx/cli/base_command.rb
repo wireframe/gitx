@@ -13,11 +13,6 @@ module Gitx
 
       add_runtime_options!
 
-      method_option :trace, type: :boolean, aliases: '-v'
-      def initialize(*args)
-        super(*args)
-      end
-
       private
 
       def repo
@@ -29,7 +24,7 @@ module Gitx
 
       def run_cmd(*cmd)
         executor.execute(*cmd) do |output|
-          say(output, :yellow) if options[:trace]
+          say(output, :yellow)
         end
       end
 
