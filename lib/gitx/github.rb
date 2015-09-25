@@ -116,7 +116,7 @@ module Gitx
 
     def github_client_name
       timestamp = Time.now.utc.strftime('%FT%R:%S%z')
-      client_name = "The Garage Git eXtensions #{timestamp}"
+      client_name = "Git eXtensions #{timestamp}"
     end
 
     def github_client
