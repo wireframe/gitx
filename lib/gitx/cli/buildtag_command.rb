@@ -10,8 +10,8 @@ module Gitx
       method_option :message, type: :string, aliases: '-m', desc: 'message to attach to the buildtag'
       def buildtag
         fail "Branch must be one of the supported taggable branches: #{config.taggable_branches}" unless config.taggable_branch?(branch_name)
-        run_cmd "git tag #{git_tag} -a -m '#{label}'"
-        run_cmd "git push origin #{git_tag}"
+        run_git_cmd 'tag', git_tag, '--annotate', '--message', label
+        run_git_cmd 'push', 'origin', git_tag
       end
 
       private

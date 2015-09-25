@@ -9,7 +9,8 @@ describe Gitx::Cli::TrackCommand do
       pretend: true
     }
   end
-  let(:cli) { Gitx::Cli::TrackCommand.new(args, options, config) }
+  let(:cli) { described_class.new(args, options, config) }
+  let(:executor) { cli.send(:executor) }
   let(:branch) { double('fake branch', name: 'feature-branch') }
 
   before do
@@ -20,7 +21,7 @@ describe Gitx::Cli::TrackCommand do
     before do
       allow(cli).to receive(:say)
 
-      expect(cli).to receive(:run_cmd).with('git branch --set-upstream-to origin/feature-branch').ordered
+      expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/feature-branch').ordered
 
       cli.track
     end

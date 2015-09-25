@@ -8,16 +8,16 @@ module Gitx
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
       def cleanup
         checkout_branch config.base_branch
-        run_cmd 'git pull'
-        run_cmd 'git remote prune origin'
+        run_git_cmd 'pull'
+        run_git_cmd 'remote', 'prune', 'origin'
 
         say 'Deleting local and remote branches that have been merged into '
         say config.base_branch, :green
         merged_branches(remote: true).each do |branch|
-          run_cmd "git push origin --delete #{branch}"
+          run_git_cmd 'push', 'origin', '--delete', branch
         end
         merged_branches(remote: false).each do |branch|
-          run_cmd "git branch -d #{branch}"
+          run_git_cmd 'branch', '--delete', branch
         end
       end
 
@@ -26,9 +26,9 @@ module Gitx
       # @return list of branches that have been merged
       def merged_branches(options = {})
         args = []
-        args << '-r' if options[:remote]
+        args << '--remote' if options[:remote]
         args << '--merged'
-        output = run_cmd("git branch #{args.join(' ')}").split("\n")
+        output = run_git_cmd('branch', *args).split("\n")
         branches = output.map do |branch|
           branch = branch.gsub(/\*/, '').strip.split(' ').first
           branch = branch.split('/').last if options[:remote]

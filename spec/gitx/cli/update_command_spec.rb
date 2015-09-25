@@ -9,9 +9,10 @@ describe Gitx::Cli::UpdateCommand do
       pretend: true
     }
   end
-  let(:cli) { Gitx::Cli::UpdateCommand.new(args, options, config) }
+  let(:cli) { described_class.new(args, options, config) }
   let(:branch) { double('fake branch', name: 'feature-branch') }
   let(:repo) { cli.send(:repo) }
+  let(:executor) { cli.send(:executor) }
   let(:remote_branch_names) { ['origin/feature-branch'] }
 
   before do
@@ -26,9 +27,9 @@ describe Gitx::Cli::UpdateCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(cli).to receive(:run_cmd).with('git pull origin feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
-        expect(cli).to receive(:run_cmd).with('git push origin HEAD').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'share').ordered
 
         cli.update
       end
@@ -40,9 +41,9 @@ describe Gitx::Cli::UpdateCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(cli).to receive(:run_cmd).with('git pull origin feature-branch').and_raise('merge error').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').and_raise('merge error').ordered
 
-        expect { cli.update }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the update command')
+        expect { cli.update }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command')
       end
       it 'raises error' do
         should meet_expectations
@@ -52,10 +53,10 @@ describe Gitx::Cli::UpdateCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(cli).to receive(:run_cmd).with('git pull origin feature-branch').ordered
-        expect(cli).to receive(:run_cmd).with('git pull origin master').and_raise('merge error occurred').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').and_raise('merge error occurred').ordered
 
-        expect { cli.update }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge Conflict Occurred. Please fix merge conflict and rerun the update command')
+        expect { cli.update }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command')
       end
       it 'raises error' do
         should meet_expectations
@@ -66,8 +67,8 @@ describe Gitx::Cli::UpdateCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(cli).not_to receive(:run_cmd).with('git pull origin feature-branch')
-        expect(cli).to receive(:run_cmd).with('git pull origin master').ordered
+        expect(executor).not_to receive(:execute).with('git', 'pull', 'origin', 'feature-branch')
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
 
         cli.update
       end

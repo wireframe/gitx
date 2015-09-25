@@ -10,6 +10,7 @@ describe Gitx::Cli::BuildtagCommand do
     }
   end
   let(:cli) { described_class.new(args, options, config) }
+  let(:executor) { cli.send(:executor) }
   let(:branch) { double('fake branch', name: 'feature-branch') }
 
   before do
@@ -40,8 +41,8 @@ describe Gitx::Cli::BuildtagCommand do
       end
       before do
         Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
-          expect(cli).to receive(:run_cmd).with("git tag build-master-2013-10-30-10-21-28 -a -m '[gitx] buildtag for master'").ordered
-          expect(cli).to receive(:run_cmd).with('git push origin build-master-2013-10-30-10-21-28').ordered
+          expect(executor).to receive(:execute).with('git', 'tag', 'build-master-2013-10-30-10-21-28', '--annotate', '--message', '[gitx] buildtag for master').ordered
+          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'build-master-2013-10-30-10-21-28').ordered
           cli.buildtag
         end
       end
@@ -58,8 +59,8 @@ describe Gitx::Cli::BuildtagCommand do
       end
       before do
         Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
-          expect(cli).to receive(:run_cmd).with("git tag build-master-2013-10-30-10-21-28 -a -m 'custom git commit message'").ordered
-          expect(cli).to receive(:run_cmd).with('git push origin build-master-2013-10-30-10-21-28').ordered
+          expect(executor).to receive(:execute).with('git', 'tag', 'build-master-2013-10-30-10-21-28', '--annotate', '--message', 'custom git commit message').ordered
+          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'build-master-2013-10-30-10-21-28').ordered
           cli.buildtag
         end
       end

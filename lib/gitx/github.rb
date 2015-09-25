@@ -1,7 +1,6 @@
 require 'octokit'
 require 'fileutils'
 require 'yaml'
-require 'gitx/cli/update_command'
 
 module Gitx
   module Github
@@ -23,7 +22,7 @@ module Gitx
       pull_request = find_pull_request(branch)
       pull_request ||= begin
         checkout_branch(branch)
-        execute_command(Gitx::Cli::UpdateCommand, :update)
+        run_git_cmd 'update'
         pull_request = create_pull_request(branch)
         say 'Created pull request: '
         say pull_request.html_url, :green
@@ -73,7 +72,7 @@ module Gitx
     end
 
     def pull_request_body(branch)
-      changelog = run_cmd("git log #{config.base_branch}...#{branch} --reverse --no-merges --pretty=format:'* %B'")
+      changelog = run_git_cmd('log', "#{config.base_branch}...#{branch}", '--reverse', '--no-merges', "--pretty=format:'* %B'")
       description = options[:description]
 
       description_template = []

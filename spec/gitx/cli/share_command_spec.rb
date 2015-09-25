@@ -9,7 +9,8 @@ describe Gitx::Cli::ShareCommand do
       pretend: true
     }
   end
-  let(:cli) { Gitx::Cli::ShareCommand.new(args, options, config) }
+  let(:cli) { described_class.new(args, options, config) }
+  let(:executor) { cli.send(:executor) }
   let(:branch) { double('fake branch', name: 'feature-branch') }
 
   before do
@@ -20,8 +21,8 @@ describe Gitx::Cli::ShareCommand do
     before do
       allow(cli).to receive(:say)
 
-      expect(cli).to receive(:run_cmd).with('git push origin feature-branch').ordered
-      expect(cli).to receive(:run_cmd).with('git branch --set-upstream-to origin/feature-branch').ordered
+      expect(executor).to receive(:execute).with('git', 'push', 'origin', 'feature-branch').ordered
+      expect(executor).to receive(:execute).with('git', 'track').ordered
 
       cli.share
     end

@@ -1,27 +1,5 @@
-require 'open3'
-
 class Thor
   module Actions
-    # execute a shell command and raise an error if non-zero exit code is returned
-    # return the string output from the command
-    def run_cmd(*args)
-      options = args.last.is_a?(Hash) ? args.pop : {}
-      cmd = args
-      say "$ #{cmd.join(' ')}", :yellow
-      output = ''
-
-      Open3.popen2e(*cmd) do |stdin, stdout_err, wait_thr|
-        while line = stdout_err.gets
-          say(line, :yellow) if options[:trace]
-          output << line
-        end
-
-        exit_status = wait_thr.value
-        fail "#{cmd.join(' ')} failed" unless exit_status.success? || options[:allow_failure]
-      end
-      output
-    end
-
     # launch configured editor to retreive message/string
     # see http://osdir.com/ml/ruby-talk/2010-06/msg01424.html
     # see https://gist.github.com/rkumar/456809
