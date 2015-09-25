@@ -43,10 +43,9 @@ describe Gitx::Cli::ReviewCommand do
       end
       let(:changelog) { "* old commit\n\n* new commit" }
       before do
-        expect(Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
-
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'log', 'master...feature-branch', '--reverse', '--no-merges', "--pretty=format:'* %B'").and_return(changelog).ordered
         expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return('description')
 
@@ -80,10 +79,9 @@ describe Gitx::Cli::ReviewCommand do
       let(:changelog) { "* old commit\n\n* new commit" }
       let(:pull_request_description) { 'description' }
       before do
-        expect(Gitx::Cli::UpdateCommand).to receive(:new).and_return(fake_update_command)
-
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'log', 'master...feature-branch', '--reverse', '--no-merges', "--pretty=format:'* %B'").and_return(changelog).ordered
         expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return(pull_request_description)
 

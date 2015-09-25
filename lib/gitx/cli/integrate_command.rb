@@ -16,12 +16,7 @@ module Gitx
         branch = feature_branch_name
         print_message(branch, integration_branch)
 
-        begin
-          execute_command(UpdateCommand, :update)
-        rescue
-          raise MergeError, 'Merge conflict occurred.  Please fix merge conflict and rerun the integrate command'
-        end
-
+        run_git_cmd 'update'
         pull_request = pull_request_for_branch(branch)
         integrate_branch(branch, integration_branch, pull_request) unless options[:resume]
         checkout_branch branch

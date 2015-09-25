@@ -8,7 +8,7 @@ module Gitx
       desc 'share', 'Share the current branch in the remote repository'
       def share
         run_git_cmd 'push', 'origin', current_branch.name
-        run_git_cmd 'branch', '--set-upstream-to', "origin/#{current_branch.name}"
+        run_git_cmd 'track'
       end
     end
   end

@@ -36,8 +36,7 @@ describe Gitx::Cli::NukeCommand do
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
-        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'prototype').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'share').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
         cli.nuke bad_branch
@@ -60,8 +59,7 @@ describe Gitx::Cli::NukeCommand do
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
-        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'prototype').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'share').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
         cli.nuke 'prototype'
@@ -149,8 +147,7 @@ describe Gitx::Cli::NukeCommand do
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
-        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'prototype').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/prototype').ordered
+        expect(executor).to receive(:execute).with('git', 'share').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
         cli.nuke 'prototype'

@@ -25,8 +25,7 @@ module Gitx
         run_git_cmd('branch', '--delete', '--force', bad_branch) rescue Gitx::Executor::ExecutionError
         run_git_cmd('push', 'origin', '--delete', bad_branch) rescue Gitx::Executor::ExecutionError
         run_git_cmd 'checkout', '-b', bad_branch, last_known_good_tag
-        run_git_cmd 'push', 'origin', bad_branch
-        run_git_cmd 'branch', '--set-upstream-to', "origin/#{bad_branch}"
+        run_git_cmd 'share'
         checkout_branch config.base_branch
       end
 

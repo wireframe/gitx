@@ -34,12 +34,12 @@ describe Gitx::Cli::ReleaseCommand do
     context 'when user confirms release and pull request exists with non-success status' do
       before do
         expect(repo).to receive(:workdir).and_return(temp_dir)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:yes?).with('Release feature-branch to master? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: failure.  Proceed with release? (y/n)', :red).and_return(false)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to_not receive(:execute).with('git', 'checkout', 'master')
         expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'master')
         expect(executor).to_not receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch')
@@ -57,12 +57,11 @@ describe Gitx::Cli::ReleaseCommand do
       before do
         expect(repo).to receive(:workdir).and_return(temp_dir)
 
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
-
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
@@ -88,12 +87,11 @@ describe Gitx::Cli::ReleaseCommand do
         File.open(File.join(temp_dir, '.gitx.yml'), 'w') do |f|
           f.puts gitx_config.to_yaml
         end
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
-
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
@@ -111,12 +109,12 @@ describe Gitx::Cli::ReleaseCommand do
     context 'when target_branch is not nil and user confirms release and pull request exists with success status' do
       before do
         expect(repo).to receive(:workdir).and_return(temp_dir)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
@@ -147,13 +145,13 @@ describe Gitx::Cli::ReleaseCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         allow(cli).to receive(:ask_editor).and_return('description')
 
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update).twice
-
         expect(cli).to receive(:yes?).with('Release feature-branch to master? (y/n)', :green).and_return(true)
         expect(cli).to receive(:yes?).with('Branch status is currently: pending.  Proceed with release? (y/n)', :red).and_return(true)
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'log', 'master...feature-branch', '--reverse', '--no-merges', "--pretty=format:'* %B'").and_return('2013-01-01 did some stuff').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
@@ -181,12 +179,12 @@ describe Gitx::Cli::ReleaseCommand do
       end
       before do
         expect(repo).to receive(:workdir).and_return(temp_dir)
-        expect(cli).to receive(:execute_command).with(Gitx::Cli::UpdateCommand, :update)
 
         expect(cli).to receive(:yes?).and_return(true)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered

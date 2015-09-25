@@ -22,7 +22,7 @@ describe Gitx::Cli::ShareCommand do
       allow(cli).to receive(:say)
 
       expect(executor).to receive(:execute).with('git', 'push', 'origin', 'feature-branch').ordered
-      expect(executor).to receive(:execute).with('git', 'branch', '--set-upstream-to', 'origin/feature-branch').ordered
+      expect(executor).to receive(:execute).with('git', 'track').ordered
 
       cli.share
     end

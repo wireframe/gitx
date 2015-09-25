@@ -1,7 +1,6 @@
 require 'thor'
 require 'gitx'
 require 'gitx/cli/base_command'
-require 'gitx/cli/update_command'
 require 'gitx/github'
 
 module Gitx
@@ -17,7 +16,7 @@ module Gitx
         branch ||= current_branch.name
         assert_not_protected_branch!(branch, 'release')
         checkout_branch(branch)
-        execute_command(UpdateCommand, :update)
+        run_git_cmd 'update'
 
         pull_request = find_or_create_pull_request(branch)
         return unless confirm_branch_status?(branch)

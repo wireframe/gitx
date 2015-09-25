@@ -49,11 +49,6 @@ module Gitx
         fail "Cannot #{action} reserved branch" if config.reserved_branch?(branch) || config.aggregate_branch?(branch)
       end
 
-      # helper to invoke other CLI commands
-      def execute_command(command_class, method, args = [])
-        command_class.new.send(method, *args)
-      end
-
       def config
         @configuration ||= Gitx::Configuration.new(repo.workdir)
       end
