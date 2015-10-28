@@ -33,6 +33,7 @@ module Gitx
       EOS
 
       desc 'review', 'Create or update a pull request on github'
+      method_option :title, type: :string, aliases: '-t', desc: 'pull request title'
       method_option :description, type: :string, aliases: '-d', desc: 'pull request description'
       method_option :assignee, type: :string, aliases: '-a', desc: 'pull request assignee'
       method_option :open, type: :boolean, aliases: '-o', desc: 'open the pull request in a web browser'

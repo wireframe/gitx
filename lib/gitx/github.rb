@@ -66,7 +66,7 @@ module Gitx
       say 'in '
       say github_slug, :green
 
-      title = branch.gsub(/[-_]/, ' ')
+      title = pull_request_title(branch)
       body = pull_request_body(branch)
       github_client.create_pull_request(github_slug, config.base_branch, branch, title, body)
     end
@@ -80,6 +80,10 @@ module Gitx
       description_template << changelog
 
       body = ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
+    end
+
+    def pull_request_title(branch)
+      options[:title] || branch.gsub(/[-_]/, ' ')
     end
 
     # authorization token used for github API calls
