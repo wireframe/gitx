@@ -26,11 +26,14 @@ module Gitx
 
       def valid_new_branch_name?(branch)
         return false if repo_branches.include?(branch)
+        # TODO: use Rugged::Reference.valid_name?(branch) here instead of regex
+        # see https://github.com/libgit2/rugged/blob/master/test/reference_test.rb
         branch =~ VALID_BRANCH_NAME_REGEX
       end
 
       def repo_branches
         @branch_names ||= repo.branches.each_name.map do |branch|
+          # FIXME: this doesn't detect remote branches with slashes (ex: foo/bar)
           branch.split('/').last
         end
       end
