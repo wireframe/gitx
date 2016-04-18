@@ -79,7 +79,7 @@ module Gitx
       description_template << "#{description}\n" if description
       description_template << changelog
 
-      body = ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
+      ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
     end
 
     def pull_request_title(branch)
@@ -120,7 +120,7 @@ module Gitx
 
     def github_client_name
       timestamp = Time.now.utc.strftime('%FT%R:%S%z')
-      client_name = "Git eXtensions #{timestamp}"
+      "Git eXtensions #{timestamp}"
     end
 
     def github_client
@@ -142,7 +142,7 @@ module Gitx
     #   https://github.com/wireframe/gitx.git #=> wireframe/gitx
     def github_slug
       remote = repo.config['remote.origin.url']
-      remote.to_s.gsub(/\.git$/, '').split(/[:\/]/).last(2).join('/')
+      remote.to_s.gsub(/\.git$/, '').split(%r{[:\/]}).last(2).join('/')
     end
 
     def github_organization

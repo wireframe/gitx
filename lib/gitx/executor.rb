@@ -12,7 +12,9 @@ module Gitx
       output = ''
 
       Open3.popen2e(*cmd) do |_stdin, stdout_err, wait_thread|
-        while line = stdout_err.gets
+        loop do
+          line = stdout_err.gets
+          break unless line
           output << line
           yield line if block_given?
         end
