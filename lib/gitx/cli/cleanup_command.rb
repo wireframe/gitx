@@ -30,7 +30,7 @@ module Gitx
       # filter out reserved and aggregate branches
       def filtered_merged_branches(source)
         merged_branches(source).reject do |branch|
-          config.reserved_branches.include?(branch) || config.aggregate_branch?(b)
+          config.reserved_branches.include?(branch) || config.aggregate_branch?(branch)
         end
       end
 
