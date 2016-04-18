@@ -7,38 +7,47 @@ module Gitx
     class CleanupCommand < BaseCommand
       desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
       def cleanup
-        checkout_branch config.base_branch
-        run_git_cmd 'pull'
-        run_git_cmd 'remote', 'prune', 'origin'
-
+        update_base_branch
         say 'Deleting local and remote branches that have been merged into '
         say config.base_branch, :green
-        merged_branches(remote: true).each do |branch|
+        filtered_merged_branches(:remote).each do |branch|
           run_git_cmd 'push', 'origin', '--delete', branch
         end
-        merged_branches(remote: false).each do |branch|
+        filtered_merged_branches(:local).each do |branch|
           run_git_cmd 'branch', '--delete', branch
         end
       end
 
       private
 
-      # @return list of branches that have been merged
-      def merged_branches(options = {})
-        args = []
-        args << '--remote' if options[:remote]
-        args << '--merged'
-        output = run_git_cmd('branch', *args).split("\n")
-        branches = output.map do |branch|
-          branch = branch.gsub(/\*/, '').strip.split(' ').first
-          branch = branch.gsub('origin/', '') if options[:remote]
-          branch
-        end
-        branches.uniq!
-        branches -= config.reserved_branches
-        branches.reject! { |b| config.aggregate_branch?(b) }
+      def update_base_branch
+        checkout_branch config.base_branch
+        run_git_cmd 'pull'
+        run_git_cmd 'remote', 'prune', 'origin'
+      end
 
-        branches
+      # @return list of branches that have been merged
+      # filter out reserved and aggregate branches
+      def filtered_merged_branches(source)
+        merged_branches(source).reject do |branch|
+          config.reserved_branches.include?(branch) || config.aggregate_branch?(b)
+        end
+      end
+
+      # @return list of branches that have been merged
+      # see http://stackoverflow.com/questions/26804024/git-branch-merged-sha-via-rugged-libgit2-bindings
+      def merged_branches(source)
+        merged_branches = repo.branches.each(source).select do |branch|
+          target = branch.resolve.target
+          repo.merge_base(base_branch_merge_target, target) == target.oid
+        end
+        merged_branches.map do |branch|
+          branch.name.gsub('origin/', '')
+        end
+      end
+
+      def base_branch_merge_target
+        repo.head.target
       end
     end
   end
