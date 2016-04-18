@@ -9,7 +9,7 @@ module Gitx
       method_option :branch, type: :string, aliases: '-b', desc: 'branch name for build tag'
       method_option :message, type: :string, aliases: '-m', desc: 'message to attach to the buildtag'
       def buildtag
-        fail "Branch must be one of the supported taggable branches: #{config.taggable_branches}" unless config.taggable_branch?(branch_name)
+        raise "Branch must be one of the supported taggable branches: #{config.taggable_branches}" unless config.taggable_branch?(branch_name)
         run_git_cmd 'tag', git_tag, '--annotate', '--message', label
         run_git_cmd 'push', 'origin', git_tag
       end

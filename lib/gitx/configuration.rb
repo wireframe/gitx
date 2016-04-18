@@ -3,7 +3,7 @@ require 'thor/core_ext/hash_with_indifferent_access'
 
 module Gitx
   class Configuration
-    CONFIG_FILE = '.gitx.yml'
+    CONFIG_FILE = '.gitx.yml'.freeze
 
     attr_reader :config
 

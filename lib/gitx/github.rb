@@ -4,9 +4,9 @@ require 'yaml'
 
 module Gitx
   module Github
-    GLOBAL_CONFIG_FILE = '~/.config/gitx/github.yml'
-    REVIEW_CONTEXT = 'peer_review'
-    CLIENT_URL = 'https://github.com/wireframe/gitx'
+    GLOBAL_CONFIG_FILE = '~/.config/gitx/github.yml'.freeze
+    REVIEW_CONTEXT = 'peer_review'.freeze
+    CLIENT_URL = 'https://github.com/wireframe/gitx'.freeze
     PULL_REQUEST_FOOTER = <<-EOS.dedent
       # Pull Request Protips(tm):
       # * Describe how this change accomplishes the task at hand
@@ -131,7 +131,7 @@ module Gitx
     # @raise error if github.user is not configured
     def username
       username = repo.config['github.user']
-      fail "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
+      raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
       username
     end
 

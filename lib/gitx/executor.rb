@@ -20,7 +20,7 @@ module Gitx
         end
 
         exit_status = wait_thread.value
-        fail ExecutionError, "#{cmd.join(' ')} failed" unless exit_status.success?
+        raise ExecutionError, "#{cmd.join(' ')} failed" unless exit_status.success?
       end
       output
     end

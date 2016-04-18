@@ -18,7 +18,7 @@ class Thor
                   '-f'
                 else
                   ''
-        end
+                end
         pid = fork { exec([editor, flags, f.path].join(' ')) }
         Process.waitpid(pid)
         File.read(f.path)

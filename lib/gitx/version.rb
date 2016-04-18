@@ -1,3 +1,3 @@
 module Gitx
-  VERSION = '2.23.0'
+  VERSION = '2.23.0'.freeze
 end

@@ -5,7 +5,7 @@ require 'gitx/cli/base_command'
 module Gitx
   module Cli
     class StartCommand < BaseCommand
-      EXAMPLE_BRANCH_NAMES = %w( api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link )
+      EXAMPLE_BRANCH_NAMES = %w( api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link ).freeze
       VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/
 
       desc 'start', 'start a new git branch with latest changes from master'

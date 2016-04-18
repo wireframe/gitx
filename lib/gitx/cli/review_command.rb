@@ -8,14 +8,14 @@ module Gitx
     class ReviewCommand < BaseCommand
       include Gitx::Github
 
-      BUMP_COMMENT_PREFIX = '[gitx] review bump :tada:'
+      BUMP_COMMENT_PREFIX = '[gitx] review bump :tada:'.freeze
       BUMP_COMMENT_FOOTER = <<-EOS.dedent
         # Bump comments should include:
         # * Summary of what changed
         #
         # This footer will automatically be stripped from the created comment
       EOS
-      APPROVAL_COMMENT_PREFIX = '[gitx] review approved :shipit:'
+      APPROVAL_COMMENT_PREFIX = '[gitx] review approved :shipit:'.freeze
       APPROVAL_COMMENT_FOOTER = <<-EOS.dedent
         # Approval comments can include:
         # * Feedback
@@ -23,7 +23,7 @@ module Gitx
         #
         # This footer will automatically be stripped from the created comment
       EOS
-      REJECTION_COMMENT_PREFIX = '[gitx] review rejected'
+      REJECTION_COMMENT_PREFIX = '[gitx] review rejected'.freeze
       REJECTION_COMMENT_FOOTER = <<-EOS.dedent
         # Rejection comments should include:
         # * Feedback
@@ -42,7 +42,7 @@ module Gitx
       method_option :reject, type: :boolean, desc: 'reject the pull request an post comment on pull request'
       # @see http://developer.github.com/v3/pulls/
       def review(branch = nil)
-        fail 'Github authorization token not found' unless authorization_token
+        raise 'Github authorization token not found' unless authorization_token
 
         branch ||= current_branch.name
         pull_request = find_or_create_pull_request(branch)
