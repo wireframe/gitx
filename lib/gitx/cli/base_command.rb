@@ -42,11 +42,11 @@ module Gitx
       end
 
       def assert_aggregate_branch!(target_branch)
-        fail "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{config.aggregate_branches}" unless config.aggregate_branch?(target_branch)
+        raise "Invalid aggregate branch: #{target_branch} must be one of supported aggregate branches #{config.aggregate_branches}" unless config.aggregate_branch?(target_branch)
       end
 
       def assert_not_protected_branch!(branch, action)
-        fail "Cannot #{action} reserved branch" if config.reserved_branch?(branch) || config.aggregate_branch?(branch)
+        raise "Cannot #{action} reserved branch" if config.reserved_branch?(branch) || config.aggregate_branch?(branch)
       end
 
       def config

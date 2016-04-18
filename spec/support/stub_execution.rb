@@ -9,6 +9,6 @@ module Kernel
     end
   end
 
-  alias_method :execute_without_stub, :`
-  alias_method :`, :execute_with_stub
+  alias execute_without_stub `
+  alias ` execute_with_stub
 end

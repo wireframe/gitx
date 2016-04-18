@@ -46,7 +46,7 @@ describe Gitx::Cli::ReviewCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
-        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', "--pretty=format:* %B").and_return(changelog).ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return(changelog).ordered
         expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return('description')
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
@@ -82,11 +82,11 @@ describe Gitx::Cli::ReviewCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
-        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', "--pretty=format:* %B").and_return(changelog).ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return(changelog).ordered
         expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return(pull_request_description)
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
-          .with(body: {base: 'master', head: 'feature-branch', title: 'feature branch', body: pull_request_description}.to_json)
+          .with(body: { base: 'master', head: 'feature-branch', title: 'feature branch', body: pull_request_description }.to_json)
           .to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
 
         VCR.use_cassette('pull_request_does_not_exist') do

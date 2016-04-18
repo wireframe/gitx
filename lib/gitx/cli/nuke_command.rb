@@ -9,7 +9,7 @@ module Gitx
       method_option :destination, type: :string, aliases: '-d', desc: 'destination branch to reset to'
       def nuke(bad_branch)
         good_branch = options[:destination] || ask("What branch do you want to reset #{bad_branch} to? (default: #{bad_branch})")
-        good_branch = bad_branch if good_branch.length == 0
+        good_branch = bad_branch if good_branch.empty?
 
         last_known_good_tag = current_build_tag(good_branch)
         return unless yes?("Reset #{bad_branch} to #{last_known_good_tag}? (y/n)", :green)
@@ -47,7 +47,7 @@ module Gitx
 
       def current_build_tag(branch)
         last_build_tag = build_tags_for_branch(branch).last
-        fail "No known good tag found for branch: #{branch}.  Verify tag exists via `git tag -l 'build-#{branch}-*'`" unless last_build_tag
+        raise "No known good tag found for branch: #{branch}.  Verify tag exists via `git tag -l 'build-#{branch}-*'`" unless last_build_tag
         last_build_tag
       end
 

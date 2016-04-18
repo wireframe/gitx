@@ -12,13 +12,13 @@ class Thor
         f.flush
 
         flags = case editor
-        when 'mate', 'emacs', 'subl'
-          '-w'
-        when 'mvim'
-          '-f'
-        else
-          ''
-        end
+                when 'mate', 'emacs', 'subl'
+                  '-w'
+                when 'mvim'
+                  '-f'
+                else
+                  ''
+                end
         pid = fork { exec([editor, flags, f.path].join(' ')) }
         Process.waitpid(pid)
         File.read(f.path)

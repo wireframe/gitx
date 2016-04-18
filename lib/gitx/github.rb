@@ -4,9 +4,9 @@ require 'yaml'
 
 module Gitx
   module Github
-    GLOBAL_CONFIG_FILE = '~/.config/gitx/github.yml'
-    REVIEW_CONTEXT = 'peer_review'
-    CLIENT_URL = 'https://github.com/wireframe/gitx'
+    GLOBAL_CONFIG_FILE = '~/.config/gitx/github.yml'.freeze
+    REVIEW_CONTEXT = 'peer_review'.freeze
+    CLIENT_URL = 'https://github.com/wireframe/gitx'.freeze
     PULL_REQUEST_FOOTER = <<-EOS.dedent
       # Pull Request Protips(tm):
       # * Describe how this change accomplishes the task at hand
@@ -72,14 +72,14 @@ module Gitx
     end
 
     def pull_request_body(branch)
-      changelog = run_git_cmd('log', "origin/#{config.base_branch}...#{branch}", '--reverse', '--no-merges', "--pretty=format:* %B")
+      changelog = run_git_cmd('log', "origin/#{config.base_branch}...#{branch}", '--reverse', '--no-merges', '--pretty=format:* %B')
       description = options[:description]
 
       description_template = []
       description_template << "#{description}\n" if description
       description_template << changelog
 
-      body = ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
+      ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
     end
 
     def pull_request_title(branch)
@@ -120,7 +120,7 @@ module Gitx
 
     def github_client_name
       timestamp = Time.now.utc.strftime('%FT%R:%S%z')
-      client_name = "Git eXtensions #{timestamp}"
+      "Git eXtensions #{timestamp}"
     end
 
     def github_client
@@ -131,7 +131,7 @@ module Gitx
     # @raise error if github.user is not configured
     def username
       username = repo.config['github.user']
-      fail "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
+      raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
       username
     end
 
@@ -142,7 +142,7 @@ module Gitx
     #   https://github.com/wireframe/gitx.git #=> wireframe/gitx
     def github_slug
       remote = repo.config['remote.origin.url']
-      remote.to_s.gsub(/\.git$/, '').split(/[:\/]/).last(2).join('/')
+      remote.to_s.gsub(/\.git$/, '').split(%r{[:\/]}).last(2).join('/')
     end
 
     def github_organization

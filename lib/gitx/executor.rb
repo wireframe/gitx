@@ -11,14 +11,16 @@ module Gitx
       yield "$ #{cmd.join(' ')}" if block_given?
       output = ''
 
-      Open3.popen2e(*cmd) do |stdin, stdout_err, wait_thread|
-        while line = stdout_err.gets
+      Open3.popen2e(*cmd) do |_stdin, stdout_err, wait_thread|
+        loop do
+          line = stdout_err.gets
+          break unless line
           output << line
           yield line if block_given?
         end
 
         exit_status = wait_thread.value
-        fail ExecutionError, "#{cmd.join(' ')} failed" unless exit_status.success?
+        raise ExecutionError, "#{cmd.join(' ')} failed" unless exit_status.success?
       end
       output
     end

@@ -11,20 +11,29 @@ describe Gitx::Cli::CleanupCommand do
   end
   let(:cli) { described_class.new(args, options, config) }
   let(:executor) { cli.send(:executor) }
-  let(:branch) { double('fake branch', name: 'feature-branch') }
-  let(:remote_branches) { '' }
-  let(:local_branches) { '' }
+  let(:remote_branches) { [] }
+  let(:local_branches) { [] }
+  let(:workdir) { '.' }
+  let(:oid) { '123123' }
+  let(:target) { double(:target, oid: oid) }
+  let(:reference) { double(:ref, target: target) }
+  let(:repo) { double(:repo, workdir: workdir, head: reference) }
+  let(:branches) { double(:branches) }
 
   before do
-    allow(cli).to receive(:current_branch).and_return(branch)
+    allow(cli).to receive(:repo).and_return(repo)
+    allow(repo).to receive(:branches).and_return(branches)
+    allow(repo).to receive(:merge_base).with(target, target).and_return(oid)
+    allow(branches).to receive(:each).with(:local).and_return(local_branches)
+    allow(branches).to receive(:each).with(:remote).and_return(remote_branches)
   end
 
   describe '#cleanup' do
     context 'when merged local branches exist' do
       let(:local_branches) do
-        <<-EOS.dedent
-        merged-local-feature
-        EOS
+        [
+          double(:branch, name: 'merged-local-feature', resolve: reference)
+        ]
       end
       before do
         allow(cli).to receive(:say)
@@ -32,8 +41,6 @@ describe Gitx::Cli::CleanupCommand do
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(executor).to receive(:execute).with('git', 'remote', 'prune', 'origin').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--remote', '--merged').and_return(remote_branches).ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--merged').and_return(local_branches).ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', 'merged-local-feature').ordered
 
         cli.cleanup
@@ -44,9 +51,9 @@ describe Gitx::Cli::CleanupCommand do
     end
     context 'when merged remote branches exist' do
       let(:remote_branches) do
-        <<-EOS.dedent
-        origin/merged-remote-feature
-        EOS
+        [
+          double(:branch, name: 'origin/merged-remote-feature', resolve: reference)
+        ]
       end
       before do
         allow(cli).to receive(:say)
@@ -54,9 +61,7 @@ describe Gitx::Cli::CleanupCommand do
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(executor).to receive(:execute).with('git', 'remote', 'prune', 'origin').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--remote', '--merged').and_return(remote_branches).ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'merged-remote-feature').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--merged').and_return(local_branches).ordered
 
         cli.cleanup
       end
@@ -66,9 +71,9 @@ describe Gitx::Cli::CleanupCommand do
     end
     context 'when mreged remote branches with slash exist' do
       let(:remote_branches) do
-        <<-EOS.dedent
-        origin/merged-remote-feature/review
-        EOS
+        [
+          double(:branch, name: 'origin/merged-remote-feature/review', resolve: reference)
+        ]
       end
       before do
         allow(cli).to receive(:say)
@@ -76,9 +81,7 @@ describe Gitx::Cli::CleanupCommand do
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(executor).to receive(:execute).with('git', 'remote', 'prune', 'origin').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--remote', '--merged').and_return(remote_branches).ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'merged-remote-feature/review').ordered
-        expect(executor).to receive(:execute).with('git', 'branch', '--merged').and_return(local_branches).ordered
 
         cli.cleanup
       end
