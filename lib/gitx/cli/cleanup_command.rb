@@ -31,7 +31,7 @@ module Gitx
         output = run_git_cmd('branch', *args).split("\n")
         branches = output.map do |branch|
           branch = branch.gsub(/\*/, '').strip.split(' ').first
-          branch = branch.split('/').last if options[:remote]
+          branch = branch.gsub('origin/', '') if options[:remote]
           branch
         end
         branches.uniq!

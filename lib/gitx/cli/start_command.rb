@@ -26,12 +26,13 @@ module Gitx
 
       def valid_new_branch_name?(branch)
         return false if repo_branches.include?(branch)
-        branch =~ VALID_BRANCH_NAME_REGEX
+        Rugged::Reference.valid_name?("refs/heads/#{branch}")
       end
 
+      # get list of local and remote branches
       def repo_branches
         @branch_names ||= repo.branches.each_name.map do |branch|
-          branch.split('/').last
+          branch.gsub('origin/', '')
         end
       end
     end

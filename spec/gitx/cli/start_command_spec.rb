@@ -27,6 +27,19 @@ describe Gitx::Cli::StartCommand do
         should meet_expectations
       end
     end
+    context 'when user inputs branch with slash' do
+      before do
+        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull').ordered
+        expect(repo).to receive(:create_branch).with('foo/ryan', 'master').ordered
+        expect(cli).to receive(:checkout_branch).with('foo/ryan').ordered
+
+        cli.start 'foo/ryan'
+      end
+      it do
+        should meet_expectations
+      end
+    end
     context 'when user does not input a branch name' do
       before do
         expect(cli).to receive(:ask).and_return('new-branch')
