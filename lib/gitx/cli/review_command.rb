@@ -15,7 +15,7 @@ module Gitx
         #
         # This footer will automatically be stripped from the created comment
       EOS
-      APPROVAL_COMMENT_PREFIX  = '[gitx] review approved :shipit:'
+      APPROVAL_COMMENT_PREFIX = '[gitx] review approved :shipit:'
       APPROVAL_COMMENT_FOOTER = <<-EOS.dedent
         # Approval comments can include:
         # * Feedback

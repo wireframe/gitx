@@ -152,7 +152,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
-        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', "--pretty=format:* %B").and_return('2013-01-01 did some stuff').ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return('2013-01-01 did some stuff').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered

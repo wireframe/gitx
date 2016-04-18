@@ -11,7 +11,7 @@ module Gitx
       yield "$ #{cmd.join(' ')}" if block_given?
       output = ''
 
-      Open3.popen2e(*cmd) do |stdin, stdout_err, wait_thread|
+      Open3.popen2e(*cmd) do |_stdin, stdout_err, wait_thread|
         while line = stdout_err.gets
           output << line
           yield line if block_given?
