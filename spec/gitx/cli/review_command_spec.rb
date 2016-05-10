@@ -273,7 +273,8 @@ describe Gitx::Cli::ReviewCommand do
       let(:github_password) { 'secretz' }
       let(:authorization_token) { '123981239123' }
       before do
-        stub_request(:post, 'https://ryan@codecrate.com:secretz@api.github.com/authorizations')
+        stub_request(:post, 'https://api.github.com/authorizations')
+          .with(basic_auth: ['ryan@codecrate.com', 'secretz'])
           .to_return(status: 200, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
 
         expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', echo: false).and_return(github_password)
@@ -296,7 +297,8 @@ describe Gitx::Cli::ReviewCommand do
       let(:github_password) { 'secretz' }
       let(:authorization_token) { '123981239123' }
       before do
-        stub_request(:post, 'https://ryan@codecrate.com:secretz@api.github.com/authorizations')
+        stub_request(:post, 'https://api.github.com/authorizations')
+          .with(basic_auth: ['ryan@codecrate.com', 'secretz'])
           .to_return(status: 401, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
           .then
           .to_return(status: 200, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
@@ -343,7 +345,8 @@ describe Gitx::Cli::ReviewCommand do
       let(:authorization_token) { '123981239123' }
       let(:two_factor_auth_token) { '456456' }
       before do
-        stub_request(:post, 'https://ryan@codecrate.com:secretz@api.github.com/authorizations')
+        stub_request(:post, 'https://api.github.com/authorizations')
+          .with(basic_auth: ['ryan@codecrate.com', 'secretz'])
           .with(headers: { 'X-GitHub-OTP' => two_factor_auth_token })
           .to_return(status: 200, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
 
