@@ -69,7 +69,7 @@ describe Gitx::Cli::CleanupCommand do
         should meet_expectations
       end
     end
-    context 'when mreged remote branches with slash exist' do
+    context 'when merged remote branches with slash exist' do
       let(:remote_branches) do
         [
           double(:branch, name: 'origin/merged-remote-feature/review', resolve: reference)
@@ -86,6 +86,29 @@ describe Gitx::Cli::CleanupCommand do
         cli.cleanup
       end
       it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
+    context 'when merged branch includes the base_branch' do
+      let(:base_branch) { 'custom-base-branch' }
+      let(:remote_branches) do
+        [
+          double(:branch, name: "origin/#{base_branch}", resolve: reference)
+        ]
+      end
+      before do
+        configuration = cli.send(:config)
+        configuration.config[:base_branch] = base_branch
+        allow(cli).to receive(:say)
+
+        expect(executor).to receive(:execute).with('git', 'checkout', base_branch).ordered
+        expect(executor).to receive(:execute).with('git', 'pull').ordered
+        expect(executor).to receive(:execute).with('git', 'remote', 'prune', 'origin').ordered
+        expect(executor).to_not receive(:execute).with('git', 'push', 'origin', '--delete', base_branch)
+
+        cli.cleanup
+      end
+      it 'does not delete remote branch' do
         should meet_expectations
       end
     end

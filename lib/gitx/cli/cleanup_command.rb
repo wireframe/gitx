@@ -29,9 +29,16 @@ module Gitx
       # @return list of branches that have been merged
       # filter out reserved and aggregate branches
       def filtered_merged_branches(source)
-        merged_branches(source).reject do |branch|
-          config.reserved_branches.include?(branch) || config.aggregate_branch?(branch)
+        merged_branches(source).select do |branch|
+          deletable_branch?(branch)
         end
+      end
+
+      def deletable_branch?(branch)
+        return false if config.reserved_branches.include?(branch)
+        return false if config.aggregate_branch?(branch)
+        return false if config.base_branch == branch
+        true
       end
 
       # @return list of branches that have been merged
