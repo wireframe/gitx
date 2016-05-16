@@ -1,6 +1,7 @@
 require 'thor'
 require 'gitx'
 require 'gitx/cli/base_command'
+require 'gitx/cli/buildtag_command'
 
 module Gitx
   module Cli
@@ -47,14 +48,15 @@ module Gitx
 
       def current_build_tag(branch)
         last_build_tag = build_tags_for_branch(branch).last
-        raise "No known good tag found for branch: #{branch}.  Verify tag exists via `git tag -l 'build-#{branch}-*'`" unless last_build_tag
+        raise "No known good tag found for branch: #{branch}.  Verify tag exists via `git tag -l`" unless last_build_tag
         last_build_tag
       end
 
       def build_tags_for_branch(branch)
         run_git_cmd 'fetch', '--tags'
-        build_tags = run_git_cmd('tag', '--list', "build-#{branch}-*").split
-        build_tags.sort
+        prefix = [BuildtagCommand::BUILD_TAG_PREFIX, branch].join(BuildtagCommand::BUILD_TAG_SEPARATOR)
+        tags = repo.tags.select { |t| t.name.starts_with?(prefix) }
+        tags.map(&:name).sort
       end
     end
   end
