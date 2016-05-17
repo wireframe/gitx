@@ -41,8 +41,8 @@ describe Gitx::Cli::BuildtagCommand do
       end
       before do
         Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
-          expect(executor).to receive(:execute).with('git', 'tag', 'build-master-2013-10-30-10-21-28', '--annotate', '--message', '[gitx] buildtag for master').ordered
-          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'build-master-2013-10-30-10-21-28').ordered
+          expect(executor).to receive(:execute).with('git', 'tag', 'builds/master/2013-10-30-10-21-28', '--annotate', '--message', '[gitx] buildtag for master').ordered
+          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'builds/master/2013-10-30-10-21-28').ordered
           cli.buildtag
         end
       end
@@ -59,8 +59,8 @@ describe Gitx::Cli::BuildtagCommand do
       end
       before do
         Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
-          expect(executor).to receive(:execute).with('git', 'tag', 'build-master-2013-10-30-10-21-28', '--annotate', '--message', 'custom git commit message').ordered
-          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'build-master-2013-10-30-10-21-28').ordered
+          expect(executor).to receive(:execute).with('git', 'tag', 'builds/master/2013-10-30-10-21-28', '--annotate', '--message', 'custom git commit message').ordered
+          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'builds/master/2013-10-30-10-21-28').ordered
           cli.buildtag
         end
       end

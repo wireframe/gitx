@@ -12,9 +12,13 @@ describe Gitx::Cli::NukeCommand do
   let(:cli) { described_class.new(args, options, config) }
   let(:executor) { cli.send(:executor) }
   let(:branch) { double('fake branch', name: 'feature-branch') }
+  let(:tags) { [] }
+  let(:workdir) { '.' }
+  let(:repo) { double(:repo, workdir: workdir, tags: tags) }
 
   before do
     allow(cli).to receive(:current_branch).and_return(branch)
+    allow(cli).to receive(:repo).and_return(repo)
   end
 
   describe '#nuke' do
@@ -26,16 +30,16 @@ describe Gitx::Cli::NukeCommand do
       end
       let(:good_branch) { 'master' }
       let(:bad_branch) { 'prototype' }
-      let(:buildtag) { 'build-master-2013-10-01-01' }
+      let(:buildtag) { double(:tag, name: 'builds/master/2013-10-01-01') }
+      let(:tags) { [buildtag] }
       before do
         expect(cli).to receive(:yes?).and_return(true)
 
-        expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
-
+        expect(executor).to receive(:execute).with('git', 'fetch', '--tags').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
-        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'builds/master/2013-10-01-01').ordered
         expect(executor).to receive(:execute).with('git', 'share').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
@@ -48,17 +52,17 @@ describe Gitx::Cli::NukeCommand do
     context 'when target branch == prototype and destination prompt == nil' do
       let(:good_branch) { 'master' }
       let(:bad_branch) { 'prototype' }
-      let(:buildtag) { 'build-master-2013-10-01-01' }
+      let(:buildtag) { double(:tag, name: 'builds/master/2013-10-01-01') }
+      let(:tags) { [buildtag] }
       before do
         expect(cli).to receive(:ask).and_return(good_branch)
         expect(cli).to receive(:yes?).and_return(true)
 
-        expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
-
+        expect(executor).to receive(:execute).with('git', 'fetch', '--tags').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
-        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'builds/master/2013-10-01-01').ordered
         expect(executor).to receive(:execute).with('git', 'share').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
@@ -69,14 +73,14 @@ describe Gitx::Cli::NukeCommand do
       end
     end
     context 'when user does not confirm nuking the target branch' do
-      let(:buildtag) { 'build-master-2013-10-01-01' }
+      let(:buildtag) { double(:tag, name: 'builds/master/2013-10-01-01') }
+      let(:tags) { [buildtag] }
       before do
         expect(cli).to receive(:ask).and_return('master')
         expect(cli).to receive(:yes?).and_return(false)
 
-        expect(cli).to receive(:current_build_tag).with('master').and_return(buildtag)
-
-        expect(executor).to_not receive(:execute)
+        expect(executor).to receive(:execute).with('git', 'fetch', '--tags').ordered
+        expect(executor).to_not receive(:execute).with('git', 'checkout', 'master').ordered
 
         cli.nuke 'prototype'
       end
@@ -95,13 +99,12 @@ describe Gitx::Cli::NukeCommand do
       let(:buildtags) { '' }
       it 'raises error' do
         expect(executor).to receive(:execute).with('git', 'fetch', '--tags').ordered
-        expect(executor).to receive(:execute).with('git', 'tag', '--list', 'build-master-*').and_return(buildtags).ordered
-
         expect { cli.nuke('prototype') }.to raise_error(/No known good tag found for branch/)
       end
     end
     context 'when database migrations exist and user cancels operation' do
-      let(:buildtag) { 'build-master-2013-10-01-01' }
+      let(:buildtag) { double(:tag, name: 'builds/master/2013-10-01-01') }
+      let(:tags) { [buildtag] }
       let(:good_branch) { 'master' }
       let(:bad_branch) { 'prototype' }
       let(:migrations) do
@@ -110,11 +113,10 @@ describe Gitx::Cli::NukeCommand do
       before do
         FileUtils.mkdir_p('db/migrate')
 
-        expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
-
+        expect(executor).to receive(:execute).with('git', 'fetch', '--tags').ordered
         expect(cli).to receive(:ask).and_return(good_branch)
-        expect(cli).to receive(:yes?).with('Reset prototype to build-master-2013-10-01-01? (y/n)', :green).and_return(true)
-        expect(executor).to receive(:execute).with('git', 'diff', 'build-master-2013-10-01-01...prototype', '--name-only', 'db/migrate').and_return(migrations)
+        expect(cli).to receive(:yes?).with('Reset prototype to builds/master/2013-10-01-01? (y/n)', :green).and_return(true)
+        expect(executor).to receive(:execute).with('git', 'diff', 'builds/master/2013-10-01-01...prototype', '--name-only', 'db/migrate').and_return(migrations)
         expect(cli).to receive(:yes?).with('Are you sure you want to nuke prototype? (y/n) ', :green).and_return(false)
 
         cli.nuke 'prototype'
@@ -127,7 +129,8 @@ describe Gitx::Cli::NukeCommand do
       end
     end
     context 'when database migrations exist and user approves operation' do
-      let(:buildtag) { 'build-master-2013-10-01-01' }
+      let(:buildtag) { double(:tag, name: 'builds/master/2013-10-01-01') }
+      let(:tags) { [buildtag] }
       let(:good_branch) { 'master' }
       let(:bad_branch) { 'prototype' }
       let(:migrations) do
@@ -136,17 +139,16 @@ describe Gitx::Cli::NukeCommand do
       before do
         FileUtils.mkdir_p('db/migrate')
 
-        expect(cli).to receive(:current_build_tag).with(good_branch).and_return(buildtag)
-
         expect(cli).to receive(:ask).and_return(good_branch)
-        expect(cli).to receive(:yes?).with('Reset prototype to build-master-2013-10-01-01? (y/n)', :green).and_return(true)
-        expect(executor).to receive(:execute).with('git', 'diff', 'build-master-2013-10-01-01...prototype', '--name-only', 'db/migrate').and_return(migrations)
+        expect(cli).to receive(:yes?).with('Reset prototype to builds/master/2013-10-01-01? (y/n)', :green).and_return(true)
+        expect(executor).to receive(:execute).with('git', 'diff', 'builds/master/2013-10-01-01...prototype', '--name-only', 'db/migrate').and_return(migrations)
         expect(cli).to receive(:yes?).with('Are you sure you want to nuke prototype? (y/n) ', :green).and_return(true)
 
+        expect(executor).to receive(:execute).with('git', 'fetch', '--tags').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'prototype').ordered
-        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'build-master-2013-10-01-01').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', '-b', 'prototype', 'builds/master/2013-10-01-01').ordered
         expect(executor).to receive(:execute).with('git', 'share').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
