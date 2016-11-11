@@ -6,6 +6,10 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
+FileName:
+  Exclude:
+    - bin/*
+
 LineLength:
   Max: 200
 
@@ -39,6 +43,10 @@ Style/RescueModifier:
     - 'lib/gitx/cli/integrate_command.rb'
     - 'lib/gitx/cli/nuke_command.rb'
 
-FileName:
-  Exclude:
-    - bin/*
+# disable ruby 3 transition validation
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# increase max block size (fixes gemspec validation)
+Metrics/BlockLength:
+  Max: 50

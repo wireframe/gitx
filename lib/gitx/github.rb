@@ -161,14 +161,14 @@ module Gitx
 
     def save_global_config(options)
       config_dir = File.dirname(global_config_file)
-      ::FileUtils.mkdir_p(config_dir, mode: 0700) unless File.exist?(config_dir)
+      ::FileUtils.mkdir_p(config_dir, mode: 0o700) unless File.exist?(config_dir)
 
       @config = global_config.merge(options)
       File.open(global_config_file, 'a+') do |file|
         file.truncate(0)
         file.write(@config.to_yaml)
       end
-      File.chmod(0600, global_config_file)
+      File.chmod(0o600, global_config_file)
     end
 
     def ask_without_echo(message)
