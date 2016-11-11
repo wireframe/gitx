@@ -5,7 +5,7 @@ require 'gitx/cli/base_command'
 module Gitx
   module Cli
     class StartCommand < BaseCommand
-      EXAMPLE_BRANCH_NAMES = %w( api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link ).freeze
+      EXAMPLE_BRANCH_NAMES = %w(api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link).freeze
       VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/
 
       desc 'start', 'start a new git branch with latest changes from master'
@@ -19,10 +19,16 @@ module Gitx
         run_git_cmd 'pull'
         repo.create_branch branch_name, config.base_branch
         checkout_branch branch_name
-        run_git_cmd('commit', '--allow-empty', '--message', "Starting work on #{branch_name} (Issue ##{options[:issue]})") if options[:issue]
+        run_git_cmd('commit', '--allow-empty', '--message', commit_message(branch_name))
       end
 
       private
+
+      def commit_message(branch_name)
+        message = "[gitx] Start work on #{branch_name}"
+        message += "\n\nConnected to ##{options[:issue]}" if options[:issue]
+        message
+      end
 
       def valid_new_branch_name?(branch)
         return false if repo_branches.include?(branch)

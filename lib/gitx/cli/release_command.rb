@@ -23,13 +23,19 @@ module Gitx
 
         checkout_branch config.base_branch
         run_git_cmd 'pull', 'origin', config.base_branch
-        run_git_cmd 'merge', '--no-ff', '--message', "[gitx] Releasing #{branch} to #{config.base_branch} (Pull request ##{pull_request.number})", branch
+        run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, pull_request), branch
         run_git_cmd 'push', 'origin', 'HEAD'
 
         after_release
       end
 
       private
+
+      def commit_message(branch, pull_request)
+        message = "[gitx] Release #{branch} to #{config.base_branch}"
+        message += "\n\nConnected to ##{pull_request.number}"
+        message
+      end
 
       def confirm_branch_status?(branch)
         status = branch_status(branch)

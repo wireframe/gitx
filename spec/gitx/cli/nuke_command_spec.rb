@@ -108,7 +108,7 @@ describe Gitx::Cli::NukeCommand do
       let(:good_branch) { 'master' }
       let(:bad_branch) { 'prototype' }
       let(:migrations) do
-        %w( db/migrate/20140715194946_create_users.rb db/migrate/20140730063034_update_user_account.rb ).join("\n")
+        %w(db/migrate/20140715194946_create_users.rb db/migrate/20140730063034_update_user_account.rb).join("\n")
       end
       before do
         FileUtils.mkdir_p('db/migrate')
@@ -134,7 +134,7 @@ describe Gitx::Cli::NukeCommand do
       let(:good_branch) { 'master' }
       let(:bad_branch) { 'prototype' }
       let(:migrations) do
-        %w( db/migrate/20140715194946_create_users.rb db/migrate/20140730063034_update_user_account.rb ).join("\n")
+        %w(db/migrate/20140715194946_create_users.rb db/migrate/20140730063034_update_user_account.rb).join("\n")
       end
       before do
         FileUtils.mkdir_p('db/migrate')
