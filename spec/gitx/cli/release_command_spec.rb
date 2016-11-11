@@ -42,7 +42,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to_not receive(:execute).with('git', 'checkout', 'master')
         expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'master')
-        expect(executor).to_not receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch')
+        expect(executor).to_not receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to master\n\nConnected to #10", 'feature-branch')
         expect(executor).to_not receive(:execute).with('git', 'push', 'origin', 'HEAD')
 
         VCR.use_cassette('pull_request_does_exist_with_failure_status') do
@@ -64,7 +64,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to master\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate').ordered
 
@@ -94,7 +94,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to master\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('echo hello').ordered
 
@@ -117,7 +117,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to master\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate').ordered
 
@@ -155,7 +155,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return('2013-01-01 did some stuff').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to master\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate').ordered
 
@@ -187,7 +187,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Releasing feature-branch to master (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to master\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate').ordered
         expect(executor).to receive(:execute).with('git cleanup').ordered

@@ -39,14 +39,18 @@ module Gitx
 
       def integrate_branch(branch, integration_branch, pull_request)
         fetch_remote_branch(integration_branch)
-        commit_message = "[gitx] Integrating #{branch} into #{integration_branch}"
-        commit_message += " (Pull request ##{pull_request.number})" if pull_request
         begin
-          run_git_cmd 'merge', '--no-ff', '--message', commit_message, branch
+          run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, integration_branch, pull_request), branch
         rescue
           raise MergeError, "Merge conflict occurred.  Please fix merge conflict and rerun command with --resume #{branch} flag"
         end
         run_git_cmd 'push', 'origin', 'HEAD'
+      end
+
+      def commit_message(branch, integration_branch, pull_request)
+        commit_message = "[gitx] Integrate #{branch} into #{integration_branch}"
+        commit_message += "\n\nConnected to ##{pull_request.number}" if pull_request
+        commit_message
       end
 
       def feature_branch_name

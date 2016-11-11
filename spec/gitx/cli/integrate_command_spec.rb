@@ -34,7 +34,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrating feature-branch into staging (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Integrate feature-branch into staging\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
 
@@ -55,7 +55,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrating master into staging', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrate master into staging', 'master').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
 
@@ -88,7 +88,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrating feature-branch into staging (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Integrate feature-branch into staging\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
 
@@ -115,7 +115,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').and_raise(Gitx::Executor::ExecutionError).ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrating feature-branch into staging (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Integrate feature-branch into staging\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
 
@@ -134,7 +134,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'prototype').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'prototype').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrating feature-branch into prototype (Pull request #10)', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Integrate feature-branch into prototype\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
 
@@ -158,7 +158,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrating feature-branch into staging (Pull request #10)', 'feature-branch')
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Integrate feature-branch into staging\n\nConnected to #10", 'feature-branch')
           .and_raise('git merge feature-branch failed').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do

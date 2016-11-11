@@ -20,6 +20,7 @@ describe Gitx::Cli::StartCommand do
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
         cli.start 'new-branch'
       end
@@ -33,6 +34,7 @@ describe Gitx::Cli::StartCommand do
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(repo).to receive(:create_branch).with('foo/ryan', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('foo/ryan').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on foo/ryan').ordered
 
         cli.start 'foo/ryan'
       end
@@ -48,6 +50,7 @@ describe Gitx::Cli::StartCommand do
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
         cli.start
       end
@@ -63,6 +66,7 @@ describe Gitx::Cli::StartCommand do
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
         cli.start 'a bad_branch-name?'
       end
@@ -81,6 +85,7 @@ describe Gitx::Cli::StartCommand do
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
         cli.start 'bar'
       end
@@ -99,6 +104,7 @@ describe Gitx::Cli::StartCommand do
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
         cli.start 'bar'
       end
@@ -117,7 +123,7 @@ describe Gitx::Cli::StartCommand do
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
-        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', 'Starting work on new-branch (Issue #10)').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', "[gitx] Start work on new-branch\n\nConnected to #10").ordered
 
         cli.start 'new-branch'
       end
