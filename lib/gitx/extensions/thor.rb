@@ -1,3 +1,5 @@
+require 'tempfile'
+
 class Thor
   module Actions
     # launch configured editor to retreive message/string
@@ -7,7 +9,7 @@ class Thor
     def ask_editor(initial_text = '', editor: nil, footer: nil)
       editor ||= ENV['EDITOR'] || 'vi'
       initial_text += "\n\n#{footer}" if footer
-      text = Tempfile.open('text.md') do |f|
+      text = ::Tempfile.open('text.md') do |f|
         f << initial_text
         f.flush
 
