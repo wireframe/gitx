@@ -24,9 +24,9 @@ describe Gitx::Cli::BaseCommand do
   describe 'with custom .gitx.yml config file' do
     let(:config) do
       {
-        'aggregate_branches' => %w(foo bar),
-        'reserved_branches' => %w(baz qux),
-        'taggable_branches' => %w(quux corge)
+        'aggregate_branches' => %w[foo bar],
+        'reserved_branches' => %w[baz qux],
+        'taggable_branches' => %w[quux corge]
       }
     end
     before do
@@ -36,9 +36,9 @@ describe Gitx::Cli::BaseCommand do
       end
     end
     it 'overrides default options' do
-      expect(cli.send(:config).aggregate_branches).to eq(%w(foo bar))
-      expect(cli.send(:config).reserved_branches).to eq(%w(baz qux))
-      expect(cli.send(:config).taggable_branches).to eq(%w(quux corge))
+      expect(cli.send(:config).aggregate_branches).to eq(%w[foo bar])
+      expect(cli.send(:config).reserved_branches).to eq(%w[baz qux])
+      expect(cli.send(:config).taggable_branches).to eq(%w[quux corge])
     end
   end
 end
