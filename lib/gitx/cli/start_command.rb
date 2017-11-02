@@ -26,7 +26,7 @@ module Gitx
 
       def commit_message(branch_name)
         message = "[gitx] Start work on #{branch_name}"
-        if issue = options[:issue]
+        if (issue = options[:issue])
           issue = issue.dup.prepend('#') if issue =~ /\A\d+\z/
           message += "\n\nConnected to #{issue}"
         end
