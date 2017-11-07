@@ -9,7 +9,7 @@ module Gitx
       VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/
 
       desc 'start', 'start a new git branch with latest changes from master'
-      method_option :issue, type: :numeric, aliases: '-i', desc: 'Github issue number'
+      method_option :issue, type: :string, aliases: '-i', desc: 'Issue identifier'
       def start(branch_name = nil)
         until valid_new_branch_name?(branch_name)
           branch_name = ask("What would you like to name your branch? (ex: #{EXAMPLE_BRANCH_NAMES.sample})")
@@ -26,7 +26,10 @@ module Gitx
 
       def commit_message(branch_name)
         message = "[gitx] Start work on #{branch_name}"
-        message += "\n\nConnected to ##{options[:issue]}" if options[:issue]
+        if (issue = options[:issue])
+          issue = issue.dup.prepend('#') if issue =~ /\A\d+\z/
+          message += "\n\nConnected to #{issue}"
+        end
         message
       end
 
