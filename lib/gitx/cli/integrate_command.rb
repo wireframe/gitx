@@ -41,7 +41,7 @@ module Gitx
         fetch_remote_branch(integration_branch)
         begin
           run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, integration_branch, pull_request), branch
-        rescue
+        rescue Gitx::Executor::ExecutionError
           raise MergeError, "Merge conflict occurred.  Please fix merge conflict and rerun command with --resume #{branch} flag"
         end
         run_git_cmd 'push', 'origin', 'HEAD'

@@ -159,10 +159,10 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Integrate feature-branch into staging\n\nConnected to #10", 'feature-branch')
-                                             .and_raise('git merge feature-branch failed').ordered
+                                             .and_raise(Gitx::Executor::ExecutionError).ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
-          expect { cli.integrate }.to raise_error(/Merge conflict occurred.  Please fix merge conflict and rerun command with --resume feature-branch flag/)
+          expect { cli.integrate }.to raise_error(Gitx::Cli::BaseCommand::MergeError, /Merge conflict occurred.  Please fix merge conflict and rerun command with --resume feature-branch flag/)
         end
       end
       it 'raises a helpful error' do

@@ -21,7 +21,7 @@ module Gitx
 
       def update_branch(branch)
         run_git_cmd 'pull', 'origin', branch
-      rescue
+      rescue Gitx::Executor::ExecutionError
         raise MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command'
       end
 

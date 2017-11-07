@@ -41,7 +41,7 @@ describe Gitx::Cli::UpdateCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').and_raise('merge error').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').and_raise(Gitx::Executor::ExecutionError).ordered
 
         expect { cli.update }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command')
       end
@@ -54,7 +54,7 @@ describe Gitx::Cli::UpdateCommand do
         allow(cli).to receive(:say)
 
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').and_raise('merge error occurred').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').and_raise(Gitx::Executor::ExecutionError).ordered
 
         expect { cli.update }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command')
       end
