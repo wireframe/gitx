@@ -7,7 +7,7 @@ module Gitx
     GLOBAL_CONFIG_FILE = '~/.config/gitx/github.yml'.freeze
     REVIEW_CONTEXT = 'peer_review'.freeze
     CLIENT_URL = 'https://github.com/wireframe/gitx'.freeze
-    PULL_REQUEST_FOOTER = <<-EOS.dedent
+    PULL_REQUEST_FOOTER = <<-MESSAGE.dedent
       # Pull Request Protips(tm):
       # * Describe how this change accomplishes the task at hand
       # * Use GitHub flavored Markdown http://github.github.com/github-flavored-markdown/
@@ -16,7 +16,7 @@ module Gitx
       # * Review CONTRIBUTING.md for relevant workflow requirements
       #
       # This footer will automatically be stripped from the pull request description
-    EOS
+    MESSAGE
 
     def find_or_create_pull_request(branch)
       pull_request = find_pull_request(branch)

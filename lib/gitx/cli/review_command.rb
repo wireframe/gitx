@@ -9,28 +9,28 @@ module Gitx
       include Gitx::Github
 
       BUMP_COMMENT_PREFIX = '[gitx] review bump :tada:'.freeze
-      BUMP_COMMENT_FOOTER = <<-EOS.dedent
+      BUMP_COMMENT_FOOTER = <<-MESSAGE.dedent
         # Bump comments should include:
         # * Summary of what changed
         #
         # This footer will automatically be stripped from the created comment
-      EOS
+      MESSAGE
       APPROVAL_COMMENT_PREFIX = '[gitx] review approved :shipit:'.freeze
-      APPROVAL_COMMENT_FOOTER = <<-EOS.dedent
+      APPROVAL_COMMENT_FOOTER = <<-MESSAGE.dedent
         # Approval comments can include:
         # * Feedback
         # * Follow-up items for after release
         #
         # This footer will automatically be stripped from the created comment
-      EOS
+      MESSAGE
       REJECTION_COMMENT_PREFIX = '[gitx] review rejected'.freeze
-      REJECTION_COMMENT_FOOTER = <<-EOS.dedent
+      REJECTION_COMMENT_FOOTER = <<-MESSAGE.dedent
         # Rejection comments should include:
         # * Feedback
         # * Required changes before approved
         #
         # This footer will automatically be stripped from the created comment
-      EOS
+      MESSAGE
 
       desc 'review', 'Create or update a pull request on github'
       method_option :title, type: :string, aliases: '-t', desc: 'pull request title'
