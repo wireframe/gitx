@@ -11,9 +11,10 @@ module Gitx
       desc 'release', 'release the current branch to production'
       method_option :cleanup, type: :boolean, desc: 'cleanup merged branches after release'
       def release(branch = nil)
-        return unless yes?("Release #{current_branch.name} to #{config.base_branch}? (y/n)", :green)
-
         branch ||= current_branch.name
+        
+        return unless yes?("Release #{branch} to #{config.base_branch}? (y/n)", :green)
+
         assert_not_protected_branch!(branch, 'release')
         checkout_branch(branch)
         run_git_cmd 'update'
