@@ -39,7 +39,7 @@ module Gitx
 
       # get list of local and remote branches
       def repo_branches
-        @branch_names ||= repo.branches.each_name.map do |branch|
+        @repo_branches ||= repo.branches.each_name.map do |branch|
           branch.gsub('origin/', '')
         end
       end

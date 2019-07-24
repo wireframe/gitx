@@ -55,7 +55,7 @@ module Gitx
       end
 
       def feature_branch_name
-        @feature_branch ||= begin
+        @feature_branch_name ||= begin
           feature_branch = options[:resume] || current_branch.name
           feature_branch = ask("#{feature_branch} does not exist. Please select one of the available local branches: #{local_branches}") until local_branch_exists?(feature_branch)
           feature_branch

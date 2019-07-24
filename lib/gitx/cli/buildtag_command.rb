@@ -29,7 +29,7 @@ module Gitx
       end
 
       def build_tag
-        @buildtag ||= [
+        @build_tag ||= [
           BUILD_TAG_PREFIX,
           branch_name,
           utc_timestamp

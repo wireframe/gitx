@@ -50,7 +50,7 @@ module Gitx
       end
 
       def config
-        @configuration ||= Gitx::Configuration.new(repo.workdir)
+        @config ||= Gitx::Configuration.new(repo.workdir)
       end
 
       def executor

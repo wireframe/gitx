@@ -124,7 +124,7 @@ module Gitx
     end
 
     def github_client
-      @client ||= Octokit::Client.new(access_token: authorization_token)
+      @github_client ||= Octokit::Client.new(access_token: authorization_token)
     end
 
     # @return [String] github username (ex: 'wireframe') of the current github.user
@@ -155,7 +155,7 @@ module Gitx
     end
 
     def global_config
-      @config ||= begin
+      @global_config ||= begin
         File.exist?(global_config_file) ? YAML.load_file(global_config_file) : {}
       end
     end
