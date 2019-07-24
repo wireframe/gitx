@@ -1,10 +1,9 @@
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'gitx/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'gitx'
-  spec.version       = Gitx::VERSION
   spec.authors       = ['Ryan Sonnek']
   spec.email         = ['ryan.sonnek@gmail.com']
   spec.description   = 'Git eXtensions for improved development workflows'
@@ -32,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock'
 
   # configure gem version for continuous integration builds
-  if ENV['TRAVIS_JOB_NUMBER']
-    spec.version = "#{spec.version}.ci.#{ENV['TRAVIS_JOB_NUMBER']}"
-  end
+  version = Gitx::VERSION
+  version = "#{version}.ci.#{ENV['TRAVIS_JOB_NUMBER']}" if ENV['TRAVIS_JOB_NUMBER']
+  spec.version = version
 end

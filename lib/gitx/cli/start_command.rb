@@ -6,14 +6,12 @@ module Gitx
   module Cli
     class StartCommand < BaseCommand
       EXAMPLE_BRANCH_NAMES = %w[api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link].freeze
-      VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/
+      VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/.freeze
 
       desc 'start', 'start a new git branch with latest changes from master'
       method_option :issue, type: :string, aliases: '-i', desc: 'Issue identifier'
       def start(branch_name = nil)
-        until valid_new_branch_name?(branch_name)
-          branch_name = ask("What would you like to name your branch? (ex: #{EXAMPLE_BRANCH_NAMES.sample})")
-        end
+        branch_name = ask("What would you like to name your branch? (ex: #{EXAMPLE_BRANCH_NAMES.sample})") until valid_new_branch_name?(branch_name)
 
         checkout_branch config.base_branch
         run_git_cmd 'pull'
@@ -35,12 +33,13 @@ module Gitx
 
       def valid_new_branch_name?(branch)
         return false if repo_branches.include?(branch)
+
         Rugged::Reference.valid_name?("refs/heads/#{branch}")
       end
 
       # get list of local and remote branches
       def repo_branches
-        @branch_names ||= repo.branches.each_name.map do |branch|
+        @repo_branches ||= repo.branches.each_name.map do |branch|
           branch.gsub('origin/', '')
         end
       end

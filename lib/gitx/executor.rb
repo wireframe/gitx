@@ -15,6 +15,7 @@ module Gitx
         loop do
           line = stdout_err.gets
           break unless line
+
           output << line
           yield line if block_given?
         end

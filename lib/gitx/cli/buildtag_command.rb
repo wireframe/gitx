@@ -13,6 +13,7 @@ module Gitx
       method_option :message, type: :string, aliases: '-m', desc: 'message to attach to the buildtag'
       def buildtag
         raise "Branch must be one of the supported taggable branches: #{config.taggable_branches}" unless config.taggable_branch?(branch_name)
+
         run_git_cmd 'tag', build_tag, '--annotate', '--message', label
         run_git_cmd 'push', 'origin', build_tag
       end
@@ -28,7 +29,7 @@ module Gitx
       end
 
       def build_tag
-        @buildtag ||= [
+        @build_tag ||= [
           BUILD_TAG_PREFIX,
           branch_name,
           utc_timestamp
