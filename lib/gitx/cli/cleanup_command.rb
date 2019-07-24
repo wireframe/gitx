@@ -38,6 +38,7 @@ module Gitx
         return false if config.reserved_branches.include?(branch)
         return false if config.aggregate_branch?(branch)
         return false if config.base_branch == branch
+
         true
       end
 

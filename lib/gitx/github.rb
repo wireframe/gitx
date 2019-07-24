@@ -132,6 +132,7 @@ module Gitx
     def username
       username = repo.config['github.user']
       raise "Github user not configured.  Run: `git config --global github.user 'me@email.com'`" unless username
+
       username
     end
 

@@ -34,6 +34,7 @@ module Gitx
 
       def pull_request_for_branch(branch)
         return nil if config.reserved_branch?(branch)
+
         find_or_create_pull_request(branch)
       end
 
@@ -56,9 +57,7 @@ module Gitx
       def feature_branch_name
         @feature_branch ||= begin
           feature_branch = options[:resume] || current_branch.name
-          until local_branch_exists?(feature_branch)
-            feature_branch = ask("#{feature_branch} does not exist. Please select one of the available local branches: #{local_branches}")
-          end
+          feature_branch = ask("#{feature_branch} does not exist. Please select one of the available local branches: #{local_branches}") until local_branch_exists?(feature_branch)
           feature_branch
         end
       end
