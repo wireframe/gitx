@@ -6,7 +6,7 @@ module Gitx
   module Cli
     class StartCommand < BaseCommand
       EXAMPLE_BRANCH_NAMES = %w[api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link].freeze
-      VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/.freeze
+      VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_/]+$/.freeze
 
       desc 'start', 'start a new git branch with latest changes from master'
       method_option :issue, type: :string, aliases: '-i', desc: 'Issue identifier'
