@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'octokit'
-  spec.add_runtime_dependency 'rugged', '~> 0.26.0'
+  spec.add_runtime_dependency 'rugged', '~> 0.27.10'
   spec.add_runtime_dependency 'thor'
 
   spec.add_development_dependency 'bundler'
