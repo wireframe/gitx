@@ -227,7 +227,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git integrate').ordered
 
-        VCR.use_cassette('pull_request_does_exist_with_success_status') do
+        VCR.use_cassette('pull_request_does_exist_with_success_status_and_then_add_label') do
           cli.release
         end
       end
