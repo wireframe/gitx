@@ -6,6 +6,9 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
+AllCops:
+  TargetRubyVersion: '2.6'
+
 FileName:
   Exclude:
     - bin/*
@@ -25,7 +28,7 @@ Metrics/AbcSize:
 
 # Offense count: 2
 Metrics/CyclomaticComplexity:
-  Max: 7
+  Max: 8
 
 # Offense count: 5
 # Configuration parameters: CountComments.
