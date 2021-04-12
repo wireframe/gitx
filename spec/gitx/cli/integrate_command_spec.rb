@@ -19,6 +19,7 @@ describe Gitx::Cli::IntegrateCommand do
 
   before do
     allow(cli).to receive(:current_branch).and_return(current_branch)
+    allow(cli).to receive(:github_slug).and_return('wireframe/gitx')
     branches = double('fake branches')
     allow(branches).to receive(:each_name).with(:local).and_return(local_branch_names)
     allow(branches).to receive(:each_name).with(:remote).and_return(remote_branch_names)

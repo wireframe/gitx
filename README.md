@@ -47,13 +47,13 @@ This setting is cleared when a reviewer approves or rejects the pull request.
 
 ## git release <feature_branch_name (optional, default: current_branch)
 
-release the feature branch to master.  This operation will perform the following:
+release the feature branch to the base branch (by default, master).  This operation will perform the following:
 
 * pull latest code from remote feature branch
-* pull latest code from master branch
+* pull latest code from the base branch
 * prompt user to confirm they actually want to perform the release
 * check if pull request commit status is currently successful
-* merge current branch into master
+* merge current branch into the base branch (or add release label if configured)
 * (optional) cleanup merged branches from remote server
 
 options:
@@ -63,7 +63,7 @@ options:
 
 ## git cleanup
 
-delete released branches after they have been merged into master.
+delete released branches after they have been merged into the base branch.
 
 ## git nuke <aggregate_branch_name>
 

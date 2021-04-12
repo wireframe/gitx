@@ -2,6 +2,10 @@
 # default base branch
 base_branch: master
 
+# Label to use for releasing a pull request, if this is set a label will be
+# added to the PR rather than merging to the base branch
+release_label:
+
 # list of branches eligable for integration
 aggregate_branches:
   - staging

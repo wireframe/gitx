@@ -146,5 +146,83 @@ http_interactions:
       string: '{"state":"success"}'
     http_version:
   recorded_at: Tue, 05 Aug 2014 16:36:03 GMT
+- request:
+    method: post
+    uri: https://api.github.com/repos/wireframe/gitx/issues/10/labels
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.github.v3+json
+      User-Agent:
+      - Octokit Ruby Gem 3.2.0
+      Authorization:
+      - token 123123
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - GitHub.com
+      Date:
+      - Tue, 05 Aug 2014 16:36:03 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Status:
+      - 200 OK
+      X-Ratelimit-Limit:
+      - '5000'
+      X-Ratelimit-Remaining:
+      - '4991'
+      X-Ratelimit-Reset:
+      - '1407257585'
+      Cache-Control:
+      - private, max-age=60, s-maxage=60
+      Etag:
+      - '"6d00d48abf2adf1877c8244700cd4c6f"'
+      X-Oauth-Scopes:
+      - repo
+      X-Accepted-Oauth-Scopes:
+      - ''
+      Vary:
+      - Accept, Authorization, Cookie, X-GitHub-OTP
+      - Accept-Encoding
+      X-Github-Media-Type:
+      - github.v3; format=json
+      Link:
+      - <https://api.github.com/repositories/17608725/pulls?head=wireframe%3Afeature-branch&state=open&page=0>;
+        rel="last"
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - deny
+      Content-Security-Policy:
+      - default-src 'none'
+      Content-Length:
+      - '2'
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Expose-Headers:
+      - ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset,
+        X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Github-Request-Id:
+      - 46C5E25C:1E4F:1642AD9:53E107F3
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Served-By:
+      - d818ddef80f4c7d10683dd483558952a
+    body:
+      encoding: UTF-8
+      string: '[{"id":1,"name":"release-me"}]'
+    http_version:
+  recorded_at: Tue, 05 Aug 2014 16:36:03 GMT
 recorded_with: VCR 2.9.2
 

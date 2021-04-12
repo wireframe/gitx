@@ -17,6 +17,7 @@ describe Gitx::Cli::ReleaseCommand do
 
   before do
     allow(cli).to receive(:current_branch).and_return(branch)
+    allow(cli).to receive(:github_slug).and_return('wireframe/gitx')
   end
 
   describe '#release' do
@@ -58,6 +59,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(repo).to receive(:workdir).and_return(temp_dir)
 
         expect(cli).to receive(:yes?).and_return(true)
+        expect(cli).to_not receive(:label_pull_request)
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
@@ -193,6 +195,39 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git cleanup').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
+          cli.release
+        end
+      end
+      it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
+    context 'when user confirms release and pull request exists with success status with release_label config' do
+      let(:gitx_config) do
+        {
+          'release_label' => 'release-me'
+        }
+      end
+      before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
+        File.open(File.join(temp_dir, '.gitx.yml'), 'w') do |f|
+          f.puts gitx_config.to_yaml
+        end
+
+        expect(cli).to receive(:yes?).and_return(true)
+        expect(cli).to receive(:label_pull_request).with(having_attributes(number: 10), 'release-me').and_call_original
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+
+        expect(executor).to_not receive(:execute).with('git', 'checkout', 'master')
+        expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'master')
+        expect(executor).to_not receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to master\n\nConnected to #10", 'feature-branch')
+        expect(executor).to_not receive(:execute).with('git', 'push', 'origin', 'HEAD')
+
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'update').ordered
+        expect(executor).to receive(:execute).with('git integrate').ordered
+
+        VCR.use_cassette('pull_request_does_exist_with_success_status_and_then_add_label') do
           cli.release
         end
       end
