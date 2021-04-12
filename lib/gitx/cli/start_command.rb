@@ -8,7 +8,7 @@ module Gitx
       EXAMPLE_BRANCH_NAMES = %w[api-fix-invalid-auth desktop-cleanup-avatar-markup share-form-add-edit-link].freeze
       VALID_BRANCH_NAME_REGEX = /^[A-Za-z0-9\-_]+$/.freeze
 
-      desc 'start', 'start a new git branch with latest changes from master'
+      desc 'start', 'start a new git branch with latest changes from main'
       method_option :issue, type: :string, aliases: '-i', desc: 'Issue identifier'
       def start(branch_name = nil)
         branch_name = ask("What would you like to name your branch? (ex: #{EXAMPLE_BRANCH_NAMES.sample})") until valid_new_branch_name?(branch_name)

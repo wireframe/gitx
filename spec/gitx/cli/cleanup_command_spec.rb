@@ -38,7 +38,7 @@ describe Gitx::Cli::CleanupCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(executor).to receive(:execute).with('git', 'remote', 'prune', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', 'merged-local-feature').ordered
@@ -58,7 +58,7 @@ describe Gitx::Cli::CleanupCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(executor).to receive(:execute).with('git', 'remote', 'prune', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'merged-remote-feature').ordered
@@ -78,7 +78,7 @@ describe Gitx::Cli::CleanupCommand do
       before do
         allow(cli).to receive(:say)
 
-        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
         expect(executor).to receive(:execute).with('git', 'remote', 'prune', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', '--delete', 'merged-remote-feature/review').ordered

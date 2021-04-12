@@ -28,7 +28,7 @@ describe Gitx::Cli::UpdateCommand do
         allow(cli).to receive(:say)
 
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'share').ordered
 
         cli.update
@@ -49,12 +49,12 @@ describe Gitx::Cli::UpdateCommand do
         should meet_expectations
       end
     end
-    context 'when merge conflicts occur when pulling remote master branch' do
+    context 'when merge conflicts occur when pulling remote main branch' do
       before do
         allow(cli).to receive(:say)
 
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').and_raise(Gitx::Executor::ExecutionError).ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').and_raise(Gitx::Executor::ExecutionError).ordered
 
         expect { cli.update }.to raise_error(Gitx::Cli::BaseCommand::MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command')
       end
@@ -68,7 +68,7 @@ describe Gitx::Cli::UpdateCommand do
         allow(cli).to receive(:say)
 
         expect(executor).not_to receive(:execute).with('git', 'pull', 'origin', 'feature-branch')
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
 
         cli.update
       end

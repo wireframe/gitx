@@ -23,7 +23,7 @@ describe Gitx::Cli::BuildtagCommand do
         expect { cli.buildtag }.to raise_error(/Branch must be one of the supported taggable branches/)
       end
     end
-    context 'when options[:branch] is NOT master or staging' do
+    context 'when options[:branch] is NOT main or staging' do
       let(:options) do
         {
           branch: 'feature-branch'
@@ -33,16 +33,16 @@ describe Gitx::Cli::BuildtagCommand do
         expect { cli.buildtag }.to raise_error(/Branch must be one of the supported taggable branches/)
       end
     end
-    context 'when options[:branch] is master' do
+    context 'when options[:branch] is main' do
       let(:options) do
         {
-          branch: 'master'
+          branch: 'main'
         }
       end
       before do
         Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
-          expect(executor).to receive(:execute).with('git', 'tag', 'builds/master/2013-10-30-10-21-28', '--annotate', '--message', '[gitx] buildtag for master').ordered
-          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'builds/master/2013-10-30-10-21-28').ordered
+          expect(executor).to receive(:execute).with('git', 'tag', 'builds/main/2013-10-30-10-21-28', '--annotate', '--message', '[gitx] buildtag for main').ordered
+          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'builds/main/2013-10-30-10-21-28').ordered
           cli.buildtag
         end
       end
@@ -53,14 +53,14 @@ describe Gitx::Cli::BuildtagCommand do
     context 'when options[:message] is passed' do
       let(:options) do
         {
-          branch: 'master',
+          branch: 'main',
           message: 'custom git commit message'
         }
       end
       before do
         Timecop.freeze(Time.utc(2013, 10, 30, 10, 21, 28)) do
-          expect(executor).to receive(:execute).with('git', 'tag', 'builds/master/2013-10-30-10-21-28', '--annotate', '--message', 'custom git commit message').ordered
-          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'builds/master/2013-10-30-10-21-28').ordered
+          expect(executor).to receive(:execute).with('git', 'tag', 'builds/main/2013-10-30-10-21-28', '--annotate', '--message', 'custom git commit message').ordered
+          expect(executor).to receive(:execute).with('git', 'push', 'origin', 'builds/main/2013-10-30-10-21-28').ordered
           cli.buildtag
         end
       end

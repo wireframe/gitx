@@ -47,18 +47,18 @@ describe Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
     end
-    context 'when current_branch == master' do
-      let(:current_branch) { double('fake branch', name: 'master', head?: true) }
-      let(:local_branch_names) { ['master'] }
+    context 'when current_branch == main' do
+      let(:current_branch) { double('fake branch', name: 'main', head?: true) }
+      let(:local_branch_names) { ['main'] }
       let(:remote_branch_names) { ['origin/staging'] }
       before do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
-        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrate master into staging', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrate main into staging', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
-        expect(executor).to receive(:execute).with('git', 'checkout', 'master').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
 
         cli.integrate
       end
@@ -85,7 +85,7 @@ describe Gitx::Cli::IntegrateCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
-        expect(executor).to receive(:execute).with('git', 'log', 'origin/master...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return(changelog).ordered
+        expect(executor).to receive(:execute).with('git', 'log', 'origin/main...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return(changelog).ordered
         expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
         expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
@@ -109,7 +109,7 @@ describe Gitx::Cli::IntegrateCommand do
     context 'when staging branch does not exist remotely' do
       let(:remote_branch_names) { [] }
       before do
-        expect(repo).to receive(:create_branch).with('staging', 'master')
+        expect(repo).to receive(:create_branch).with('staging', 'main')
 
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'staging:staging').ordered

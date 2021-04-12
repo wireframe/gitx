@@ -1,6 +1,6 @@
 ---
 # default base branch
-base_branch: master
+base_branch: main
 
 # Label to use for releasing a pull request, if this is set a label will be
 # added to the PR rather than merging to the base branch
@@ -14,14 +14,14 @@ aggregate_branches:
 # list of branches that should not be deleted when cleaning up
 reserved_branches:
   - HEAD
-  - master
+  - main
   - next_release
   - staging
   - prototype
 
 # list of supported branches for generating buildtags
 taggable_branches:
-  - master
+  - main
   - staging
 
 # list of commands to execute after releasing feature branch
