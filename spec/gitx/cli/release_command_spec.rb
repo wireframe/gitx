@@ -17,6 +17,7 @@ describe Gitx::Cli::ReleaseCommand do
 
   before do
     allow(cli).to receive(:current_branch).and_return(branch)
+    allow(cli).to receive(:github_slug).and_return('wireframe/gitx')
   end
 
   describe '#release' do
