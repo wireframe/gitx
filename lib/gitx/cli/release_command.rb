@@ -12,7 +12,7 @@ module Gitx
       method_option :cleanup, type: :boolean, desc: 'cleanup merged branches after release'
       def release(branch = nil)
         branch ||= current_branch.name
-        
+
         return unless yes?("Release #{branch} to #{config.base_branch}? (y/n)", :green)
 
         assert_not_protected_branch!(branch, 'release')
@@ -22,10 +22,14 @@ module Gitx
         pull_request = find_or_create_pull_request(branch)
         return unless confirm_branch_status?(branch)
 
-        checkout_branch config.base_branch
-        run_git_cmd 'pull', 'origin', config.base_branch
-        run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, pull_request), branch
-        run_git_cmd 'push', 'origin', 'HEAD'
+        if (label = config.release_label)
+          label_pull_request pull_request, label
+        else
+          checkout_branch config.base_branch
+          run_git_cmd 'pull', 'origin', config.base_branch
+          run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, pull_request), branch
+          run_git_cmd 'push', 'origin', 'HEAD'
+        end
 
         after_release
       end

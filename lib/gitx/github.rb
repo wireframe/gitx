@@ -57,6 +57,10 @@ module Gitx
       github_client.create_status(github_slug, commit_sha, state, context: REVIEW_CONTEXT, description: description)
     end
 
+    def label_pull_request(pull_request, label)
+      github_client.add_labels_to_an_issue(github_slug, pull_request.number, [label])
+    end
+
     # @see http://developer.github.com/v3/pulls/
     def create_pull_request(branch)
       say 'Creating pull request for '

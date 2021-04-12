@@ -17,6 +17,10 @@ module Gitx
       config[:base_branch]
     end
 
+    def release_label
+      config[:release_label]
+    end
+
     def aggregate_branches
       config[:aggregate_branches]
     end

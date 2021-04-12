@@ -53,7 +53,7 @@ release the feature branch to the base branch (by default, master).  This operat
 * pull latest code from the base branch
 * prompt user to confirm they actually want to perform the release
 * check if pull request commit status is currently successful
-* merge current branch into the base branch
+* merge current branch into the base branch (or add release label if configured)
 * (optional) cleanup merged branches from remote server
 
 options:
