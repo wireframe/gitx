@@ -14,6 +14,7 @@ module Gitx
 
         last_known_good_tag = current_build_tag(good_branch)
         return unless yes?("Reset #{bad_branch} to #{last_known_good_tag}? (y/n)", :green)
+
         assert_aggregate_branch!(bad_branch)
         return if migrations_need_to_be_reverted?(bad_branch, last_known_good_tag)
 
@@ -34,6 +35,7 @@ module Gitx
 
       def migrations_need_to_be_reverted?(bad_branch, last_known_good_tag)
         return false unless File.exist?('db/migrate')
+
         outdated_migrations = run_git_cmd('diff', "#{last_known_good_tag}...#{bad_branch}", '--name-only', 'db/migrate').split
         return false if outdated_migrations.empty?
 
@@ -49,6 +51,7 @@ module Gitx
       def current_build_tag(branch)
         last_build_tag = build_tags_for_branch(branch).last
         raise "No known good tag found for branch: #{branch}.  Verify tag exists via `git tag -l`" unless last_build_tag
+
         last_build_tag
       end
 

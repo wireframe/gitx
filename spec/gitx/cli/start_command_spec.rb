@@ -112,10 +112,10 @@ describe Gitx::Cli::StartCommand do
         should meet_expectations
       end
     end
-    context 'when --issue option is used' do
+    context 'when --issue option is used with a numeric issue ID' do
       let(:options) do
         {
-          issue: 10
+          issue: '10'
         }
       end
       before do
@@ -124,6 +124,25 @@ describe Gitx::Cli::StartCommand do
         expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', "[gitx] Start work on new-branch\n\nConnected to #10").ordered
+
+        cli.start 'new-branch'
+      end
+      it 'creates empty commit with link to issue id' do
+        should meet_expectations
+      end
+    end
+    context 'when --issue option is used with a non-numeric issue ID' do
+      let(:options) do
+        {
+          issue: 'FOO-123'
+        }
+      end
+      before do
+        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(executor).to receive(:execute).with('git', 'pull').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(cli).to receive(:checkout_branch).with('new-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', "[gitx] Start work on new-branch\n\nConnected to FOO-123").ordered
 
         cli.start 'new-branch'
       end
