@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/wireframe/gitx.png?branch=master)](https://travis-ci.org/wireframe/gitx)
+[![Build Status](https://travis-ci.org/wireframe/gitx.png?branch=main)](https://travis-ci.org/wireframe/gitx)
 [![Code Coverage](https://coveralls.io/repos/wireframe/gitx/badge.png)](https://coveralls.io/r/wireframe/gitx)
 [![Code Climate](https://codeclimate.com/github/wireframe/gitx.png)](https://codeclimate.com/github/wireframe/gitx)
 
@@ -47,7 +47,7 @@ This setting is cleared when a reviewer approves or rejects the pull request.
 
 ## git release <feature_branch_name (optional, default: current_branch)
 
-release the feature branch to the base branch (by default, master).  This operation will perform the following:
+release the feature branch to the base branch (by default, main).  This operation will perform the following:
 
 * pull latest code from remote feature branch
 * pull latest code from the base branch

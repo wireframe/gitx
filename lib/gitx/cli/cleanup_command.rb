@@ -5,7 +5,7 @@ require 'gitx/cli/base_command'
 module Gitx
   module Cli
     class CleanupCommand < BaseCommand
-      desc 'cleanup', 'Cleanup branches that have been merged into master from the repo'
+      desc 'cleanup', 'Cleanup branches that have been merged into main from the repo'
       def cleanup
         update_base_branch
         say 'Deleting local and remote branches that have been merged into '

@@ -25,7 +25,7 @@ Use [Test Driven Development](http://en.wikipedia.org/wiki/Test-driven_developme
 * Follow [best practices](http://robots.thoughtbot.com/post/48933156625/5-useful-tips-for-a-better-commit-message) for git commit messages to communicate your changes.
 * Add [ticket references to commits to automatically trigger product management workflows](http://help.sprint.ly/knowledgebase/articles/108139-available-scm-vcs-commands)
 * Only write the **minimal** amount of code necessary to accomplish the given task.
-* Ensure branch stays up-to-date with latest changes that are merged into master by using: `$ git update`
+* Ensure branch stays up-to-date with latest changes that are merged into main by using: `$ git update`
 * Changes that are not directly related to the current feature should be cherry-picked into their own branch and merged separately.
 
 ### Testing Protips&trade;

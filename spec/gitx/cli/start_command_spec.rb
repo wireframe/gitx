@@ -16,9 +16,9 @@ describe Gitx::Cli::StartCommand do
   describe '#start' do
     context 'when user inputs branch that is valid' do
       before do
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
@@ -30,9 +30,9 @@ describe Gitx::Cli::StartCommand do
     end
     context 'when user inputs branch with slash' do
       before do
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('foo/ryan', 'master').ordered
+        expect(repo).to receive(:create_branch).with('foo/ryan', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('foo/ryan').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on foo/ryan').ordered
 
@@ -46,9 +46,9 @@ describe Gitx::Cli::StartCommand do
       before do
         expect(cli).to receive(:ask).and_return('new-branch')
 
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
@@ -62,9 +62,9 @@ describe Gitx::Cli::StartCommand do
       before do
         expect(cli).to receive(:ask).and_return('new-branch')
 
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
@@ -81,9 +81,9 @@ describe Gitx::Cli::StartCommand do
 
         expect(cli).to receive(:ask).and_return('new-branch')
 
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
@@ -100,9 +100,9 @@ describe Gitx::Cli::StartCommand do
 
         expect(cli).to receive(:ask).and_return('new-branch')
 
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', '[gitx] Start work on new-branch').ordered
 
@@ -119,9 +119,9 @@ describe Gitx::Cli::StartCommand do
         }
       end
       before do
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', "[gitx] Start work on new-branch\n\nConnected to #10").ordered
 
@@ -138,9 +138,9 @@ describe Gitx::Cli::StartCommand do
         }
       end
       before do
-        expect(cli).to receive(:checkout_branch).with('master').ordered
+        expect(cli).to receive(:checkout_branch).with('main').ordered
         expect(executor).to receive(:execute).with('git', 'pull').ordered
-        expect(repo).to receive(:create_branch).with('new-branch', 'master').ordered
+        expect(repo).to receive(:create_branch).with('new-branch', 'main').ordered
         expect(cli).to receive(:checkout_branch).with('new-branch').ordered
         expect(executor).to receive(:execute).with('git', 'commit', '--allow-empty', '--message', "[gitx] Start work on new-branch\n\nConnected to FOO-123").ordered
 

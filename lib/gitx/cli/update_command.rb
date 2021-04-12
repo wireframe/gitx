@@ -5,7 +5,7 @@ require 'gitx/cli/base_command'
 module Gitx
   module Cli
     class UpdateCommand < BaseCommand
-      desc 'update', 'Update the current branch with latest changes from the remote feature branch and master'
+      desc 'update', 'Update the current branch with latest changes from the remote feature branch and main'
       def update
         say 'Updating '
         say "#{current_branch.name} ", :green
