@@ -202,7 +202,7 @@ describe Gitx::Cli::ReleaseCommand do
         should meet_expectations
       end
     end
-    context 'when user confirms release and pull request exists with success status with release_label config' do
+    context 'when user confirms release with release_label config' do
       let(:gitx_config) do
         {
           'release_label' => 'release-me'
@@ -227,7 +227,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git integrate').ordered
 
-        VCR.use_cassette('pull_request_does_exist_with_success_status_and_then_add_label') do
+        VCR.use_cassette('pull_request_does_exist_and_then_add_label') do
           cli.release
         end
       end

@@ -20,11 +20,11 @@ module Gitx
         run_git_cmd 'update'
 
         pull_request = find_or_create_pull_request(branch)
-        return unless confirm_branch_status?(branch)
 
         if (label = config.release_label)
           label_pull_request pull_request, label
         else
+          return unless confirm_branch_status?(branch)
           checkout_branch config.base_branch
           run_git_cmd 'pull', 'origin', config.base_branch
           run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, pull_request), branch
