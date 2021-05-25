@@ -29,6 +29,9 @@ describe Gitx::Cli::UpdateCommand do
 
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'share').ordered
 
         cli.update
@@ -69,6 +72,9 @@ describe Gitx::Cli::UpdateCommand do
 
         expect(executor).not_to receive(:execute).with('git', 'pull', 'origin', 'feature-branch')
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
 
         cli.update
       end

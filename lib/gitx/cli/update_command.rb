@@ -14,10 +14,19 @@ module Gitx
 
         update_branch(current_branch.name) if remote_branch_exists?(current_branch.name)
         update_branch(config.base_branch)
+        update_base_branch
+
         run_git_cmd 'share'
       end
 
       private
+
+      def update_base_branch
+        branch_name = current_branch.name
+        checkout_branch(config.base_branch)
+        update_branch(config.base_branch)
+        checkout_branch(branch_name)
+      end
 
       def update_branch(branch)
         run_git_cmd 'pull', 'origin', branch
