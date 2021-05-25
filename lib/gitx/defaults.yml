@@ -26,4 +26,4 @@ taggable_branches:
 
 # list of commands to execute after releasing feature branch
 after_release:
-  - git integrate
+  - git integrate --skip-pull-request
