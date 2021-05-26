@@ -214,5 +214,29 @@ describe Gitx::Cli::IntegrateCommand do
         should meet_expectations
       end
     end
+    context 'with --skip-pull-request' do
+      let(:changelog) { '* made some fixes' }
+      let(:changelog) { '2013-01-01 did some stuff' }
+      let(:options) { { 'skip-pull-request': true } }
+      before do
+        allow(cli).to receive(:ask_editor).and_return('description')
+
+        expect(executor).to receive(:execute).with('git', 'update').ordered
+        expect(executor).to receive(:execute).with('git', 'fetch', 'origin').ordered
+        expect(executor).to receive(:execute).with('git', 'branch', '--delete', '--force', 'staging').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'staging').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', '[gitx] Integrate feature-branch into staging', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+
+        cli.integrate
+      end
+      it 'does not create pull request' do
+        expect(WebMock).to_not have_requested(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
+      end
+      it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
   end
 end

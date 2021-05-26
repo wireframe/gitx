@@ -68,7 +68,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
-        expect(executor).to receive(:execute).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release
@@ -121,7 +121,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
-        expect(executor).to receive(:execute).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
           cli.release 'feature-branch'
@@ -159,7 +159,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
-        expect(executor).to receive(:execute).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls').to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
         VCR.use_cassette('pull_request_does_not_exist') do
@@ -191,7 +191,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
-        expect(executor).to receive(:execute).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
         expect(executor).to receive(:execute).with('git cleanup').ordered
 
         VCR.use_cassette('pull_request_does_exist_with_success_status') do
@@ -225,7 +225,7 @@ describe Gitx::Cli::ReleaseCommand do
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
-        expect(executor).to receive(:execute).with('git integrate').ordered
+        expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
 
         VCR.use_cassette('pull_request_does_exist_and_then_add_label') do
           cli.release

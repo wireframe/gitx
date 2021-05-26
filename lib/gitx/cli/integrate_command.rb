@@ -9,6 +9,7 @@ module Gitx
     class IntegrateCommand < BaseCommand
       include Gitx::Github
       desc 'integrate', 'integrate the current branch into one of the aggregate development branches (default = staging)'
+      method_option :'skip-pull-request', type: :boolean, desc: 'skip pull request reference in merge commit'
       method_option :resume, type: :string, aliases: '-r', desc: 'resume merging of feature-branch'
       def integrate(integration_branch = 'staging')
         assert_aggregate_branch!(integration_branch)
@@ -17,7 +18,7 @@ module Gitx
         print_message(branch, integration_branch)
 
         run_git_cmd 'update'
-        pull_request = pull_request_for_branch(branch)
+        pull_request = pull_request_for_branch(branch) unless options[:'skip-pull-request']
         integrate_branch(branch, integration_branch, pull_request) unless options[:resume]
         checkout_branch branch
       end
