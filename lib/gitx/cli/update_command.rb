@@ -12,15 +12,24 @@ module Gitx
         say 'with latest changes from '
         say config.base_branch, :green
 
+        update_base_branch
         update_branch(current_branch.name) if remote_branch_exists?(current_branch.name)
-        update_branch(config.base_branch)
+        update_branch(config.base_branch, repository: '.')
+
         run_git_cmd 'share'
       end
 
       private
 
-      def update_branch(branch)
-        run_git_cmd 'pull', 'origin', branch
+      def update_base_branch
+        branch_name = current_branch.name
+        checkout_branch(config.base_branch)
+        update_branch(config.base_branch)
+        checkout_branch(branch_name)
+      end
+
+      def update_branch(branch, repository: 'origin')
+        run_git_cmd 'pull', repository, branch
       rescue Gitx::Executor::ExecutionError
         raise MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command'
       end
