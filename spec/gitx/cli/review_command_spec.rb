@@ -63,8 +63,12 @@ describe Gitx::Cli::ReviewCommand do
       end
     end
     context 'when target branch is not nil and pull request does not exist' do
+      subject(:review) do
+        VCR.use_cassette('pull_request_does_not_exist') do
+          cli.review 'feature-branch'
+        end
+      end
       let(:authorization_token) { '123123' }
-      let(:changelog) { '* made some fixes' }
       let(:fake_update_command) { double('fake update command', update: nil) }
       let(:new_pull_request) do
         {
@@ -77,27 +81,46 @@ describe Gitx::Cli::ReviewCommand do
         }
       end
       let(:changelog) { "* old commit\n\n* new commit" }
+      let(:pull_request_body) { changelog }
       let(:pull_request_description) { 'description' }
       before do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'log', 'origin/main...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return(changelog).ordered
-        expect(cli).to receive(:ask_editor).with(changelog, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return(pull_request_description)
+        expect(cli).to receive(:ask_editor).with(pull_request_body, hash_including(footer: Gitx::Github::PULL_REQUEST_FOOTER)).and_return(pull_request_description)
 
         stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
           .with(body: { base: 'main', head: 'feature-branch', title: 'feature branch', body: pull_request_description }.to_json)
           .to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
-
-        VCR.use_cassette('pull_request_does_not_exist') do
-          cli.review 'feature-branch'
-        end
       end
       it 'creates github pull request' do
         should meet_expectations
       end
       it 'runs expected commands' do
         should meet_expectations
+      end
+      context 'when PULL_REQUEST_TEMPLATE file exists' do
+        let(:pull_request_template) do
+          "## Summary\nPut your summary here\n## Artifacts\n- list\n- your\n-artifacts"
+        end
+        let(:pull_request_body) do
+          "#{changelog}\n#{pull_request_template}\n"
+        end
+        before do
+          expect(cli).to receive(:pull_request_template).and_return(pull_request_template).twice
+
+          stub_request(:post, 'https://api.github.com/repos/wireframe/gitx/pulls')
+            .with(body: { base: 'main', head: 'feature-branch', title: 'feature branch', body: pull_request_description }.to_json)
+            .to_return(status: 201, body: new_pull_request.to_json, headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it 'creates github pull request' do
+          should meet_expectations
+        end
+        it 'runs expected commands' do
+          should meet_expectations
+        end
       end
     end
     context 'when authorization_token is missing' do
