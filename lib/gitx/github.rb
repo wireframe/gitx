@@ -17,6 +17,7 @@ module Gitx
       #
       # This footer will automatically be stripped from the pull request description
     MESSAGE
+    PULL_REQEST_TEMPLATE_FILE='.github/PULL_REQUEST_TEMPLATE.md'
 
     def find_or_create_pull_request(branch)
       pull_request = find_pull_request(branch)
@@ -82,12 +83,21 @@ module Gitx
       description_template = []
       description_template << "#{description}\n" if description
       description_template << changelog
+      description_template << "#{pull_request_template}\n" if pull_request_template
 
       ask_editor(description_template.join("\n"), editor: repo.config['core.editor'], footer: PULL_REQUEST_FOOTER)
     end
 
     def pull_request_title(branch)
       options[:title] || branch.gsub(/[-_]/, ' ')
+    end
+
+    def pull_request_template_file
+      File.expand_path(PULL_REQEST_TEMPLATE_FILE)
+    end
+
+    def pull_request_template
+      @pull_request_template ||= File.exist?(pull_request_template_file) ? File.read(pull_request_template_file) : nil
     end
 
     # authorization token used for github API calls
