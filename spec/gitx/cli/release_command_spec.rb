@@ -235,5 +235,37 @@ describe Gitx::Cli::ReleaseCommand do
         should meet_expectations
       end
     end
+    context 'when user confirms release with update_from_base_on_release config set to false' do
+      let(:gitx_config) do
+        {
+          'update_from_base_on_release' => false
+        }
+      end
+      before do
+        expect(repo).to receive(:workdir).and_return(temp_dir)
+        File.open(File.join(temp_dir, '.gitx.yml'), 'w') do |f|
+          f.puts gitx_config.to_yaml
+        end
+
+        expect(cli).to receive(:yes?).and_return(true)
+        expect(cli).to_not receive(:label_pull_request)
+        expect(executor).to_not receive(:execute).with('git', 'update')
+        allow(cli).to receive(:authorization_token).and_return(authorization_token)
+
+        expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
+        expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
+        expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
+
+        VCR.use_cassette('pull_request_does_exist_with_success_status') do
+          cli.release
+        end
+      end
+      it 'runs expected commands' do
+        should meet_expectations
+      end
+    end
   end
 end
