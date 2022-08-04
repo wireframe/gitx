@@ -17,19 +17,9 @@ module Gitx
 
         assert_not_protected_branch!(branch, 'release')
         checkout_branch(branch)
-        run_git_cmd 'update'
+        run_git_cmd 'update' if config.update_from_base_on_release?
 
-        pull_request = find_or_create_pull_request(branch)
-
-        if (label = config.release_label)
-          label_pull_request pull_request, label
-        else
-          return unless confirm_branch_status?(branch)
-          checkout_branch config.base_branch
-          run_git_cmd 'pull', 'origin', config.base_branch
-          run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, pull_request), branch
-          run_git_cmd 'push', 'origin', 'HEAD'
-        end
+        perform_release(branch)
 
         after_release
       end
@@ -48,6 +38,21 @@ module Gitx
           true
         else
           yes?("Branch status is currently: #{status}.  Proceed with release? (y/n)", :red)
+        end
+      end
+
+      def perform_release(branch)
+        pull_request = find_or_create_pull_request(branch)
+
+        if (label = config.release_label)
+          label_pull_request pull_request, label
+        else
+          return unless confirm_branch_status?(branch)
+
+          checkout_branch config.base_branch
+          run_git_cmd 'pull', 'origin', config.base_branch
+          run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, pull_request), branch
+          run_git_cmd 'push', 'origin', 'HEAD'
         end
       end
 

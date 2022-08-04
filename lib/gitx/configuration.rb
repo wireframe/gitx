@@ -45,6 +45,10 @@ module Gitx
       taggable_branches.include?(branch)
     end
 
+    def update_from_base_on_release?
+      config.fetch(:update_from_base_on_release, true)
+    end
+
     def after_release_scripts
       config[:after_release]
     end

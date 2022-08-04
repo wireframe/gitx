@@ -50,7 +50,7 @@ This setting is cleared when a reviewer approves or rejects the pull request.
 release the feature branch to the base branch (by default, main).  This operation will perform the following:
 
 * pull latest code from remote feature branch
-* pull latest code from the base branch
+* pull latest code from the base branch (unless `update_from_base_on_release` config is set to `false`)
 * prompt user to confirm they actually want to perform the release
 * check if pull request commit status is currently successful
 * merge current branch into the base branch (or add release label if configured)
