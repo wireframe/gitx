@@ -293,48 +293,16 @@ describe Gitx::Cli::ReviewCommand do
           'github.user' => 'ryan@codecrate.com'
         }
       end
-      let(:github_password) { 'secretz' }
-      let(:authorization_token) { '123981239123' }
+      let(:github_personal_access_token) { 'secretz' }
       before do
-        stub_request(:post, 'https://api.github.com/authorizations')
-          .with(basic_auth: ['ryan@codecrate.com', 'secretz'])
-          .to_return(status: 200, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
-
-        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', echo: false).and_return(github_password)
-        expect(cli).to receive(:ask).with('Github two factor authorization token (if enabled): ', echo: false).and_return(nil)
+        expect(cli).to receive(:ask).with('Github personal access token for ryan@codecrate.com: ', echo: false).and_return(github_personal_access_token)
 
         @auth_token = cli.send(:authorization_token)
       end
       it 'stores authorization_token in global config' do
-        expect(global_config).to include('token' => authorization_token)
+        expect(global_config).to include('token' => github_personal_access_token)
       end
-      it { expect(@auth_token).to eq authorization_token }
-    end
-    context 'when global authorization_token is nil and first request fails' do
-      let(:repo_config) do
-        {
-          'remote.origin.url' => 'https://github.com/wireframe/gitx',
-          'github.user' => 'ryan@codecrate.com'
-        }
-      end
-      let(:github_password) { 'secretz' }
-      let(:authorization_token) { '123981239123' }
-      before do
-        stub_request(:post, 'https://api.github.com/authorizations')
-          .with(basic_auth: ['ryan@codecrate.com', 'secretz'])
-          .to_return(status: 401, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
-          .then
-          .to_return(status: 200, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
-
-        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', echo: false).and_return(github_password).twice
-        expect(cli).to receive(:ask).with('Github two factor authorization token (if enabled): ', echo: false).and_return(nil).twice
-
-        @auth_token = cli.send(:authorization_token)
-      end
-      it 'stores authorization_token in global config' do
-        expect(global_config).to include('token' => authorization_token)
-      end
-      it { expect(@auth_token).to eq authorization_token }
+      it { expect(@auth_token).to eq github_personal_access_token }
     end
     context 'when the global config has an existing token' do
       let(:authorization_token) { '123981239123' }
@@ -354,32 +322,6 @@ describe Gitx::Cli::ReviewCommand do
           file.write(config.to_yaml)
         end
         @auth_token = cli.send(:authorization_token)
-      end
-      it { expect(@auth_token).to eq authorization_token }
-    end
-    context 'when two factor authorization token given' do
-      let(:repo_config) do
-        {
-          'remote.origin.url' => 'https://github.com/wireframe/gitx',
-          'github.user' => 'ryan@codecrate.com'
-        }
-      end
-      let(:github_password) { 'secretz' }
-      let(:authorization_token) { '123981239123' }
-      let(:two_factor_auth_token) { '456456' }
-      before do
-        stub_request(:post, 'https://api.github.com/authorizations')
-          .with(basic_auth: ['ryan@codecrate.com', 'secretz'])
-          .with(headers: { 'X-GitHub-OTP' => two_factor_auth_token })
-          .to_return(status: 200, body: JSON.dump(token: authorization_token), headers: { 'Content-Type' => 'application/json' })
-
-        expect(cli).to receive(:ask).with('Github password for ryan@codecrate.com: ', echo: false).and_return(github_password)
-        expect(cli).to receive(:ask).with('Github two factor authorization token (if enabled): ', echo: false).and_return(two_factor_auth_token)
-
-        @auth_token = cli.send(:authorization_token)
-      end
-      it 'stores authorization_token in global config' do
-        expect(global_config).to include('token' => authorization_token)
       end
       it { expect(@auth_token).to eq authorization_token }
     end
