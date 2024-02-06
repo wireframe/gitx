@@ -29,7 +29,7 @@ module Gitx
       end
 
       def update_branch(branch, repository: 'origin')
-        run_git_cmd 'pull', repository, branch
+        run_git_cmd 'pull', repository, branch, '--no-rebase'
       rescue Gitx::Executor::ExecutionError
         raise MergeError, 'Merge conflict occurred. Please fix merge conflict and rerun the command'
       end

@@ -22,7 +22,7 @@ module Gitx
 
       def update_base_branch
         checkout_branch config.base_branch
-        run_git_cmd 'pull'
+        run_git_cmd 'pull', '--no-rebase'
         run_git_cmd 'remote', 'prune', 'origin'
       end
 
