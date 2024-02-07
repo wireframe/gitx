@@ -77,6 +77,10 @@ options:
 * `--branch` = configure the branch name related to the build tag
 * `--message` = configure the git message associated to the tag
 
+## Authentication
+
+In order to access any of the Github APIs you will need to generate [a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with `repo` scopes. You will be prompted for this token before gitx accesses the Github API. After you provide the token it will be saved in `~/.config/gitx.yml` so you don't need to provide it again.
+
 ## Configuration
 Any of the [default settings defined in the gem](lib/gitx/defaults.yml) can be overridden
 by creating a custom `.gitx.yml` file in the root directory of your project.

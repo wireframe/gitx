@@ -108,28 +108,15 @@ module Gitx
     def authorization_token
       auth_token = ENV['GITX_GITHUB_TOKEN'] || global_config['token']
       auth_token ||= begin
-        new_token = create_authorization
+        new_token = fetch_token
         save_global_config('token' => new_token)
         new_token
       end
       auth_token
     end
 
-    def create_authorization
-      password = ask_without_echo("Github password for #{username}: ")
-      client = Octokit::Client.new(login: username, password: password)
-      options = {
-        scopes: ['repo'],
-        note: github_client_name,
-        note_url: CLIENT_URL
-      }
-      two_factor_auth_token = ask_without_echo('Github two factor authorization token (if enabled): ')
-      options[:headers] = { 'X-GitHub-OTP' => two_factor_auth_token } if two_factor_auth_token
-      response = client.create_authorization(options)
-      response.token
-    rescue Octokit::ClientError => e
-      say "Error creating authorization: #{e.message}", :red
-      retry
+    def fetch_token
+      ask_without_echo("Github personal access token with repo scopes for #{username}: ")
     end
 
     def github_client_name
