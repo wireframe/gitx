@@ -42,7 +42,7 @@ describe Gitx::Cli::ReleaseCommand do
 
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to_not receive(:execute).with('git', 'checkout', 'main')
-        expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'main')
+        expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase')
         expect(executor).to_not receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch')
         expect(executor).to_not receive(:execute).with('git', 'push', 'origin', 'HEAD')
 
@@ -65,7 +65,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
@@ -95,7 +95,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('echo hello').ordered
@@ -118,7 +118,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
@@ -156,7 +156,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'log', 'origin/main...feature-branch', '--reverse', '--no-merges', '--pretty=format:* %B').and_return('2013-01-01 did some stuff').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
@@ -188,7 +188,7 @@ describe Gitx::Cli::ReleaseCommand do
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'update').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered
@@ -219,7 +219,7 @@ describe Gitx::Cli::ReleaseCommand do
         allow(cli).to receive(:authorization_token).and_return(authorization_token)
 
         expect(executor).to_not receive(:execute).with('git', 'checkout', 'main')
-        expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'main')
+        expect(executor).to_not receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase')
         expect(executor).to_not receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch')
         expect(executor).to_not receive(:execute).with('git', 'push', 'origin', 'HEAD')
 
@@ -254,7 +254,7 @@ describe Gitx::Cli::ReleaseCommand do
 
         expect(executor).to receive(:execute).with('git', 'checkout', 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'checkout', 'main').ordered
-        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main').ordered
+        expect(executor).to receive(:execute).with('git', 'pull', 'origin', 'main', '--no-rebase').ordered
         expect(executor).to receive(:execute).with('git', 'merge', '--no-ff', '--message', "[gitx] Release feature-branch to main\n\nConnected to #10", 'feature-branch').ordered
         expect(executor).to receive(:execute).with('git', 'push', 'origin', 'HEAD').ordered
         expect(executor).to receive(:execute).with('git integrate --skip-pull-request').ordered

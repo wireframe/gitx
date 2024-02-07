@@ -50,7 +50,7 @@ module Gitx
           return unless confirm_branch_status?(branch)
 
           checkout_branch config.base_branch
-          run_git_cmd 'pull', 'origin', config.base_branch
+          run_git_cmd 'pull', 'origin', config.base_branch, '--no-rebase'
           run_git_cmd 'merge', '--no-ff', '--message', commit_message(branch, pull_request), branch
           run_git_cmd 'push', 'origin', 'HEAD'
         end

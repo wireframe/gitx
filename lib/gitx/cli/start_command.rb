@@ -14,7 +14,7 @@ module Gitx
         branch_name = ask("What would you like to name your branch? (ex: #{EXAMPLE_BRANCH_NAMES.sample})") until valid_new_branch_name?(branch_name)
 
         checkout_branch config.base_branch
-        run_git_cmd 'pull'
+        run_git_cmd 'pull', '--no-rebase'
         repo.create_branch branch_name, config.base_branch
         checkout_branch branch_name
         run_git_cmd('commit', '--allow-empty', '--message', commit_message(branch_name))
